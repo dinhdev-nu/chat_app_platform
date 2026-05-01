@@ -1,6 +1,7 @@
 import React from "react"
 import type { Metadata } from 'next'
 import { Instrument_Sans, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
+import { ThemeProvider } from '@/components/theme-provider'
 import './globals.css'
 
 const instrumentSans = Instrument_Sans({
@@ -31,9 +32,11 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${instrumentSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
-        {children}
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   )

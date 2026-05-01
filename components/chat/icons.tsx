@@ -176,3 +176,27 @@ export function DisplayIcon({ size = 18, className }: IconProps) {
     </svg>
   );
 }
+
+export function SunIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="M128,40a8,8,0,0,0,8-8V8a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Zm88,88a8,8,0,0,0,8-8,88,88,0,1,0-88,88,8,8,0,0,0,0-16A72,72,0,1,1,200,120,8,8,0,0,0,216,128Zm-8-88a8,8,0,0,0-5.66,2.34l-16,16A8,8,0,0,0,180.66,66.34l16-16A8,8,0,0,0,208,40ZM51.29,51.29a8,8,0,0,0,11.31,0l16-16A8,8,0,0,0,51.29,23.94l-16,16A8,8,0,0,0,51.29,51.29ZM128,216a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V224A8,8,0,0,0,128,216Zm85.66-34.34a8,8,0,0,0-11.31,0l-16,16a8,8,0,0,0,11.31,11.31l16-16A8,8,0,0,0,213.66,181.66Zm-138.32,0a8,8,0,0,0,0,11.31l16,16a8,8,0,0,0,11.31-11.31l-16-16A8,8,0,0,0,75.34,181.66ZM40,128a8,8,0,0,0-8-8H8a8,8,0,0,0,0,16H32A8,8,0,0,0,40,128Zm194.66-45.66a8,8,0,0,0-11.31-11.31l-16,16a8,8,0,0,0,11.31,11.31ZM216,128a8,8,0,0,0,8-8v0a8,8,0,0,0-16,0v0A8,8,0,0,0,216,128Zm-216,0a8,8,0,0,0,8,8h24a8,8,0,0,0,0-16H8A8,8,0,0,0,0,128Z" />
+    </svg>
+  );
+}
+
+export function MoonIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="M245.37,126.27a104,104,0,0,1-133.64,133.64A104,104,0,1,0,245.37,126.27ZM112,208A80,80,0,1,1,208,128,80.09,80.09,0,0,1,112,208Z" />
+    </svg>
+  );
+}
+
+export function MonitorCheckIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="M208,32H48A16,16,0,0,0,32,48V176a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM208,48v96H48V48ZM48,192v16H208v-16ZM181.66,92.34l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L120.66,123.34l42.34-42.34a8,8,0,0,1,11.32,11.32Z" />
+    </svg>
+  );
+}

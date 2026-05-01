@@ -115,6 +115,45 @@
   --scrollbar-thumb-hover: rgb(var(--borderColor-secondary) / .4);
 }
 
+/* ===== Dark Mode ===== */
+.dark .chat-root {
+  --backgroundColor-selection-bg: 66 133 184;
+  --backgroundColor-primary: 25 25 25;
+  --backgroundColor-secondary: 38 38 38;
+  --backgroundColor-surface: 25 25 25;
+  --backgroundColor-surface-container: 38 38 38;
+  --backgroundColor-surface-inverse: 241 243 244;
+  --backgroundColor-state-enabled: 50 50 50;
+  --backgroundColor-state-hover: 60 60 60;
+  --backgroundColor-state-pressed: 80 80 80;
+  --backgroundColor-state-active: 48 48 48;
+  --backgroundColor-state-disabled: 38 38 38;
+  --backgroundColor-state-menu-hover: 200 200 200;
+  --backgroundColor-state-menu-active: 200 200 200;
+  --backgroundColor-top-layer: 32 32 32;
+  --backgroundColor-secondary-alt: 30 30 30;
+  --backgroundColor-design: 40 40 40;
+  --backgroundColor-placeholder: 50 50 50;
+  --backgroundColor-wash: 45 45 45;
+  --backgroundColor-surface-hover: 50 50 50;
+  --backgroundColor-surface-input: 38 38 38;
+  --backgroundColor-accent: 241 243 244;
+  --backgroundColor-dark: 15 15 15;
+  --textColor-selection-text: 220 220 220;
+  --textColor-primary: 241 243 244;
+  --textColor-secondary: 160 160 160;
+  --textColor-disabled: 100 100 100;
+  --textColor-inverse-primary: 25 25 25;
+  --textColor-inverse-secondary: 70 70 70;
+  --textColor-inverse-disabled: 50 50 50;
+  --textColor-light: 230 230 230;
+  --borderColor-primary: 241 243 244;
+  --borderColor-secondary: 200 200 200;
+  --borderColor-wash: 200 200 200;
+  --borderColor-disabled: 100 100 100;
+  --outlineColor-focus-ring: 48 48 48;
+}
+
 /* ===== Font Heading ===== */
 .chat-root .font-heading {
   font-family: Google Sans, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
@@ -324,7 +363,113 @@
   pointer-events: none;
 }
 
+/* Dark mode dot pattern */
+.dark .chat-dot-pattern-light {
+  background-image: radial-gradient(circle, rgb(80, 80, 80) 0.5px, transparent 0.5px);
+}
+
 /* ===== Search focus within ===== */
 .chat-root .search-box:focus-within {
   background-color: rgb(var(--backgroundColor-state-active) / 1);
+}
+
+/* ===== Display Toggle Button ===== */
+.chat-display-toggle-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: rgb(var(--backgroundColor-surface-container) / .5);
+  border: 1px solid rgb(var(--borderColor-secondary) / .15);
+  color: rgb(var(--textColor-primary));
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  cursor: pointer;
+  transition: background-color 200ms ease-out;
+  select: none;
+}
+
+.chat-display-toggle-btn:hover {
+  background-color: rgb(var(--backgroundColor-state-hover));
+}
+
+/* ===== Project Item ===== */
+.chat-project-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  transition: background-color 200ms ease-out;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+  border: 1px solid transparent;
+  opacity: 1;
+  transform: scale(0.985);
+}
+
+.chat-project-item:hover {
+  background-color: rgb(var(--backgroundColor-state-hover));
+}
+
+.chat-project-item-thumbnail {
+  flex-shrink: 0;
+  width: 2.5rem;
+  height: 2.5rem;
+  min-width: 2.5rem;
+  border-radius: 0.5rem;
+  background-color: rgb(31 41 55);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.chat-project-item-thumbnail--with-image {
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
+}
+
+.chat-project-item-name {
+  font-weight: 600;
+  color: rgb(var(--textColor-primary));
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chat-project-item-meta {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+  color: rgb(var(--textColor-secondary));
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chat-project-item-date {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 10px;
+}
+
+.chat-project-item-shared {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 0.5rem;
+  color: rgb(var(--textColor-secondary));
 }

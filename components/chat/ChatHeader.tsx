@@ -91,8 +91,6 @@ export default function ChatHeader() {
         <button
           type="button"
           tabIndex={0}
-          aria-expanded={false}
-          aria-haspopup="dialog"
           aria-label="Tính năng mới"
           title="Có gì mới?"
           className="
@@ -108,8 +106,6 @@ export default function ChatHeader() {
         <button
           type="button"
           tabIndex={0}
-          aria-haspopup="menu"
-          aria-expanded={false}
           className="
             cursor-pointer p-2 rounded-full select-none
             transition-colors text-[rgb(var(--textColor-primary))]
@@ -124,8 +120,6 @@ export default function ChatHeader() {
           <button
             type="button"
             tabIndex={0}
-            aria-expanded={false}
-            aria-haspopup="dialog"
             aria-label="Trình đơn tài khoản"
             className="rounded-full focus-ring"
           >

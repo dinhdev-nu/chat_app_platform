@@ -26,86 +26,31 @@ export default function ProjectItem({
     <li
       role="button"
       tabIndex={0}
-      className="flex items-center justify-between gap-3 rounded-lg p-2 transition-colors"
-      style={{
-        fontSize: "14px",
-        fontWeight: 400,
-        lineHeight: "150%",
-        borderColor: "rgb(var(--borderColor-invisible) / 0)",
-        borderWidth: "1px",
-        opacity: 1,
-        transform: "scale(0.985)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.backgroundColor = "rgb(var(--backgroundColor-state-hover))";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.backgroundColor = "transparent";
-      }}
+      className="chat-project-item"
     >
       {/* Thumbnail */}
-      <div>
-        <div
-          className="flex justify-center rounded-lg group relative opacity-100"
-          style={{
-            backgroundColor: "rgb(31 41 55)",
-            boxShadow: thumbnailUrl
-              ? "0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)"
-              : "none",
-          }}
-        >
-          <div
-            className="flex justify-center rounded-md bg-no-repeat overflow-hidden"
-            style={{
-              width: "2.5rem",
-              height: "2.5rem",
-              minWidth: "2.5rem",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundImage: thumbnailUrl
-                ? `image-set(url(${thumbnailUrl}) 1x)`
-                : "none",
-              backgroundColor: thumbnailBgColor || "rgb(31 41 55)",
-            }}
-          />
-        </div>
-      </div>
+      <div
+        className={`chat-project-item-thumbnail${thumbnailUrl ? " chat-project-item-thumbnail--with-image" : ""}`}
+        style={{
+          backgroundImage: thumbnailUrl ? `image-set(url(${thumbnailUrl}) 1x)` : "none",
+          backgroundColor: thumbnailBgColor || "rgb(31 41 55)",
+        }}
+      />
 
       {/* Info */}
       <div className="flex flex-1 flex-col justify-center">
-        <p
-          className="font-semibold"
-          style={{
-            color: "rgb(var(--textColor-primary))",
-            display: "-webkit-box",
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
+        <p className="chat-project-item-name">
           {name}
         </p>
-        <div
-          className="flex justify-between items-center"
-          style={{
-            fontSize: "13px",
-            fontWeight: 400,
-            lineHeight: "150%",
-            color: "rgb(var(--textColor-secondary))",
-            display: "-webkit-box",
-            WebkitLineClamp: 1,
-            WebkitBoxOrient: "vertical",
-            overflow: "hidden",
-          }}
-        >
-          <div className="flex items-center gap-1" style={{ fontSize: "10px" }}>
+        <div className="chat-project-item-meta">
+          <div className="chat-project-item-date">
             <span className="text-inherit">
               <DeviceIconComponent size={12} />
             </span>
             <span>{date}</span>
             {shared && (
-              <span className="flex items-center gap-1 ml-2">
-                <span style={{ color: "rgb(var(--textColor-secondary))" }}>
+              <span className="chat-project-item-shared">
+                <span>
                   <UsersIcon size={16} />
                 </span>
                 Đã chia sẻ
