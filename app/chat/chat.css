@@ -1,0 +1,330 @@
+/* ===== Chat Page Design System Variables ===== */
+.chat-root {
+  --colors-neutral-0: 255 255 255;
+  --colors-neutral-25: 242 242 242;
+  --colors-neutral-50: 250 250 250;
+  --colors-neutral-75: 235 235 235;
+  --colors-neutral-100: 229 229 229;
+  --colors-neutral-150: 207 207 207;
+  --colors-neutral-175: 176 176 176;
+  --colors-neutral-200: 166 166 166;
+  --colors-neutral-250: 171 171 171;
+  --colors-neutral-300: 157 157 157;
+  --colors-neutral-400: 117 117 117;
+  --colors-neutral-500: 111 111 111;
+  --colors-neutral-600: 64 64 64;
+  --colors-neutral-700: 53 53 53;
+  --colors-neutral-725: 58 58 58;
+  --colors-neutral-750: 48 48 48;
+  --colors-neutral-775: 42 42 42;
+  --colors-neutral-790: 37 37 37;
+  --colors-neutral-800: 38 38 38;
+  --colors-neutral-850: 30 30 30;
+  --colors-neutral-900: 25 25 25;
+  --colors-neutral-950: 20 20 20;
+  --colors-primary-600: 55 56 64;
+  --colors-primary-700: 35 39 47;
+  --colors-primary-850: 25 26 31;
+  --colors-primary-900: 21 19 21;
+  --colors-violet-50: 249 247 252;
+  --colors-violet-75: 243 240 250;
+  --colors-violet-100: 236 232 247;
+  --colors-violet-400: 156 117 255;
+  --colors-violet-500: 138 97 242;
+  --colors-violet-900: 42 39 48;
+  --colors-violet-950: 32 30 36;
+  --colors-purple-300: 197 205 255;
+  --colors-purple-400: 143 154 255;
+  --colors-purple-500: 102 94 246;
+  --colors-pink-300: 254 204 244;
+  --colors-pink-500: 255 177 238;
+  --colors-pink-700: 252 64 207;
+  --colors-emerald-50: 247 252 250;
+  --colors-emerald-75: 239 249 245;
+  --colors-emerald-100: 232 247 241;
+  --colors-emerald-300: 11 217 114;
+  --colors-emerald-350: 80 255 182;
+  --colors-emerald-400: 65 186 136;
+  --colors-emerald-500: 62 178 130;
+  --colors-emerald-900: 39 48 44;
+  --colors-emerald-950: 28 34 31;
+  --colors-orange-300: 255 199 169;
+  --colors-orange-500: 255 142 89;
+  --colors-orange-700: 255 76 13;
+  --colors-blue-300: 189 214 255;
+  --colors-blue-500: 94 155 255;
+  --colors-blue-700: 34 103 255;
+  --colors-red-400: 248 69 99;
+  --colors-red-450: 250 91 56;
+  --colors-red-500: 230 48 8;
+  --backgroundColor-selection-bg: 199 220 242;
+  --backgroundColor-primary: 241 243 244;
+  --backgroundColor-secondary: 218 220 224;
+  --backgroundColor-surface: 241 243 244;
+  --backgroundColor-surface-container: 218 220 224;
+  --backgroundColor-surface-inverse: 32 33 36;
+  --backgroundColor-transparent: 0 0 0;
+  --backgroundColor-state-enabled: 218 220 224;
+  --backgroundColor-state-hover: 218 220 224;
+  --backgroundColor-state-pressed: 155 161 167;
+  --backgroundColor-state-active: 241 243 244;
+  --backgroundColor-state-disabled: 218 220 224;
+  --backgroundColor-state-menu-hover: 22 23 24;
+  --backgroundColor-state-menu-active: 22 23 24;
+  --backgroundColor-top-layer: 255 255 255;
+  --backgroundColor-secondary-alt: 250 250 250;
+  --backgroundColor-design: 242 242 242;
+  --backgroundColor-placeholder: 229 229 229;
+  --backgroundColor-wash: 229 229 229;
+  --backgroundColor-surface-hover: 235 235 235;
+  --backgroundColor-surface-input: 242 242 242;
+  --backgroundColor-accent: 32 33 36;
+  --backgroundColor-dark: 25 25 25;
+  --backgroundColor-error: 230 48 8;
+  --backgroundColor-mobile: 255 177 238;
+  --backgroundColor-desktop: 94 155 255;
+  --textColor-selection-text: 44 44 42;
+  --textColor-primary: 32 33 36;
+  --textColor-secondary: 95 99 104;
+  --textColor-disabled: 22 23 24;
+  --textColor-inverse-primary: 241 243 244;
+  --textColor-inverse-secondary: 189 193 198;
+  --textColor-inverse-disabled: 218 220 224;
+  --textColor-accent: 96 86 240;
+  --textColor-light: 25 25 25;
+  --textColor-like: 248 69 99;
+  --textColor-mobile: 255 177 238;
+  --textColor-desktop: 94 155 255;
+  --textColor-success: 11 217 114;
+  --textColor-danger: 248 69 99;
+  --textColor-error: 250 91 56;
+  --borderColor-primary: 32 33 36;
+  --borderColor-secondary: 22 23 24;
+  --borderColor-wash: 22 23 24;
+  --borderColor-disabled: 22 23 24;
+  --borderColor-error: 250 91 56;
+  --borderColor-accent: 96 86 240;
+  --borderColor-mobile: 255 177 238;
+  --borderColor-desktop: 94 155 255;
+  --borderColor-invisible: 255 255 255;
+  --outlineColor-primary: 255 255 255;
+  --outlineColor-focus-ring: 241 243 244;
+  --gradientColorStops-secondary-alt: 53 53 53;
+  --font-sans-theme: "Google Sans";
+  --scrollbar-thumb: rgb(var(--borderColor-secondary) / .25);
+  --scrollbar-thumb-hover: rgb(var(--borderColor-secondary) / .4);
+}
+
+/* ===== Font Heading ===== */
+.chat-root .font-heading {
+  font-family: Google Sans, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+}
+@media (min-width: 768px) {
+          .chat-root {
+            min-height: 100%;
+            flex-direction: row !important;
+            overflow: hidden;
+          }
+        }
+
+/* ===== Color Utilities ===== */
+.chat-root .text-primary {
+  color: rgb(var(--textColor-primary) / 1);
+}
+.chat-root .text-secondary {
+  color: rgb(var(--textColor-secondary) / 1);
+}
+.chat-root .text-disabled {
+  color: rgb(var(--textColor-disabled) / .5);
+}
+.chat-root .text-inherit {
+  color: inherit;
+}
+.chat-root .text-accent {
+  color: rgb(var(--textColor-accent) / 1);
+}
+
+/* ===== Background Utilities ===== */
+.chat-root .bg-chat-primary {
+  background-color: rgb(var(--backgroundColor-primary) / 1);
+}
+.chat-root .bg-chat-secondary {
+  background-color: rgb(var(--backgroundColor-secondary) / .5);
+}
+.chat-root .bg-surface-container {
+  background-color: rgb(var(--backgroundColor-surface-container) / .5);
+}
+.chat-root .bg-state-enabled {
+  background-color: rgb(var(--backgroundColor-state-enabled) / .575);
+}
+.chat-root .bg-state-active {
+  background-color: rgb(var(--backgroundColor-state-active) / 1);
+}
+.chat-root .bg-state-hover {
+  background-color: rgb(var(--backgroundColor-state-hover) / 1);
+}
+.chat-root .bg-state-pressed {
+  background-color: rgb(var(--backgroundColor-state-pressed) / 1);
+}
+.chat-root .bg-wash {
+  background-color: rgb(var(--backgroundColor-wash) / 1);
+}
+
+/* ===== Border Utilities ===== */
+.chat-root .border-chat-secondary {
+  border-color: rgb(var(--borderColor-secondary) / .15);
+}
+.chat-root .border-wash {
+  border-color: rgb(var(--borderColor-wash) / .1);
+}
+.chat-root .border-invisible {
+  border-color: rgb(var(--borderColor-invisible) / 0);
+}
+
+/* ===== Selection Styles ===== */
+.chat-root ::selection {
+  background-color: rgb(var(--backgroundColor-selection-bg) / .7);
+  color: rgb(var(--textColor-selection-text) / 1);
+}
+
+/* ===== Typography ===== */
+.chat-root .text-body-md {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.chat-root .text-body-sm {
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+}
+.chat-root .text-subtitle-lg {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 150%;
+}
+.chat-root .text-subtitle-md {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 150%;
+}
+.chat-root .text-subtitle-sm {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 150%;
+}
+
+/* ===== Tiptap Editor Styles ===== */
+.chat-root .create-tiptap .tiptap-editor .tiptap {
+  scrollbar-width: thin;
+  min-height: 100px;
+  max-height: calc(100vh - 500px);
+  overflow-y: auto !important;
+}
+.chat-root .tiptap-editor .tiptap {
+  -ms-overflow-style: none;
+  outline: none;
+  overflow: auto;
+}
+.chat-root .tiptap-editor .tiptap::-webkit-scrollbar {
+  display: none;
+}
+.chat-root .tiptap-editor p:first-child {
+  color: inherit;
+  margin-top: 0;
+}
+.chat-root .tiptap-editor p.is-editor-empty:first-child::before {
+  color: rgb(var(--textColor-secondary));
+  content: attr(data-placeholder);
+  float: left;
+  pointer-events: none;
+  height: 0;
+}
+
+/* ===== Hide Scrollbar ===== */
+.chat-root .hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.chat-root .hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ===== Glass Backdrop ===== */
+.chat-root .backdrop-blur-glass {
+  -webkit-backdrop-filter: blur(40px);
+  backdrop-filter: blur(40px);
+}
+
+/* ===== Focus Ring ===== */
+.chat-root .focus-ring:focus-visible {
+  outline-offset: -2px;
+  outline-width: 2px;
+  outline-color: rgb(var(--outlineColor-focus-ring) / 1);
+}
+.chat-root button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ===== Markdown Links ===== */
+.chat-root .markdown a {
+  font-weight: 500;
+  text-decoration: underline;
+}
+.chat-root .markdown a:hover {
+  color: rgb(var(--textColor-secondary) / 1);
+}
+
+/* ===== Transition Glass ===== */
+.chat-root .transition-glass {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+}
+
+/* ===== Slide-up animation ===== */
+@keyframes chat-slide-up {
+  0% {
+    transform: translateY(var(--slide-up-amount, 8px));
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.chat-root .animate-slide-up {
+  animation: 0.4s ease-out forwards chat-slide-up;
+}
+
+/* ===== Fade-in animation ===== */
+@keyframes chat-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.chat-root .animate-fade-in {
+  animation: 0.4s ease-out forwards chat-fade-in;
+}
+
+/* ===== Dot Pattern Background ===== */
+.chat-dot-pattern {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.chat-dot-pattern-light {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgb(204, 204, 204) 0.5px, transparent 0.5px);
+  background-size: 10px 10px;
+  background-position: 5px 5px;
+  pointer-events: none;
+}
+
+/* ===== Search focus within ===== */
+.chat-root .search-box:focus-within {
+  background-color: rgb(var(--backgroundColor-state-active) / 1);
+}
