@@ -11,6 +11,7 @@ import {
   ChevronDownIcon,
   LiveModeIcon,
   ArrowUpIcon,
+  ListBulletIcon,
 } from "./icons";
 
 const SUGGESTION_PROMPTS = [
@@ -19,7 +20,15 @@ const SUGGESTION_PROMPTS = [
   "A mobile scavenger hunt app for exploring a new city, with clues, a map, and a photo challenge checklist",
 ];
 
-export default function PromptInput() {
+interface PromptInputProps {
+  isProjectSidebarOpen?: boolean;
+  onToggleProjects?: () => void;
+}
+
+export default function PromptInput({
+  isProjectSidebarOpen = false,
+  onToggleProjects,
+}: PromptInputProps) {
   const [deviceMode, setDeviceMode] = useState<"app" | "web">("app");
   const [promptText, setPromptText] = useState("");
 
@@ -30,6 +39,7 @@ export default function PromptInput() {
     >
       {/* Mobile menu button */}
       <button
+        type="button"
         className="
           fixed right-2 top-16 z-20 md:hidden
           flex items-center justify-center rounded-xl
@@ -40,9 +50,14 @@ export default function PromptInput() {
           text-[rgb(var(--textColor-primary))]
         "
         aria-label="Open menu"
-        aria-expanded={false}
+        aria-expanded={isProjectSidebarOpen}
         aria-controls="recent-projects-panel"
-      />
+        onClick={onToggleProjects}
+      >
+        <span className="text-inherit">
+          <ListBulletIcon />
+        </span>
+      </button>
 
       {/* Outer wrapper */}
       <div

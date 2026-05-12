@@ -18,7 +18,7 @@ export default function ChatHeader() {
         <div role="link" tabIndex={0} className="select-none outline-none cursor-pointer">
           <img
             alt="Tên sản phẩm, Stitch (beta)"
-            className="block dark:hidden"
+            className="block dark:invert dark:opacity-90"
             src="/assets/home/ICA8c3ZnIH.svg"
           />
         </div>

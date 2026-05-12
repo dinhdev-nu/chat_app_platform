@@ -66,6 +66,30 @@ export function UsersIcon({ size = 18, className }: IconProps) {
   );
 }
 
+export function UserGroupIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+    </svg>
+  )
+}
+
+export function AchievementIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+    </svg>
+  );
+}
+
+export function PushPinIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="m640-480 80 80v80H520v240l-40 40-40-40v-240H240v-80l80-80v-280h-40v-80h400v80h-40v280Zm-286 80h252l-46-46v-314H400v314l-46 46Zm126 0Z" />
+    </svg>
+  );
+}
+
 export function SearchIcon({ size = 16, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
@@ -177,26 +201,34 @@ export function DisplayIcon({ size = 18, className }: IconProps) {
   );
 }
 
-export function SunIcon({ size = 20, className }: IconProps) {
+export function SunIcon({ size = 18, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M128,40a8,8,0,0,0,8-8V8a8,8,0,0,0-16,0V32A8,8,0,0,0,128,40Zm88,88a8,8,0,0,0,8-8,88,88,0,1,0-88,88,8,8,0,0,0,0-16A72,72,0,1,1,200,120,8,8,0,0,0,216,128Zm-8-88a8,8,0,0,0-5.66,2.34l-16,16A8,8,0,0,0,180.66,66.34l16-16A8,8,0,0,0,208,40ZM51.29,51.29a8,8,0,0,0,11.31,0l16-16A8,8,0,0,0,51.29,23.94l-16,16A8,8,0,0,0,51.29,51.29ZM128,216a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V224A8,8,0,0,0,128,216Zm85.66-34.34a8,8,0,0,0-11.31,0l-16,16a8,8,0,0,0,11.31,11.31l16-16A8,8,0,0,0,213.66,181.66Zm-138.32,0a8,8,0,0,0,0,11.31l16,16a8,8,0,0,0,11.31-11.31l-16-16A8,8,0,0,0,75.34,181.66ZM40,128a8,8,0,0,0-8-8H8a8,8,0,0,0,0,16H32A8,8,0,0,0,40,128Zm194.66-45.66a8,8,0,0,0-11.31-11.31l-16,16a8,8,0,0,0,11.31,11.31ZM216,128a8,8,0,0,0,8-8v0a8,8,0,0,0-16,0v0A8,8,0,0,0,216,128Zm-216,0a8,8,0,0,0,8,8h24a8,8,0,0,0,0-16H8A8,8,0,0,0,0,128Z" />
+      <path d="M120,40V16a8,8,0,0,1,16,0V40a8,8,0,0,1-16,0Zm72,88a64,64,0,1,1-64-64A64.07,64.07,0,0,1,192,128Zm-16,0a48,48,0,1,0-48,48A48.05,48.05,0,0,0,176,128ZM58.34,69.66A8,8,0,0,0,69.66,58.34l-16-16A8,8,0,0,0,42.34,53.66Zm0,116.68-16,16a8,8,0,0,0,11.32,11.32l16-16a8,8,0,0,0-11.32-11.32ZM192,72a8,8,0,0,0,5.66-2.34l16-16a8,8,0,0,0-11.32-11.32l-16,16A8,8,0,0,0,192,72Zm5.66,114.34a8,8,0,0,0-11.32,11.32l16,16a8,8,0,0,0,11.32-11.32ZM48,128a8,8,0,0,0-8-8H16a8,8,0,0,0,0,16H40A8,8,0,0,0,48,128Zm80,80a8,8,0,0,0-8,8v24a8,8,0,0,0,16,0V216A8,8,0,0,0,128,208Zm112-88H216a8,8,0,0,0,0,16h24a8,8,0,0,0,0-16Z" />
     </svg>
   );
 }
 
-export function MoonIcon({ size = 20, className }: IconProps) {
+export function MoonIcon({ size = 18, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M245.37,126.27a104,104,0,0,1-133.64,133.64A104,104,0,1,0,245.37,126.27ZM112,208A80,80,0,1,1,208,128,80.09,80.09,0,0,1,112,208Z" />
+      <path d="M233.54,142.23a8,8,0,0,0-8-2,88.08,88.08,0,0,1-109.8-109.8,8,8,0,0,0-10-10,104.84,104.84,0,0,0-52.91,37A104,104,0,0,0,136,224a103.09,103.09,0,0,0,62.52-20.88,104.84,104.84,0,0,0,37-52.91A8,8,0,0,0,233.54,142.23ZM188.9,190.34A88,88,0,0,1,65.66,67.11a89,89,0,0,1,31.4-26A106,106,0,0,0,96,56,104.11,104.11,0,0,0,200,160a106,106,0,0,0,14.92-1.06A89,89,0,0,1,188.9,190.34Z" />
     </svg>
   );
 }
 
-export function MonitorCheckIcon({ size = 20, className }: IconProps) {
+export function CheckIcon({ size = 16, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M208,32H48A16,16,0,0,0,32,48V176a16,16,0,0,0,16,16H208a16,16,0,0,0,16-16V48A16,16,0,0,0,208,32ZM208,48v96H48V48ZM48,192v16H208v-16ZM181.66,92.34l-48,48a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L120.66,123.34l42.34-42.34a8,8,0,0,1,11.32,11.32Z" />
+      <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" />
+    </svg>
+  );
+}
+
+export function ListBulletIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
+      <path d="M80,64a8,8,0,0,1,8-8H216a8,8,0,0,1,0,16H88A8,8,0,0,1,80,64Zm136,56H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16Zm0,64H88a8,8,0,0,0,0,16H216a8,8,0,0,0,0-16ZM44,52A12,12,0,1,0,56,64,12,12,0,0,0,44,52Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,116Zm0,64a12,12,0,1,0,12,12A12,12,0,0,0,44,180Z" />
     </svg>
   );
 }

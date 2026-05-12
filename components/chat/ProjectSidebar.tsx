@@ -1,113 +1,129 @@
 "use client";
 
 import React, { useState } from "react";
-import { GridIcon, UsersIcon, SearchIcon } from "./icons";
+import { GridIcon, UsersIcon, SearchIcon, CloseIcon, ListBulletIcon } from "./icons";
 import ProjectItem from "./ProjectItem";
 
-const PROJECT_GROUPS = [
+
+
+interface SidebarProject {
+  name: string;
+  date: string;
+  thumbnailUrl?: string;
+  thumbnailBgColor?: string;
+  deviceType: "desktop" | "mobile";
+  shared?: boolean;
+  pinned?: boolean;
+}
+
+const PROJECT_GROUPS: SidebarProject[] = [
   {
-    label: "30 ngày qua",
-    projects: [
-      {
-        name: "Adaline UI Clone",
-        date: "Apr 10, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_4.png",
-        deviceType: "desktop" as const,
-      },
-    ],
+    name: "Adaline UI Clone",
+    date: "Apr 10, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_4.png",
+    deviceType: "desktop",
   },
   {
-    label: "Năm nay",
-    projects: [
-      {
-        name: "Lumina POS Dashboard",
-        date: "Mar 22, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_5.png",
-        deviceType: "desktop" as const,
-      },
-    ],
+    name: "Lumina POS Dashboard",
+    date: "Mar 22, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_5.png",
+    deviceType: "desktop",
   },
   {
-    label: "Năm ngoái",
-    projects: [
-      {
-        name: "Màn hình Đăng nhập/Đăng ký",
-        date: "Nov 23, 2025",
-        thumbnailBgColor: "rgb(201 213 217)",
-        deviceType: "desktop" as const,
-      },
-    ],
+    name: "Màn hình Đăng nhập/Đăng ký",
+    date: "Nov 23, 2025",
+    thumbnailBgColor: "rgb(201 213 217)",
+    deviceType: "desktop",
   },
   {
-    label: "Ví dụ",
-    projects: [
-      {
-        name: "Main Dashboard",
-        date: "Mar 14, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_6.png",
-        deviceType: "mobile" as const,
-        shared: true,
-      },
-      {
-        name: "Home Lookbook",
-        date: "Mar 14, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_7.png",
-        deviceType: "mobile" as const,
-        shared: true,
-      },
-      {
-        name: "Vertical Feed",
-        date: "Mar 14, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_8.png",
-        deviceType: "mobile" as const,
-        shared: true,
-      },
-      {
-        name: "Dashboard",
-        date: "Mar 14, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_9.png",
-        deviceType: "mobile" as const,
-        shared: true,
-      },
-      {
-        name: "Fleet Admin Dashboard",
-        date: "Mar 14, 2026",
-        thumbnailUrl: "/assets/home/iVBORw0KGg_10.png",
-        deviceType: "desktop" as const,
-        shared: true,
-      },
-    ],
+    name: "Main Dashboard",
+    date: "Mar 14, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_6.png",
+    deviceType: "mobile",
+    shared: true,
+  },
+  {
+    name: "Home Lookbook",
+    date: "Mar 14, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_7.png",
+    deviceType: "mobile",
+    shared: true,
+  },
+  {
+    name: "Vertical Feed",
+    date: "Mar 14, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_8.png",
+    deviceType: "mobile",
+    shared: true,
+  },
+  {
+    name: "Dashboard",
+    date: "Mar 14, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_9.png",
+    deviceType: "mobile",
+    shared: true,
+  },
+  {
+    name: "Fleet Admin Dashboard",
+    date: "Mar 14, 2026",
+    thumbnailUrl: "/assets/home/iVBORw0KGg_10.png",
+    deviceType: "desktop",
+    shared: true,
   },
 ];
 
-export default function ProjectSidebar() {
+interface ProjectSidebarProps {
+  isMobileOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function ProjectSidebar({
+  isMobileOpen = false,
+  onClose,
+}: ProjectSidebarProps) {
   const [activeTab, setActiveTab] = useState<"mine" | "shared">("mine");
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <section
       id="recent-projects-panel"
-      className="
+      className={`
         flex flex-col gap-2 fixed inset-x-0 bottom-0 z-20 p-4
-        translate-y-full overflow-y-auto rounded-t-2xl
+        overflow-y-auto rounded-t-2xl
         transition-transform duration-300 ease-in-out
-        backdrop-blur-[40px]
-        md:static md:translate-y-0 md:z-auto md:p-3 md:gap-4
+        md:pointer-events-auto md:static md:translate-y-0 md:z-auto md:p-3 md:gap-4
         md:overflow-visible md:rounded-none md:border-t-0 md:shrink-0
         [height:calc(100vh-80px)] md:h-full
-      "
+        ${isMobileOpen ? "pointer-events-auto translate-y-0" : "pointer-events-none translate-y-full"}
+      `}
     >
-      {/* Desktop-only sidebar content */}
       <div
         className="
-          hidden md:flex flex-col flex-1 min-h-0
+          flex flex-col flex-1 min-h-0
           rounded-2xl p-3 overflow-y-auto hide-scrollbar
           bg-[rgb(var(--backgroundColor-surface-container)/.5)]
           backdrop-blur-[40px]
           border border-[rgb(var(--borderColor-secondary)/.15)]
-          w-[375px]
+          w-full md:w-[375px]
         "
       >
+        <div className="md:hidden flex items-center justify-between gap-3 pb-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-[rgb(var(--textColor-primary))]">
+            <span className="text-[rgb(var(--textColor-primary))]">
+              <ListBulletIcon />
+            </span>
+            Dự án gần đây
+          </div>
+          <button
+            type="button"
+            aria-label="Đóng menu"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"
+            onClick={onClose}
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
         <div className="hide-scrollbar flex w-full flex-1 flex-col gap-1 overflow-y-scroll pb-4">
 
           {/* Tab Toggle */}
@@ -124,15 +140,11 @@ export default function ProjectSidebar() {
               type="button"
               role="radio"
               aria-checked={activeTab === "mine"}
-              className="
+              className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
                 text-sm font-medium cursor-pointer transition-colors z-10 text-center
-              "
-              style={{
-                color: activeTab === "mine"
-                  ? "rgb(var(--textColor-primary))"
-                  : "rgb(var(--textColor-secondary))",
-              }}
+                ${activeTab === "mine" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
+              `}
               tabIndex={0}
               onClick={() => setActiveTab("mine")}
             >
@@ -143,7 +155,7 @@ export default function ProjectSidebar() {
                 <span className="text-[rgb(var(--textColor-primary))]">
                   <GridIcon />
                 </span>
-                Dự án của tôi
+                Đoạn chat của tôi
               </span>
             </button>
 
@@ -152,15 +164,11 @@ export default function ProjectSidebar() {
               type="button"
               role="radio"
               aria-checked={activeTab === "shared"}
-              className="
+              className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
                 text-sm font-medium cursor-pointer transition-colors z-10 text-center
-              "
-              style={{
-                color: activeTab === "shared"
-                  ? "rgb(var(--textColor-primary))"
-                  : "rgb(var(--textColor-secondary))",
-              }}
+                ${activeTab === "shared" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
+              `}
               tabIndex={0}
               onClick={() => setActiveTab("shared")}
             >
@@ -171,7 +179,7 @@ export default function ProjectSidebar() {
                 <span className="text-[#757575]">
                   <UsersIcon />
                 </span>
-                Được chia sẻ với tôi
+                Ban bè của tôi
               </span>
             </button>
           </div>
@@ -190,7 +198,7 @@ export default function ProjectSidebar() {
                 <SearchIcon />
               </span>
               <input
-                placeholder="Tìm kiếm dự án"
+                placeholder={activeTab === "mine" ? "Tìm kiếm đoạn chat" : "Tìm kiếm bạn bè"}
                 className="w-full bg-transparent text-sm outline-none text-[rgb(var(--textColor-primary))]"
                 type="text"
                 value={searchQuery}
@@ -200,30 +208,23 @@ export default function ProjectSidebar() {
             <div className="h-3" />
           </div>
 
-          {/* Project Groups */}
-          {PROJECT_GROUPS.map((group) => (
-            <ul key={group.label}>
-              <div className="py-4 md:py-2 text-base font-semibold leading-[150%] text-[rgb(var(--textColor-secondary))] bg-transparent">
-                {group.label}
-              </div>
-              {group.projects.map((project) => (
-                <ProjectItem
-                  key={project.name}
-                  name={project.name}
-                  date={project.date}
-                  thumbnailUrl={project.thumbnailUrl}
-                  thumbnailBgColor={project.thumbnailBgColor}
-                  deviceType={project.deviceType}
-                  shared={project.shared}
-                />
-              ))}
-            </ul>
-          ))}
+          {/* Project List */}
+          <ul>
+            {PROJECT_GROUPS.map((project) => (
+              <ProjectItem
+                key={project.name}
+                name={project.name}
+                date={project.date}
+                thumbnailUrl={project.thumbnailUrl}
+                thumbnailBgColor={project.thumbnailBgColor}
+                deviceType={project.deviceType}
+                shared={project.shared}
+              />
+            ))}
+          </ul>
         </div>
       </div>
 
-      {/* Mobile toggle placeholder */}
-      <div className="md:hidden" />
     </section>
   );
 }

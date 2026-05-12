@@ -7,9 +7,12 @@ import {
   DotPattern,
   DisplayToggle,
 } from "@/components/chat";
+import React, { useState } from "react";
 import "./chat.css";
 
 export default function ChatPageClient() {
+  const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
+
   return (
     <div
       dir="ltr"
@@ -28,10 +31,16 @@ export default function ChatPageClient() {
           {/* Main Content Area */}
           <div className="relative flex flex-1 md:overflow-hidden">
             {/* Left Sidebar */}
-            <ProjectSidebar />
+            <ProjectSidebar
+              isMobileOpen={isProjectSidebarOpen}
+              onClose={() => setIsProjectSidebarOpen(false)}
+            />
 
             {/* Center: Prompt Input */}
-            <PromptInput />
+            <PromptInput
+              isProjectSidebarOpen={isProjectSidebarOpen}
+              onToggleProjects={() => setIsProjectSidebarOpen((current) => !current)}
+            />
           </div>
 
           {/* Display Toggle */}
