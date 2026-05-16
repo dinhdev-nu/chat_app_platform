@@ -3,86 +3,42 @@
 import React, { useState } from "react";
 import { GridIcon, UsersIcon, SearchIcon, CloseIcon, ListBulletIcon } from "./icons";
 import ProjectItem from "./ProjectItem";
+import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 
-
-
-interface SidebarProject {
-  name: string;
-  date: string;
-  thumbnailUrl?: string;
-  thumbnailBgColor?: string;
-  deviceType: "desktop" | "mobile";
-  shared?: boolean;
-  pinned?: boolean;
-}
-
-const PROJECT_GROUPS: SidebarProject[] = [
-  {
-    name: "Adaline UI Clone",
-    date: "Apr 10, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_4.png",
-    deviceType: "desktop",
-  },
-  {
-    name: "Lumina POS Dashboard",
-    date: "Mar 22, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_5.png",
-    deviceType: "desktop",
-  },
-  {
-    name: "Màn hình Đăng nhập/Đăng ký",
-    date: "Nov 23, 2025",
-    thumbnailBgColor: "rgb(201 213 217)",
-    deviceType: "desktop",
-  },
-  {
-    name: "Main Dashboard",
-    date: "Mar 14, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_6.png",
-    deviceType: "mobile",
-    shared: true,
-  },
-  {
-    name: "Home Lookbook",
-    date: "Mar 14, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_7.png",
-    deviceType: "mobile",
-    shared: true,
-  },
-  {
-    name: "Vertical Feed",
-    date: "Mar 14, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_8.png",
-    deviceType: "mobile",
-    shared: true,
-  },
-  {
-    name: "Dashboard",
-    date: "Mar 14, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_9.png",
-    deviceType: "mobile",
-    shared: true,
-  },
-  {
-    name: "Fleet Admin Dashboard",
-    date: "Mar 14, 2026",
-    thumbnailUrl: "/assets/home/iVBORw0KGg_10.png",
-    deviceType: "desktop",
-    shared: true,
-  },
-];
+type SidebarFilter = "all" | "unread";
 
 interface ProjectSidebarProps {
   isMobileOpen?: boolean;
   onClose?: () => void;
+  conversations?: ConversationListItem[];
 }
 
 export default function ProjectSidebar({
   isMobileOpen = false,
   onClose,
+  conversations = MOCK_CONVERSATIONS,
 }: ProjectSidebarProps) {
-  const [activeTab, setActiveTab] = useState<"mine" | "shared">("mine");
+  const [activeTab, setActiveTab] = useState<SidebarFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const visibleConversations = [...conversations]
+    .sort((left, right) => {
+      const leftTime = left.lastActivityAt ? new Date(left.lastActivityAt).getTime() : 0;
+      const rightTime = right.lastActivityAt ? new Date(right.lastActivityAt).getTime() : 0;
+      return rightTime - leftTime;
+    })
+    .filter((conversation) => {
+      if (activeTab === "unread" && conversation.unreadCount <= 0) {
+        return false;
+      }
+
+      const query = searchQuery.trim().toLowerCase();
+      if (!query) return true;
+
+      return [conversation.name, conversation.description, conversation.lastMessageText]
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query));
+    });
 
   return (
     <section
@@ -112,7 +68,7 @@ export default function ProjectSidebar({
             <span className="text-[rgb(var(--textColor-primary))]">
               <ListBulletIcon />
             </span>
-            Dự án gần đây
+            Hội thoại gần đây
           </div>
           <button
             type="button"
@@ -139,23 +95,23 @@ export default function ProjectSidebar({
             <button
               type="button"
               role="radio"
-              aria-checked={activeTab === "mine"}
+              aria-checked={activeTab === "all"}
               className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
                 text-sm font-medium cursor-pointer transition-colors z-10 text-center
-                ${activeTab === "mine" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
+                ${activeTab === "all" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
               `}
               tabIndex={0}
-              onClick={() => setActiveTab("mine")}
+              onClick={() => setActiveTab("all")}
             >
-              {activeTab === "mine" && (
+              {activeTab === "all" && (
                 <div className="absolute inset-0 z-0 rounded-[32px] bg-[rgb(var(--backgroundColor-state-active))]" />
               )}
               <span className="relative z-10 flex items-center justify-center gap-1.5">
                 <span className="text-[rgb(var(--textColor-primary))]">
                   <GridIcon />
                 </span>
-                Đoạn chat của tôi
+                Tất cả
               </span>
             </button>
 
@@ -163,23 +119,23 @@ export default function ProjectSidebar({
             <button
               type="button"
               role="radio"
-              aria-checked={activeTab === "shared"}
+              aria-checked={activeTab === "unread"}
               className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
                 text-sm font-medium cursor-pointer transition-colors z-10 text-center
-                ${activeTab === "shared" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
+                ${activeTab === "unread" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
               `}
               tabIndex={0}
-              onClick={() => setActiveTab("shared")}
+              onClick={() => setActiveTab("unread")}
             >
-              {activeTab === "shared" && (
+              {activeTab === "unread" && (
                 <div className="absolute inset-0 z-0 rounded-[32px] bg-[rgb(var(--backgroundColor-state-active))]" />
               )}
               <span className="relative z-10 flex items-center justify-center gap-1.5">
                 <span className="text-[#757575]">
-                  <UsersIcon />
+                  <ListBulletIcon />
                 </span>
-                Ban bè của tôi
+                Chưa đọc
               </span>
             </button>
           </div>
@@ -198,7 +154,7 @@ export default function ProjectSidebar({
                 <SearchIcon />
               </span>
               <input
-                placeholder={activeTab === "mine" ? "Tìm kiếm đoạn chat" : "Tìm kiếm bạn bè"}
+                placeholder={activeTab === "all" ? "Tìm kiếm hội thoại" : "Tìm kiếm hội thoại chưa đọc"}
                 className="w-full bg-transparent text-sm outline-none text-[rgb(var(--textColor-primary))]"
                 type="text"
                 value={searchQuery}
@@ -210,15 +166,10 @@ export default function ProjectSidebar({
 
           {/* Project List */}
           <ul>
-            {PROJECT_GROUPS.map((project) => (
+            {visibleConversations.map((conversation) => (
               <ProjectItem
-                key={project.name}
-                name={project.name}
-                date={project.date}
-                thumbnailUrl={project.thumbnailUrl}
-                thumbnailBgColor={project.thumbnailBgColor}
-                deviceType={project.deviceType}
-                shared={project.shared}
+                key={conversation.id}
+                conversation={conversation}
               />
             ))}
           </ul>

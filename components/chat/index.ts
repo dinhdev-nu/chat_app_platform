@@ -4,3 +4,5 @@ export { default as ProjectItem } from "./ProjectItem";
 export { default as PromptInput } from "./PromptInput";
 export { default as DotPattern } from "./DotPattern";
 export { default as DisplayToggle } from "./DisplayToggle";
+export { MOCK_CONVERSATIONS } from "./conversation-data";
+export type { ConversationListItem } from "./conversation-data";
