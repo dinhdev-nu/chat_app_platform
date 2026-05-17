@@ -21,14 +21,12 @@ export default function SidebarList({ activeTab, conversations, contacts }: Prop
                     width: "200%",
                     transform: activeTab === "all" ? "translateX(0%)" : "translateX(-50%)",
                     transition: "transform 520ms cubic-bezier(0.16, 1, 0.3, 1)",
-                    willChange: "transform",
                 }}
             >
                 <div
                     style={{
                         width: "50%",
                         transition: "opacity 420ms cubic-bezier(0.16, 1, 0.3, 1), transform 420ms cubic-bezier(0.16, 1, 0.3, 1)",
-                        willChange: "opacity, transform",
                         opacity: activeTab === "all" ? 1 : 0.92,
                         transform: activeTab === "all" ? "translateY(0px)" : "translateY(2px)",
                     }}
@@ -45,7 +43,6 @@ export default function SidebarList({ activeTab, conversations, contacts }: Prop
                     style={{
                         width: "50%",
                         transition: "opacity 420ms cubic-bezier(0.16, 1, 0.3, 1), transform 420ms cubic-bezier(0.16, 1, 0.3, 1)",
-                        willChange: "opacity, transform",
                         opacity: activeTab === "friends" ? 1 : 0.92,
                         transform: activeTab === "friends" ? "translateY(0px)" : "translateY(2px)",
                     }}

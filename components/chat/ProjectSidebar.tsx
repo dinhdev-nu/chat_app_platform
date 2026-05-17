@@ -103,16 +103,15 @@ export default function ProjectSidebar({
       <div
         className="
           flex flex-col flex-1 min-h-0
-          rounded-2xl p-3 overflow-y-auto hide-scrollbar
-          bg-[rgb(var(--backgroundColor-surface-container)/.5)]
-          backdrop-blur-[40px]
-          border border-[rgb(var(--borderColor-secondary)/.15)]
+          rounded-3xl p-3 overflow-y-auto hide-scrollbar
+          bg-surface-container backdrop-blur-glass
+          border border-chat-secondary shadow-glass-soft
           w-full md:w-[375px]
         "
       >
         <div className="md:hidden flex items-center justify-between gap-3 pb-3">
-          <div className="flex items-center gap-2 text-base font-semibold text-[rgb(var(--textColor-primary))]">
-            <span className="text-[rgb(var(--textColor-primary))]">
+          <div className="flex items-center gap-2 text-lg font-bold text-primary">
+            <span className="text-primary">
               <UserGroupIcon />
             </span>
             Bạn bè & hội thoại
@@ -160,8 +159,8 @@ export default function ProjectSidebar({
               aria-checked={activeTab === "all"}
               className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
-                text-sm font-medium cursor-pointer transition-colors z-10 text-center
-                ${activeTab === "all" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
+                text-subtitle-sm cursor-pointer transition-colors z-10 text-center
+                ${activeTab === "all" ? "text-primary" : "text-secondary"}
               `}
               tabIndex={0}
               ref={(el) => { buttonsRef.current[0] = el; }}
@@ -181,8 +180,8 @@ export default function ProjectSidebar({
               aria-checked={activeTab === "friends"}
               className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
-                text-sm font-medium cursor-pointer transition-colors z-10 text-center
-                ${activeTab === "friends" ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}
+                text-subtitle-sm cursor-pointer transition-colors z-10 text-center
+                ${activeTab === "friends" ? "text-primary" : "text-secondary"}
               `}
               tabIndex={0}
               ref={(el) => { buttonsRef.current[1] = el; }}
@@ -212,7 +211,7 @@ export default function ProjectSidebar({
                 </span>
                 <input
                   placeholder={activeTab === "all" ? "Tìm kiếm hội thoại" : "Tìm kiếm bạn bè"}
-                  className="w-full bg-transparent text-sm outline-none text-[rgb(var(--textColor-primary))]"
+                  className="w-full bg-transparent text-body-sm outline-none text-primary"
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

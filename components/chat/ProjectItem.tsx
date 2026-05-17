@@ -37,8 +37,8 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
       className="
         flex items-center justify-between gap-3 p-2 rounded-xl
         transition-colors duration-200 ease-out
-        text-sm font-normal leading-[150%]
-        border border-transparent opacity-100 scale-[0.985]
+        text-body-sm
+        border border-transparent opacity-100 active:scale-[0.985]
         hover:bg-[rgb(var(--backgroundColor-state-hover))]
       "
     >
@@ -65,10 +65,10 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
       {/* Info */}
       <div className="flex flex-1 flex-col justify-center min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="min-w-0 flex-1 truncate font-semibold text-[rgb(var(--textColor-primary))]">
+          <p className="min-w-0 flex-1 truncate text-body-md font-bold text-primary">
             {conversation.name ?? "Không có tiêu đề"}
           </p>
-          <div className="flex shrink-0 items-center gap-2 text-[11px] text-[rgb(var(--textColor-secondary))]">
+          <div className="flex shrink-0 items-center gap-2 text-[11px] text-secondary">
             {conversation.isMuted && (
               <span
                 title="Đang tắt thông báo"
@@ -86,12 +86,12 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
           <span
             title={typeLabel}
             aria-label={typeLabel}
-            className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] px-2 py-0.5 text-[11px]"
+            className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] px-2 py-0.5 text-caption text-secondary"
           >
             <TypeIcon type={conversation.type} />
             <span className="sr-only">{typeLabel}</span>
           </span>
-          <span className="truncate">
+          <span className="truncate text-body-sm text-secondary">
             {conversation.lastMessageText ?? conversation.description ?? "Chưa có tin nhắn"}
           </span>
           {conversation.unreadCount > 0 && (

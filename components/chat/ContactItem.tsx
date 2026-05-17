@@ -5,7 +5,7 @@ import {
     ContactUserResponse,
     formatContactLastSeen,
 } from "./contact-data";
-import { UserGroupIcon } from "./icons";
+import { UserIcon } from "./icons";
 
 interface ContactItemProps {
     contact: ContactUserResponse;
@@ -22,8 +22,8 @@ export default function ContactItem({ contact }: ContactItemProps) {
             className="
         flex items-center justify-between gap-3 p-2 rounded-xl
         transition-colors duration-200 ease-out
-        text-sm font-normal leading-[150%]
-        border border-transparent opacity-100 scale-[0.985]
+        text-body-sm
+        border border-transparent opacity-100 active:scale-[0.985]
         hover:bg-[rgb(var(--backgroundColor-state-hover))]
       "
         >
@@ -48,21 +48,26 @@ export default function ContactItem({ contact }: ContactItemProps) {
 
             <div className="flex flex-1 flex-col justify-center min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                    <p className="min-w-0 flex-1 truncate font-semibold text-[rgb(var(--textColor-primary))]">
+                    <p className="min-w-0 flex-1 truncate text-body-md font-bold text-primary">
                         {contact.username}
                     </p>
-                    <span className="flex shrink-0 items-center gap-1 text-[11px] text-[rgb(var(--textColor-secondary))]">
-                        <UserGroupIcon size={14} className="text-[rgb(var(--textColor-secondary))]" />
-                        Bạn bè
-                    </span>
+                    <div className="flex shrink-0 items-center gap-2 text-[11px] text-secondary">
+                        <span>{lastSeenLabel}</span>
+                    </div>
                 </div>
 
                 <div className="mt-0.5 flex items-center gap-2 text-[12px] leading-[150%] text-[rgb(var(--textColor-secondary))]">
-                    <span className="truncate">
+                    <span
+                        title="Bạn bè"
+                        aria-label="Bạn bè"
+                        className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] px-2 py-0.5 text-caption text-secondary"
+                    >
+                        <UserIcon size={14} />
+                        <span className="sr-only">Bạn bè</span>
+                    </span>
+                    <span className="truncate text-body-sm text-secondary">
                         {contact.bio ?? "Không có mô tả"}
                     </span>
-                    <span className="shrink-0">•</span>
-                    <span className="shrink-0">{lastSeenLabel}</span>
                 </div>
             </div>
         </li>
