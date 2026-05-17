@@ -79,7 +79,7 @@ export default function PromptInput({
               "
             >
               <div
-                className="flex flex-wrap justify-center items-center gap-2 group text-xs md:text-sm [font-family:'Google_Sans',sans-serif]"
+                className="flex flex-wrap justify-center items-center gap-2 group text-xs md:text-sm font-sans"
               >
                 <div className="inline text-[rgb(var(--textColor-primary))] font-medium">
                   <p>
@@ -115,7 +115,7 @@ export default function PromptInput({
               <h1
                 className="
                   text-left font-normal leading-none
-                  [font-family:'Google_Sans',sans-serif]
+                  font-sans
                   text-[rgb(var(--textColor-primary))]
                   text-[clamp(2.25rem,5vw,72px)]
                 "

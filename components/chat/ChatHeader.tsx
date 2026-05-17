@@ -127,7 +127,7 @@ export default function ChatHeader() {
               className="
                 flex items-center justify-center rounded-full
                 text-lg font-medium select-none p-0
-                [font-family:'Google_Sans',sans-serif]
+                font-sans
                 text-white
                 bg-[rgb(var(--backgroundColor-secondary)/.5)]
                 border border-[rgb(var(--borderColor-wash)/.2)]

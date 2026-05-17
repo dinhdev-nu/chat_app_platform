@@ -16,3 +16,13 @@ Hãy tạo mock-test dữ liệu cho list conv với : type ConversationListItem
 
 	LastMessageText *string `json:"last_message_text,omitempty"`
 }. Khi triển khai đảm bảo sau này tích hợp api thật dễ triển khai tránh phức tạp. Nếu có sửa đổi giao diện thì không thay đổi style giao diện bám vào #file:chat.css  và #file:icons.tsx  hoặc "@heroicons/react": "^2.2.0", nếu cần
+
+type SearchUser struct {
+	ID             string         `json:"id"`
+	Username       string         `json:"username"`
+	AvatarURL      *string        `json:"avatar_url"`
+	Bio            *string        `json:"bio"`
+	LastSeenAt     *time.Time     `json:"last_seen_at"`
+	OutgoingStatus *ContactStatus `json:"outgoing_status,omitempty"`
+	IncomingStatus *ContactStatus `json:"incoming_status,omitempty"`
+}

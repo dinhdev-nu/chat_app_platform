@@ -235,7 +235,7 @@
 
 /* ===== Font Heading ===== */
 .chat-root .font-heading {
-  font-family: Google Sans, ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
 }
 @media (min-width: 768px) {
           .chat-root {

@@ -10,12 +10,14 @@ import {
 import React, { useState } from "react";
 import "./chat.css";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
+import type { ContactUserResponse } from "@/components/chat/contact-data";
 
 interface ChatPageClientProps {
   conversationList?: ConversationListItem[];
+  contactList?: ContactUserResponse[];
 }
 
-export default function ChatPageClient({ conversationList }: ChatPageClientProps) {
+export default function ChatPageClient({ conversationList, contactList }: ChatPageClientProps) {
   const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
 
   return (
@@ -40,6 +42,7 @@ export default function ChatPageClient({ conversationList }: ChatPageClientProps
               isMobileOpen={isProjectSidebarOpen}
               onClose={() => setIsProjectSidebarOpen(false)}
               conversations={conversationList}
+              contacts={contactList}
             />
 
             {/* Center: Prompt Input */}
