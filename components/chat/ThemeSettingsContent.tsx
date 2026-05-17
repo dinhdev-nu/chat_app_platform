@@ -1,31 +1,68 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   BackIcon,
-  ChevronDownIcon,
-  ChevronDownSmIcon,
-  EditIcon,
-  FontIcon,
-  MoonIcon,
-  SunIcon,
+  SearchIcon,
+  CloseIcon,
+  UserGroupIcon,
+  UsersIcon,
+  CheckIcon
 } from "@/components/chat/icons";
+import { MOCK_CONTACT_USERS, formatContactLastSeen } from "@/components/chat/contact-data";
 
 interface ThemeSettingsContentProps {
   onBack?: () => void;
+  initialType?: 2 | 3;
 }
 
-export default function ThemeSettingsContent({ onBack }: ThemeSettingsContentProps) {
+export default function ThemeSettingsContent({ onBack, initialType = 2 }: ThemeSettingsContentProps) {
+  const [activeTab, setActiveTab] = useState<"info" | "members">("info");
+
+  // Form State
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [type, setType] = useState<2 | 3>(initialType); // 2: Group, 3: Channel
+
+  React.useEffect(() => {
+    setType(initialType);
+  }, [initialType]);
+  const [avatarUrl, setAvatarUrl] = useState<string>("");
+  const [memberIds, setMemberIds] = useState<string[]>([]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredUsers = MOCK_CONTACT_USERS.filter((u) =>
+    u.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const toggleMember = (id: string) => {
+    setMemberIds((prev) =>
+      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+    );
+  };
+
+  const handleSave = () => {
+    const payload = {
+      name,
+      type,
+      avatar_url: avatarUrl || undefined,
+      description: description || undefined,
+      member_user_ids: memberIds,
+    };
+    console.log("Create Payload:", payload);
+    // TODO: Call API
+  };
+
   return (
-    <div className="flex flex-1 flex-col gap-2 min-h-0">
-      {/* ── Header: back + title input + edit ──────────────── */}
-      <div className="flex items-center gap-2 flex-shrink-0">
-        {/* Back button */}
+    <div className="flex flex-1 flex-col gap-2 min-h-0 text-primary">
+      {/* ── Header ──────────────── */}
+      <div className="flex items-center gap-2 flex-shrink-0 p-4 pb-0">
         <div>
           <button
             onClick={onBack}
-            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border-none bg-transparent text-primary enabled:hover:bg-state-hover enabled:active:bg-state-pressed text-subtitle-sm p-1.5 h-auto rounded-full"
+            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border-none bg-transparent text-primary hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] text-subtitle-sm p-1.5 h-auto rounded-full transition-colors"
             tabIndex={0}
-            aria-label="Back to DESIGN.md list"
-            style={{ transform: "none" }}
           >
             <span className="text-inherit">
               <BackIcon size={16} />
@@ -33,258 +70,225 @@ export default function ThemeSettingsContent({ onBack }: ThemeSettingsContentPro
           </button>
         </div>
 
-        {/* Title input */}
-        <input
-          placeholder="Untitled Design System"
-          className="flex-1 bg-transparent text-sm font-medium text-primary placeholder:text-secondary/60 outline-none border-b border-transparent focus:border-[rgb(var(--textColor-primary)/0.3)] transition-colors py-1"
-          type="text"
-          defaultValue="Hệ thống thiết kế của tôi"
-        />
-
-        {/* Edit button */}
-        <div>
-          <button
-            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border-none bg-transparent text-primary enabled:hover:bg-state-hover enabled:active:bg-state-pressed text-subtitle-sm p-1.5 h-auto rounded-full"
-            tabIndex={0}
-            aria-label="Edit name"
-            style={{ transform: "none" }}
-          >
-            <span className="text-inherit">
-              <EditIcon size={16} />
-            </span>
-          </button>
-        </div>
+        <span className="flex-1 text-sm font-medium text-primary py-1">
+          {type === 2 ? "Tạo nhóm mới" : "Tạo kênh mới"}
+        </span>
       </div>
 
-      {/* ── Tabs: Theme / DESIGN.md ────────────────────────── */}
-      <div className="flex items-center gap-6 flex-shrink-0 border-b border-divider">
-        <div className="flex flex-1">
-          <button
-            type="button"
-            className="relative flex-1 text-center px-1 pb-2.5 text-body-sm transition-colors -mb-px after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-colors text-primary font-medium after:bg-current"
-          >
-            Theme
-          </button>
-        </div>
-        <div className="flex flex-1">
-          <button
-            type="button"
-            className="relative flex-1 text-center px-1 pb-2.5 text-body-sm transition-colors -mb-px after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[3px] after:rounded-full after:transition-colors text-secondary hover:text-primary after:bg-transparent"
-          >
-            DESIGN.md
-          </button>
+      {/* ── Tabs ────────────────────────── */}
+      <div className="flex items-center gap-6 flex-shrink-0 border-b border-[rgb(var(--backgroundColor-state-enabled))] px-4">
+        <div className="flex flex-1 relative">
+          <div className="flex flex-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab("info")}
+              className={`relative flex-1 text-center px-1 pb-2.5 text-body-sm transition-colors ${activeTab === "info" ? "text-primary font-medium" : "text-secondary hover:text-primary"
+                }`}
+            >
+              Thông tin
+            </button>
+          </div>
+          <div className="flex flex-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab("members")}
+              className={`relative flex-1 text-center px-1 pb-2.5 text-body-sm transition-colors ${activeTab === "members" ? "text-primary font-medium" : "text-secondary hover:text-primary"
+                }`}
+            >
+              Thành viên ({memberIds.length})
+            </button>
+          </div>
+          {/* Sliding Indicator */}
+          <div
+            className="absolute bottom-0 left-0 w-1/2 h-[3px] rounded-full bg-[rgb(var(--textColor-primary))] transition-transform duration-300 ease-out will-change-transform"
+            style={{ transform: activeTab === "info" ? 'translateX(0)' : 'translateX(100%)' }}
+          />
         </div>
       </div>
 
       {/* ── Scrollable content ─────────────────────────────── */}
-      <div className="flex-1 grid min-h-0 -mr-4 pr-4">
+      <div className="flex-1 relative min-h-0 overflow-hidden">
+
+        {/* Info Content */}
         <div
-          className="col-start-1 row-start-1 flex flex-col gap-3 min-h-0 overflow-y-auto hide-scrollbar h-full w-full"
-          style={{ opacity: 1 }}
+          className={`absolute inset-0 flex flex-col gap-4 overflow-y-auto hide-scrollbar py-2 px-4 transition-all duration-300 ease-in-out ${activeTab === "info" ? "opacity-100 translate-x-0 z-10 pointer-events-auto" : "opacity-0 -translate-x-8 z-0 pointer-events-none"
+            }`}
         >
-          {/* Mode */}
+          {/* Type Selection */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-caption text-primary">Mode</h3>
-            <div
-              role="radiogroup"
-              className="relative flex gap-1 p-0.5 rounded-[32px] bg-surface-container backdrop-blur-[40px]"
-            >
-              {/* Light – active */}
+            <h3 className="text-xs text-secondary font-medium">Loại</h3>
+            <div role="radiogroup" className="relative flex p-0.5 rounded-[32px] bg-[rgb(var(--backgroundColor-surface-container)/.5)] backdrop-blur-[40px]">
+              {/* Sliding Background */}
+              <div
+                className="absolute top-0.5 bottom-0.5 left-0.5 w-[calc(50%-0.125rem)] rounded-[32px] bg-[rgb(var(--backgroundColor-state-active))] transition-transform duration-300 ease-out will-change-transform"
+                style={{ transform: type === 2 ? 'translateX(0)' : 'translateX(calc(100% + 0.25rem))' }}
+              />
               <button
                 type="button"
                 role="radio"
-                aria-checked={true}
-                className="relative flex-1 px-2 py-2 rounded-[32px] text-sm font-medium cursor-pointer transition-colors z-10 text-center text-primary"
-                tabIndex={0}
-                style={{ transform: "none" }}
+                aria-checked={type === 2}
+                onClick={() => setType(2)}
+                className={`relative flex-1 px-2 py-2 rounded-[32px] text-sm font-medium cursor-pointer transition-colors z-10 text-center ${type === 2 ? 'text-primary' : 'text-secondary hover:text-primary'}`}
               >
-                <div
-                  className="absolute inset-0 z-0 bg-state-active rounded-[32px]"
-                  style={{ opacity: 1 }}
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="text-primary"><UsersIcon size={18} /></span>
+                  Nhóm
+                </span>
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={type === 3}
+                onClick={() => setType(3)}
+                className={`relative flex-1 px-2 py-2 rounded-[32px] text-sm font-medium cursor-pointer transition-colors z-10 text-center ${type === 3 ? 'text-primary' : 'text-secondary hover:text-primary'}`}
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  <span className="text-primary"><UserGroupIcon size={18} /></span>
+                  Kênh
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Avatar & Name */}
+          <div className="flex flex-col gap-3">
+            <h3 className="text-xs text-secondary font-medium">Tên & Ảnh đại diện</h3>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden border border-[rgb(var(--backgroundColor-state-enabled))]">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-secondary"><UserGroupIcon size={24} /></span>
+                )}
+              </div>
+              <input
+                placeholder={type === 2 ? "Tên nhóm..." : "Tên kênh..."}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="flex-1 bg-transparent text-sm font-medium text-primary placeholder:text-[rgb(var(--textColor-secondary))] outline-none border-b border-transparent focus:border-[rgb(var(--textColor-primary)/0.3)] transition-colors py-2"
+                type="text"
+              />
+            </div>
+            {/* Optional: Input for Avatar URL */}
+            <input
+              placeholder="URL ảnh đại diện (tuỳ chọn)"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              className="w-full bg-transparent text-xs text-secondary placeholder:text-[rgb(var(--textColor-secondary))] outline-none border-b border-[rgb(var(--backgroundColor-state-enabled))] focus:border-[rgb(var(--textColor-primary)/0.3)] transition-colors py-1"
+              type="text"
+            />
+          </div>
+
+          {/* Description */}
+          <div className="flex flex-col gap-3">
+            <h3 className="text-xs text-secondary font-medium">Mô tả</h3>
+            <textarea
+              placeholder="Thêm mô tả..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full bg-[rgb(var(--backgroundColor-surface-container)/.3)] text-sm text-primary placeholder:text-[rgb(var(--textColor-secondary))] outline-none border border-[rgb(var(--backgroundColor-state-enabled))] rounded-xl p-3 min-h-[80px] resize-none focus:border-[rgb(var(--textColor-primary)/0.3)] transition-colors"
+            />
+          </div>
+        </div>
+
+        {/* Members Content */}
+        <div
+          className={`absolute inset-0 flex flex-col gap-3 overflow-y-auto hide-scrollbar py-2 px-4 transition-all duration-300 ease-in-out ${activeTab === "members" ? "opacity-100 translate-x-0 z-10 pointer-events-auto" : "opacity-0 translate-x-8 z-0 pointer-events-none"
+            }`}
+        >
+          {/* Search Bar */}
+          <div className="sticky top-0 z-10">
+            <div className="flex items-center gap-2">
+              <div
+                className="
+                  search-box flex items-center p-2.5 rounded-full
+                  transition-colors duration-200 flex-1
+                  bg-[rgb(var(--backgroundColor-state-enabled)/.575)]
+                  backdrop-blur-[12px]
+                "
+              >
+                <span className="pl-1 pr-2 text-[rgb(var(--textColor-secondary))]">
+                  <SearchIcon />
+                </span>
+                <input
+                  placeholder="Tìm kiếm người dùng..."
+                  className="w-full bg-transparent text-body-sm outline-none text-primary placeholder:text-[rgb(var(--textColor-secondary))]"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <span className="relative z-10">
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="text-primary">
-                      <SunIcon size={18} />
-                    </span>
-                    Light
-                  </span>
-                </span>
-              </button>
-
-              {/* Dark – inactive */}
-              <button
-                type="button"
-                role="radio"
-                aria-checked={false}
-                className="relative flex-1 px-2 py-2 rounded-[32px] text-sm font-medium cursor-pointer transition-colors z-10 text-center text-secondary hover:text-primary hover:bg-state-hover"
-                tabIndex={0}
-                style={{ transform: "none" }}
-              >
-                <span className="relative z-10">
-                  <span className="flex items-center justify-center gap-2">
-                    <span className="text-primary">
-                      <MoonIcon size={18} />
-                    </span>
-                    Dark
-                  </span>
-                </span>
-              </button>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery("")}
+                    className="text-secondary hover:text-primary pl-2"
+                  >
+                    <CloseIcon size={14} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Seed Color */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-caption text-primary">Seed Color</h3>
-            <div className="relative">
-              <button className="flex w-full items-center justify-between p-2 hover:bg-state-menu-hover rounded-xl transition-colors">
-                <div className="flex items-center gap-3">
+          {/* User List */}
+          <div className="flex flex-col gap-1 mt-2 pb-4">
+            {filteredUsers.length > 0 ? (
+              filteredUsers.map((user) => {
+                const isSelected = memberIds.includes(user.id);
+                return (
                   <div
-                    className="w-8 h-8 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: "rgb(25,120,229)" }}
-                  />
-                  <span className="text-body-md text-primary">#1978E5</span>
-                </div>
-                <span className="text-secondary pointer-events-none">
-                  <ChevronDownIcon size={18} />
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Color theme */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-caption text-primary">Color theme</h3>
-            <div className="relative">
-              <button
-                className="flex w-full items-center justify-between p-2 hover:bg-state-menu-hover rounded-xl transition-colors"
-                type="button"
-              >
-                <div className="flex items-center gap-3">
-                  <svg width={32} height={32} viewBox="0 0 32 32">
-                    <path d="M 0 16 A 16 16 0 0 1 32 16 L 16 16 Z" fill="#1275e2" />
-                    <path d="M 16 16 L 0 16 A 16 16 0 0 0 16 32 Z" fill="#5f78a3" />
-                    <path d="M 16 16 L 16 32 A 16 16 0 0 0 32 16 Z" fill="#c55b00" />
-                  </svg>
-                  <span className="text-body-md text-primary">Fidelity</span>
-                </div>
-                <span className="text-secondary pointer-events-none">
-                  <ChevronDownIcon size={18} />
-                </span>
-              </button>
-            </div>
-          </div>
-
-          {/* Color Palette */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-caption text-primary">Color Palette</h3>
-            <div className="flex flex-col">
-              {[
-                { label: "Primary", color: "rgb(18,117,226)" },
-                { label: "Secondary", color: "rgb(95,120,163)" },
-                { label: "Tertiary", color: "rgb(197,91,0)" },
-                { label: "Neutral", color: "rgb(116,119,127)" },
-              ].map(({ label, color }) => (
-                <div key={label} className="relative">
-                  <button className="flex w-full items-center justify-between p-2 hover:bg-state-menu-hover rounded-xl transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-8 h-8 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: color }}
-                      />
-                      <span className="text-body-md text-primary">{label}</span>
-                    </div>
-                    <span className="text-secondary pointer-events-none">
-                      <ChevronDownIcon size={18} />
-                    </span>
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Phông chữ (Typography) */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-caption text-primary">Phông chữ</h3>
-            <div className="flex flex-col">
-              {[
-                { role: "Headline" },
-                { role: "Body" },
-                { role: "Label" },
-              ].map(({ role }) => (
-                <div key={role} className="relative">
-                  <button className="flex h-12 w-full items-center justify-between hover:bg-state-menu-hover rounded-xl transition-colors px-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-secondary">
-                        <FontIcon size={18} />
-                      </span>
-                      <div className="flex flex-col items-start justify-center">
-                        <span
-                          className="h-5 flex items-center text-body-sm text-primary"
-                          style={{ fontFamily: "Inter, sans-serif" }}
-                        >
-                          Inter
-                        </span>
-                        <span className="h-4 flex items-center text-caption text-secondary">
-                          {role}
-                        </span>
+                    key={user.id}
+                    onClick={() => toggleMember(user.id)}
+                    className={`flex items-center gap-3 p-2 rounded-xl cursor-pointer transition-colors ${isSelected ? "bg-[rgb(var(--backgroundColor-state-active))]" : "hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)]"
+                      }`}
+                  >
+                    <div className="relative">
+                      <div className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0">
+                        {user.avatarUrl ? (
+                          <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[rgba(0,0,0,0.08)] dark:bg-[rgba(255,255,255,0.05)] text-primary font-medium">
+                            {user.username.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                       </div>
+                      {isSelected && (
+                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#1978E5] text-white rounded-full flex items-center justify-center border-2 border-[rgb(var(--backgroundColor-surface))]">
+                          <CheckIcon size={10} />
+                        </div>
+                      )}
                     </div>
-                    <span className="text-secondary">
-                      <ChevronDownSmIcon size={16} />
-                    </span>
-                  </button>
-                </div>
-              ))}
-            </div>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span className="text-sm font-semibold text-primary truncate">
+                        {user.username}
+                      </span>
+                      <span className="text-xs text-secondary truncate">
+                        {user.bio || "Sẵn sàng trò chuyện"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center text-sm text-secondary py-4">
+                Không tìm thấy người dùng nào
+              </div>
+            )}
           </div>
-
-          {/* Bán kính góc (Corner radius) */}
-          <div className="flex flex-col gap-3">
-            <h3 className="text-caption text-primary">Bán kính góc</h3>
-            <div className="flex gap-2">
-              {/* None */}
-              <button
-                className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border shadow-sm backdrop-blur-glass text-subtitle-md px-3 bg-state-enabled enabled:hover:bg-state-hover enabled:active:bg-state-pressed border-transparent text-secondary h-8 flex-1 rounded-xl"
-                tabIndex={0}
-              >
-                <div className="border-l-2 border-t-2 rounded-tl-md border-secondary h-4 w-4" />
-              </button>
-              {/* Small – active */}
-              <button
-                className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border shadow-sm backdrop-blur-glass text-subtitle-md px-3 enabled:hover:bg-state-hover enabled:active:bg-state-pressed border-primary bg-state-active text-primary h-8 flex-1 rounded-xl"
-                tabIndex={0}
-              >
-                <div className="border-l-2 border-t-2 rounded-tl-lg border-primary h-4 w-4" />
-              </button>
-              {/* Medium */}
-              <button
-                className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border shadow-sm backdrop-blur-glass text-subtitle-md px-3 bg-state-enabled enabled:hover:bg-state-hover enabled:active:bg-state-pressed border-transparent text-secondary h-8 flex-1 rounded-xl"
-                tabIndex={0}
-              >
-                <div className="border-l-2 border-t-2 rounded-tl-xl border-secondary h-4 w-4" />
-              </button>
-              {/* Full */}
-              <button
-                className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border shadow-sm backdrop-blur-glass text-subtitle-md px-3 bg-state-enabled enabled:hover:bg-state-hover enabled:active:bg-state-pressed border-transparent text-secondary h-8 flex-1 rounded-xl"
-                tabIndex={0}
-              >
-                <div className="border-l-2 border-t-2 rounded-tl-full border-secondary h-4 w-4" />
-              </button>
-            </div>
-          </div>
-
-        </div>{/* end scrollable */}
+        </div>
       </div>
 
-      {/* ── Footer: Save button ────────────────────────────── */}
-      <div className="flex flex-shrink-0 pt-2 border-t border-divider">
+      {/* ── Footer: Create button ────────────────────────────── */}
+      <div className="flex flex-shrink-0 pt-3 pb-4 px-4 border-t border-[rgb(var(--backgroundColor-state-enabled))]">
         <div className="flex flex-1 flex-row flex-wrap gap-2">
           <button
-            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border border-[rgb(var(--textColor-primary)/0.13)] shadow-sm enabled:hover:bg-state-hover enabled:active:bg-state-pressed backdrop-blur-glass text-subtitle-md px-3 h-8 flex-1 min-w-24 rounded-[20px] bg-state-enabled text-primary"
+            onClick={handleSave}
+            disabled={!name.trim() || memberIds.length === 0}
+            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border border-[rgb(var(--textColor-primary)/0.13)] shadow-sm enabled:hover:bg-[rgba(0,0,0,0.08)] dark:enabled:hover:bg-[rgba(255,255,255,0.05)] enabled:active:bg-[rgb(var(--backgroundColor-state-active))] disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-glass text-subtitle-md px-3 h-9 flex-1 min-w-24 rounded-[20px] bg-[rgb(var(--backgroundColor-state-enabled))] text-primary transition-colors"
             tabIndex={0}
           >
-            <span className="font-medium text-sm">Save</span>
+            <span className="font-medium text-sm">
+              {type === 2 ? "Tạo nhóm" : "Tạo kênh"}
+            </span>
           </button>
         </div>
       </div>

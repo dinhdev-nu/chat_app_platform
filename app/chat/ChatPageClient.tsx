@@ -21,6 +21,13 @@ interface ChatPageClientProps {
 export default function ChatPageClient({ conversationList, contactList }: ChatPageClientProps) {
   const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [sidebarActiveTab, setSidebarActiveTab] = useState<"all" | "friends">("all");
+
+  const openFriends = () => {
+    setIsProjectSidebarOpen(true);
+    setSidebarActiveTab("friends");
+    setIsPanelOpen(false);
+  };
 
   return (
     <div
@@ -44,6 +51,8 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
               isMobileOpen={isProjectSidebarOpen}
               onClose={() => setIsProjectSidebarOpen(false)}
               onOpenPanel={() => setIsPanelOpen(true)}
+              activeTab={sidebarActiveTab}
+              onActiveTabChange={(t) => setSidebarActiveTab(t)}
               conversations={conversationList}
               contacts={contactList}
             />
@@ -60,9 +69,9 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
         </main>
 
         {/* Panel (right side) */}
-        <Panel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
+        <Panel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} onOpenFriends={openFriends} />
 
-          {/* Toast Container */}
+        {/* Toast Container */}
         <div
           data-rht-toaster=""
           className="fixed inset-4 z-[9999] pointer-events-none md:!top-8 md:!left-9 md:!bottom-20 md:!right-20"

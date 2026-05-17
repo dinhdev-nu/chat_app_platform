@@ -6,8 +6,7 @@ import {
   formatConversationActivity,
   getConversationTypeLabel,
 } from "./conversation-data";
-import { BellSlashIcon } from "@heroicons/react/24/outline";
-import { UserIcon, ListBulletIcon, UsersIcon } from "./icons";
+import { UserIcon, ListBulletIcon, UsersIcon, BellSlashIcon } from "./icons";
 
 interface ProjectItemProps {
   conversation: ConversationListItem;
@@ -65,7 +64,7 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
       {/* Info */}
       <div className="flex flex-1 flex-col justify-center min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="min-w-0 flex-1 truncate text-body-md font-bold text-primary">
+          <p className="min-w-0 flex-1 truncate text-body-md font-bold text-primary" style={{ fontWeight: 700 }}>
             {conversation.name ?? "Không có tiêu đề"}
           </p>
           <div className="flex shrink-0 items-center gap-2 text-[11px] text-secondary">
@@ -75,7 +74,7 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
                 aria-label="Đang tắt thông báo"
                 className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[rgb(var(--backgroundColor-state-active))] text-[rgb(var(--textColor-secondary))]"
               >
-                <BellSlashIcon className="h-3.5 w-3.5" />
+                <BellSlashIcon size={14} />
               </span>
             )}
             <span>{activityLabel}</span>

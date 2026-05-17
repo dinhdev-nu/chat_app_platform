@@ -14,6 +14,8 @@ interface ProjectSidebarProps {
   onOpenPanel?: () => void;
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
+  activeTab?: SidebarFilter;
+  onActiveTabChange?: (tab: SidebarFilter) => void;
 }
 
 export default function ProjectSidebar({
@@ -22,6 +24,8 @@ export default function ProjectSidebar({
   onOpenPanel,
   conversations = MOCK_CONVERSATIONS,
   contacts = MOCK_CONTACT_USERS,
+  activeTab: activeTabProp,
+  onActiveTabChange,
 }: ProjectSidebarProps) {
   const [activeTab, setActiveTab] = useState<SidebarFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -44,6 +48,14 @@ export default function ProjectSidebar({
     const left = bRect.left - cRect.left + container.scrollLeft;
     setIndicator({ left, width: bRect.width, visible: true });
   }
+
+  // sync controlled prop -> internal state
+  useEffect(() => {
+    if (activeTabProp && activeTabProp !== activeTab) {
+      setActiveTab(activeTabProp);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTabProp]);
 
   useEffect(() => {
     measureActive();
@@ -139,7 +151,7 @@ export default function ProjectSidebar({
             {/* sliding active indicator */}
             <div
               aria-hidden
-              className={`absolute z-0 rounded-[32px] bg-[rgb(var(--backgroundColor-state-active))]`}
+              className={`absolute z-0 rounded-[32px] bg-[rgb(var(--backgroundColor-state-active))] `}
               style={
                 indicator.visible
                   ? {
@@ -159,16 +171,20 @@ export default function ProjectSidebar({
               aria-checked={activeTab === "all"}
               className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
-                text-subtitle-sm cursor-pointer transition-colors z-10 text-center
+                text-subtitle-sm font-bold cursor-pointer transition-colors z-10 text-center
                 ${activeTab === "all" ? "text-primary" : "text-secondary"}
               `}
               tabIndex={0}
               ref={(el) => { buttonsRef.current[0] = el; }}
-              onClick={() => setActiveTab("all")}
+              onClick={() => {
+                setActiveTab("all");
+                onActiveTabChange?.("all");
+              }}
+              style={{ fontWeight: 600 }}
             >
               <span className="relative z-10 flex items-center justify-center gap-1.5">
                 <span className="text-[rgb(var(--textColor-primary))]">
-                  <GridIcon />
+                  <GridIcon size={20} />
                 </span>
                 Tất cả
               </span>
@@ -180,16 +196,20 @@ export default function ProjectSidebar({
               aria-checked={activeTab === "friends"}
               className={`
                 relative flex-1 px-2 py-2 rounded-[32px]
-                text-subtitle-sm cursor-pointer transition-colors z-10 text-center
+                text-subtitle-sm font-bold cursor-pointer transition-colors z-10 text-center
                 ${activeTab === "friends" ? "text-primary" : "text-secondary"}
               `}
               tabIndex={0}
               ref={(el) => { buttonsRef.current[1] = el; }}
-              onClick={() => setActiveTab("friends")}
+              onClick={() => {
+                setActiveTab("friends");
+                onActiveTabChange?.("friends");
+              }}
+              style={{ fontWeight: 600 }}
             >
               <span className="relative z-10 flex items-center justify-center gap-1.5">
                 <span className="text-[#757575]">
-                  <UsersIcon />
+                  <UsersIcon size={20} />
                 </span>
                 Bạn bè
               </span>

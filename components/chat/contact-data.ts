@@ -4,7 +4,24 @@ export interface ContactUserResponse {
   avatarUrl?: string | null;
   bio?: string | null;
   lastSeenAt?: string | null;
+  createdAt?: string;
 };
+
+export enum ContactStatus {
+  Pending = 1,  // Chờ xác nhận
+  Accepted = 2, // Đã kết bạn
+  Blocked = 3,  // Đã chặn
+}
+
+export interface SearchUser {
+  id: string;
+  username: string;
+  avatarUrl?: string | null;
+  bio?: string | null;
+  lastSeenAt?: string | null;
+  outgoingStatus?: ContactStatus;
+  incomingStatus?: ContactStatus;
+}
 
 export const MOCK_CONTACT_USERS: ContactUserResponse[] = [
   {
