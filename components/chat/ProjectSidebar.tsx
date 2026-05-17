@@ -2,9 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { GridIcon, SearchIcon, CloseIcon, UserGroupIcon, UsersIcon, PlusIcon } from "./icons";
-import ProjectItem from "./ProjectItem";
 import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
-import ContactItem from "./ContactItem";
 import { ContactUserResponse, MOCK_CONTACT_USERS } from "./contact-data";
 import SidebarList from "./SidebarList";
 
@@ -13,6 +11,7 @@ type SidebarFilter = "all" | "friends";
 interface ProjectSidebarProps {
   isMobileOpen?: boolean;
   onClose?: () => void;
+  onOpenPanel?: () => void;
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
 }
@@ -20,6 +19,7 @@ interface ProjectSidebarProps {
 export default function ProjectSidebar({
   isMobileOpen = false,
   onClose,
+  onOpenPanel,
   conversations = MOCK_CONVERSATIONS,
   contacts = MOCK_CONTACT_USERS,
 }: ProjectSidebarProps) {
@@ -220,6 +220,7 @@ export default function ProjectSidebar({
               </div>
               <button
                 type="button"
+                onClick={onOpenPanel}
                 aria-label="Tạo hội thoại hoặc thêm contact"
                 title="Tạo hội thoại hoặc thêm contact"
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"

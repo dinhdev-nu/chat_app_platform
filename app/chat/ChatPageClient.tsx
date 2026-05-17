@@ -7,6 +7,7 @@ import {
   DotPattern,
   DisplayToggle,
 } from "@/components/chat";
+import Panel from "@/components/chat/Panel";
 import React, { useState } from "react";
 import "./chat.css";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
@@ -19,6 +20,7 @@ interface ChatPageClientProps {
 
 export default function ChatPageClient({ conversationList, contactList }: ChatPageClientProps) {
   const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(false);
 
   return (
     <div
@@ -41,6 +43,7 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
             <ProjectSidebar
               isMobileOpen={isProjectSidebarOpen}
               onClose={() => setIsProjectSidebarOpen(false)}
+              onOpenPanel={() => setIsPanelOpen(true)}
               conversations={conversationList}
               contacts={contactList}
             />
@@ -56,7 +59,10 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
           <DisplayToggle />
         </main>
 
-        {/* Toast Container */}
+        {/* Panel (right side) */}
+        <Panel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} />
+
+          {/* Toast Container */}
         <div
           data-rht-toaster=""
           className="fixed inset-4 z-[9999] pointer-events-none md:!top-8 md:!left-9 md:!bottom-20 md:!right-20"
