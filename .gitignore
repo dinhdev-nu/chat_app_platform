@@ -8,7 +8,7 @@
 /out/
 
 /template
-
+/docs 
 # production
 /build
 

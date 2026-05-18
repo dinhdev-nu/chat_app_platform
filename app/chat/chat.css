@@ -100,6 +100,7 @@
   --textColor-error: 250 91 56;
   --borderColor-primary: 32 33 36;
   --borderColor-secondary: 22 23 24;
+  --borderColor-tertiary: 95 99 104;
   --borderColor-wash: 22 23 24;
   --borderColor-disabled: 22 23 24;
   --borderColor-error: 250 91 56;
@@ -151,9 +152,9 @@
   --textColor-accent: 113 104 246;
   --borderColor-primary: 241 243 244;
   --borderColor-secondary: 218 220 224;
+  --borderColor-tertiary: 128 134 139;
   --borderColor-wash: 218 220 224;
   --borderColor-disabled: 218 220 224;
-  --borderColor-tertiary: 128 134 139;
   --borderColor-error: 230 48 8;
   --borderColor-accent: 113 104 246;
   --borderColor-invisible: 0 0 0;
@@ -164,12 +165,12 @@
   font-family: var(--font-instrument), ui-sans-serif, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
 }
 @media (min-width: 768px) {
-          .chat-root {
-            min-height: 100%;
-            flex-direction: row !important;
-            overflow: hidden;
-          }
-        }
+  .chat-root {
+    min-height: 100%;
+    flex-direction: row !important;
+    overflow: hidden;
+  }
+}
 
 /* ===== Color Utilities ===== */
 .chat-root .text-primary {
@@ -189,7 +190,7 @@
 }
 
 /* ===== Background Utilities ===== */
-.chat-root .bg-chat-primary { 
+.chat-root .bg-chat-primary {
   background-color: rgb(var(--backgroundColor-primary) / 1);
 }
 .chat-root .bg-chat-secondary {
@@ -197,6 +198,10 @@
 }
 .chat-root .bg-surface-container {
   background-color: rgb(var(--backgroundColor-surface-container) / .55);
+}
+/* bg-surface — matches modal.html's bg-surface */
+.chat-root .bg-surface {
+  background-color: rgb(var(--backgroundColor-surface) / 1);
 }
 /* Panel card — white in light, near-black in dark */
 .chat-root .bg-panel-surface {
@@ -217,9 +222,17 @@
 .chat-root .bg-wash {
   background-color: rgb(var(--backgroundColor-wash) / 1);
 }
+/* Overlay — semi-transparent black backdrop for modals */
+.chat-root .bg-overlay {
+  background-color: rgb(0 0 0 / 0.4);
+}
 
 /* ===== Border Utilities ===== */
 .chat-root .border-chat-secondary {
+  border-color: rgb(var(--borderColor-secondary) / .15);
+}
+/* border-secondary — matches modal.html's border-secondary */
+.chat-root .border-secondary {
   border-color: rgb(var(--borderColor-secondary) / .15);
 }
 .chat-root .border-wash {
@@ -235,6 +248,10 @@
 .dark .chat-root .border-divider {
   border-color: rgb(var(--borderColor-secondary) / 0.22);
 }
+/* border-tertiary/40 — info box border in modal */
+.chat-root .border-tertiary\/40 {
+  border-color: rgb(var(--borderColor-tertiary) / 0.4);
+}
 
 /* ===== Selection Styles ===== */
 .chat-root ::selection {
@@ -243,6 +260,11 @@
 }
 
 /* ===== Typography ===== */
+.chat-root .text-title-md {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 130%;
+}
 .chat-root .text-body-md {
   font-size: 14px;
   font-weight: 500;
@@ -405,4 +427,57 @@
   background-color: rgb(var(--backgroundColor-state-active) / 1);
 }
 
+/* ===== Modal Animations ===== */
+@keyframes modalFadeIn  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: perspective(500px) translateY(20px) scale(0.95); }
+  to   { opacity: 1; transform: perspective(500px) translateY(0)    scale(1);    }
+}
+@keyframes modalSlideDown {
+  from { opacity: 1; transform: perspective(500px) translateY(0)    scale(1);    }
+  to   { opacity: 0; transform: perspective(500px) translateY(20px) scale(0.95); }
+}
+@keyframes modalSpin { to { transform: rotate(360deg); } }
 
+.modal-overlay-enter { animation: modalFadeIn    0.2s ease-out                    both; }
+.modal-overlay-exit  { animation: modalFadeOut   0.2s ease-in                     both; }
+.modal-content-enter { animation: modalSlideUp   0.3s cubic-bezier(0.16,1,0.3,1) both; }
+.modal-content-exit  { animation: modalSlideDown 0.2s ease-in                     both; }
+.modal-spinner       { animation: modalSpin 0.8s linear infinite; }
+
+/* ===== Modal Input Underline Focus ===== */
+.chat-root .modal-input-underline {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid rgb(var(--textColor-primary) / 0);
+  background: transparent;
+  transition: border-color 0.15s;
+}
+.chat-root .modal-input-underline:focus {
+  outline: none;
+  border-bottom-color: rgb(var(--textColor-primary) / 0.3);
+}
+.chat-root .modal-input-underline-secondary {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 1px solid rgb(var(--backgroundColor-state-enabled));
+  background: transparent;
+  transition: border-color 0.15s;
+}
+.chat-root .modal-input-underline-secondary:focus {
+  outline: none;
+  border-bottom-color: rgb(var(--textColor-primary) / 0.3);
+}
+.chat-root .modal-textarea {
+  background: rgb(var(--backgroundColor-surface-container) / 0.3);
+  border: 1px solid rgb(var(--backgroundColor-state-enabled));
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+.chat-root .modal-textarea:focus {
+  outline: none;
+  border-color: rgb(var(--textColor-primary) / 0.3);
+}

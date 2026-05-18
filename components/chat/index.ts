@@ -5,6 +5,7 @@ export { default as ContactItem } from "./ContactItem";
 export { default as PromptInput } from "./PromptInput";
 export { default as DotPattern } from "./DotPattern";
 export { default as DisplayToggle } from "./DisplayToggle";
+export { default as ShareProjectModal } from "./ShareProjectModal";
 export { MOCK_CONVERSATIONS } from "./conversation-data";
 export type { ConversationListItem } from "./conversation-data";
 export { MOCK_CONTACT_USERS } from "./contact-data";
