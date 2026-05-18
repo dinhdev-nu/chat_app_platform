@@ -24,7 +24,7 @@ export default function ContactItem({ contact }: ContactItemProps) {
         transition-colors duration-200 ease-out
         text-body-sm
         border border-transparent opacity-100 active:scale-[0.985]
-        hover:bg-[rgb(var(--backgroundColor-state-hover))]
+        hover:bg-[rgb(var(--backgroundColor-state-hover)/0.5)]
       "
         >
             <div

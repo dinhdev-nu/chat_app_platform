@@ -10,9 +10,17 @@ type Props = {
     activeTab: "all" | "friends";
     conversations: ConversationListItem[];
     contacts: ContactUserResponse[];
+    activeConversationId?: string;
+    onSelectConversation?: (conv: ConversationListItem) => void;
 };
 
-export default function SidebarList({ activeTab, conversations, contacts }: Props) {
+export default function SidebarList({
+    activeTab,
+    conversations,
+    contacts,
+    activeConversationId,
+    onSelectConversation,
+}: Props) {
     return (
         <div className="relative w-full overflow-hidden">
             <div
@@ -34,7 +42,12 @@ export default function SidebarList({ activeTab, conversations, contacts }: Prop
                 >
                     <ul>
                         {conversations.map((conversation) => (
-                            <ProjectItem key={conversation.id} conversation={conversation} />
+                            <ProjectItem
+                                key={conversation.id}
+                                conversation={conversation}
+                                isActive={conversation.id === activeConversationId}
+                                onSelect={onSelectConversation}
+                            />
                         ))}
                     </ul>
                 </div>

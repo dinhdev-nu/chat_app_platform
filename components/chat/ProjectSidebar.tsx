@@ -12,6 +12,8 @@ interface ProjectSidebarProps {
   isMobileOpen?: boolean;
   onClose?: () => void;
   onOpenPanel?: () => void;
+  activeConversationId?: string;
+  onSelectConversation?: (conv: ConversationListItem) => void;
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
   activeTab?: SidebarFilter;
@@ -24,6 +26,8 @@ export default function ProjectSidebar({
   onOpenPanel,
   conversations = MOCK_CONVERSATIONS,
   contacts = MOCK_CONTACT_USERS,
+  activeConversationId,
+  onSelectConversation,
   activeTab: activeTabProp,
   onActiveTabChange,
 }: ProjectSidebarProps) {
@@ -254,6 +258,8 @@ export default function ProjectSidebar({
             activeTab={activeTab}
             conversations={visibleConversations}
             contacts={visibleContacts}
+            activeConversationId={activeConversationId}
+            onSelectConversation={onSelectConversation}
           />
         </div>
       </div>

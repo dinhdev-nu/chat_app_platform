@@ -3,9 +3,9 @@
 import {
   ChatHeader,
   ProjectSidebar,
-  PromptInput,
   DotPattern,
   DisplayToggle,
+  ChatMain,
 } from "@/components/chat";
 import Panel from "@/components/chat/Panel";
 import React, { useState } from "react";
@@ -22,6 +22,9 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
   const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [sidebarActiveTab, setSidebarActiveTab] = useState<"all" | "friends">("all");
+  const [activeConv, setActiveConv] = useState<ConversationListItem | undefined>(
+    conversationList && conversationList.length > 0 ? undefined : undefined
+  );
 
   const openFriends = () => {
     setIsProjectSidebarOpen(true);
@@ -55,13 +58,14 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
               onActiveTabChange={(t) => setSidebarActiveTab(t)}
               conversations={conversationList}
               contacts={contactList}
+              activeConversationId={activeConv?.id}
+              onSelectConversation={(conv) => setActiveConv(conv)}
             />
 
-            {/* Center: Prompt Input */}
-            <PromptInput
-              isProjectSidebarOpen={isProjectSidebarOpen}
-              onToggleProjects={() => setIsProjectSidebarOpen((current) => !current)}
-            />
+            {/* Center: Chat main */}
+            <div className="flex-1 overflow-hidden">
+              <ChatMain activeConv={activeConv} />
+            </div>
           </div>
 
           {/* Display Toggle */}

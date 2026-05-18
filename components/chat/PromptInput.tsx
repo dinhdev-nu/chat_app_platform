@@ -13,21 +13,27 @@ import {
   ArrowUpIcon,
   ListBulletIcon,
 } from "./icons";
+import { ConversationListItem } from "./conversation-data";
 
 const SUGGESTION_PROMPTS = [
-  "Mobile-responsive ecommerce home page for a bird watching gear store",
-  "Quiz page in a language learning app with a progress bar at the top. The title challenges you to match a Spanish word with the correct answer, offering four possible options.",
-  "A mobile scavenger hunt app for exploring a new city, with clues, a map, and a photo challenge checklist",
+  "Tôi là (tên của bạn). Rất vui được gặp bạn.",
+  "Chào ngày mới! Ngày hôm nay của bạn thế nào rồi?",
+  "Bạn có rảnh không?",
+  "Bạn có thể giúp mình một chút được không?",
+  "Mình muốn giới thiệu về bản thân — bạn có muốn nghe không?",
+  "Bạn đang làm gì đấy?",
 ];
 
 interface PromptInputProps {
   isProjectSidebarOpen?: boolean;
   onToggleProjects?: () => void;
+  conv?: ConversationListItem;
 }
 
 export default function PromptInput({
   isProjectSidebarOpen = false,
   onToggleProjects,
+  conv,
 }: PromptInputProps) {
   const [deviceMode, setDeviceMode] = useState<"app" | "web">("app");
   const [promptText, setPromptText] = useState("");
@@ -61,52 +67,12 @@ export default function PromptInput({
 
       {/* Outer wrapper */}
       <div
-        className="flex w-full shrink-0 flex-col items-center pb-16 md:pb-32 bg-transparent [height:calc(100%-3.5rem)]"
+        className="flex w-full flex-1 flex-col items-center py-8 md:py-12 bg-transparent"
       >
         <div
-          className="flex w-full flex-1 flex-col items-center justify-center px-2 md:px-4 [max-width:calc(100vw-16px)]"
+          className="flex w-full flex-col items-center px-2 md:px-4 [max-width:calc(100vw-16px)]"
         >
           <div className="w-full flex flex-col items-center gap-10 max-w-[720px]">
-
-            {/* Announcement Banner */}
-            <div
-              className="
-                flex justify-center items-center gap-2 z-10
-                mx-4 md:mx-2 px-3 md:px-2 lg:px-8 py-2
-                rounded-md self-center
-                bg-[rgb(var(--backgroundColor-wash))]
-                border border-[rgb(var(--borderColor-wash)/.1)]
-              "
-            >
-              <div
-                className="flex flex-wrap justify-center items-center gap-2 group text-xs md:text-sm font-sans"
-              >
-                <div className="inline text-[rgb(var(--textColor-primary))] font-medium">
-                  <p>
-                    <a
-                      href="https://x.com/stitchbygoogle/status/2034332847893574080"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="font-medium underline hover:text-[rgb(var(--textColor-secondary))]"
-                    >
-                      Meet the new Stitch
-                    </a>
-                  </p>
-                </div>
-              </div>
-              <button
-                className="
-                  flex items-center justify-center gap-2 rounded-lg p-1 h-6
-                  bg-transparent border-0
-                  text-[rgb(var(--textColor-primary))]
-                "
-                tabIndex={0}
-              >
-                <span className="w-4 h-4 shrink-0 text-[rgb(var(--textColor-primary))]">
-                  <CloseIcon size={16} />
-                </span>
-              </button>
-            </div>
 
             {/* Main Content */}
             <div className="w-full flex flex-col gap-6">
@@ -117,10 +83,10 @@ export default function PromptInput({
                   text-left font-normal leading-none
                   font-sans
                   text-[rgb(var(--textColor-primary))]
-                  text-[clamp(2.25rem,5vw,72px)]
+                  text-[clamp(2.25rem,6vw,4rem)] 
                 "
               >
-                Chào mừng bạn đến với Stitch..
+                {conv ? `Cùng trò chuyện với ${conv.name}` : "Hãy bắt đầu tạo một design"}
               </h1>
 
               {/* Suggestion Pills */}
@@ -360,32 +326,6 @@ export default function PromptInput({
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Design.md button */}
-              <div className="flex flex-col items-center w-full gap-3 animate-fade-in">
-                <input accept=".md,.txt,.markdown" className="hidden" type="file" />
-                <button
-                  id="start-with-design-md-trigger"
-                  className="
-                    flex items-center gap-2 px-5 py-3 rounded-full
-                    text-[14px] font-medium leading-[150%]
-                    transition-colors duration-200
-                    bg-[rgb(var(--backgroundColor-surface-container)/.5)]
-                    border border-[rgb(var(--borderColor-secondary)/.15)]
-                    text-[rgb(var(--textColor-primary))]
-                    hover:bg-[rgb(var(--backgroundColor-state-hover))]
-                    hover:border-[rgb(var(--borderColor-primary)/.3)]
-                  "
-                >
-                  <span className="shrink-0 text-[rgb(var(--textColor-accent))]">
-                    <PaletteIcon />
-                  </span>
-                  <span>Start with a DESIGN.md</span>
-                  <span className="shrink-0 ml-1 text-[rgb(var(--textColor-secondary))]">
-                    <ChevronDownIcon size={12} />
-                  </span>
-                </button>
               </div>
 
             </div>

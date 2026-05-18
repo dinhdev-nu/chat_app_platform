@@ -10,3 +10,7 @@ export { MOCK_CONVERSATIONS } from "./conversation-data";
 export type { ConversationListItem } from "./conversation-data";
 export { MOCK_CONTACT_USERS } from "./contact-data";
 export type { ContactUserResponse } from "./contact-data";
+export { default as ChatMain, ChatMainDemo } from "./ChatMain";
+export { default as ChatEmptyState } from "./ChatEmptyState";
+export { default as ChatActiveState } from "./ChatActiveState";
+export type { ChatMessage } from "./ChatActiveState";

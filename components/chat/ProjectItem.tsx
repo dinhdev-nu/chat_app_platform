@@ -10,6 +10,8 @@ import { UserIcon, ListBulletIcon, UsersIcon, BellSlashIcon } from "./icons";
 
 interface ProjectItemProps {
   conversation: ConversationListItem;
+  isActive?: boolean;
+  onSelect?: (conv: ConversationListItem) => void;
 }
 
 function TypeIcon({ type }: { type: ConversationListItem["type"] }) {
@@ -24,7 +26,7 @@ function TypeIcon({ type }: { type: ConversationListItem["type"] }) {
   return <ListBulletIcon size={14} />;
 }
 
-export default function ProjectItem({ conversation }: ProjectItemProps) {
+export default function ProjectItem({ conversation, isActive = false, onSelect }: ProjectItemProps) {
   const initials = (conversation.name ?? "").trim().slice(0, 2).toUpperCase() || "CH";
   const typeLabel = getConversationTypeLabel(conversation.type);
   const activityLabel = formatConversationActivity(conversation.lastActivityAt);
@@ -33,20 +35,27 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
     <li
       role="button"
       tabIndex={0}
-      className="
+      aria-current={isActive ? "true" : undefined}
+      onClick={() => onSelect?.(conversation)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onSelect?.(conversation);
+      }}
+      className={`
         flex items-center justify-between gap-3 p-2 rounded-xl
         transition-colors duration-200 ease-out
         text-body-sm
-        border border-transparent opacity-100 active:scale-[0.985]
-        hover:bg-[rgb(var(--backgroundColor-state-hover))]
-      "
+        border active:scale-[0.985]
+        ${isActive
+          ? "bg-[rgb(var(--backgroundColor-state-active)/0.12)] border-[rgb(var(--borderColor-secondary)/0.18)]"
+          : "border-transparent hover:bg-[rgb(var(--backgroundColor-state-hover)/0.5)]"}
+      `}
     >
       {/* Avatar */}
       <div
         className={`
           shrink-0 w-10 h-10 min-w-[2.5rem] rounded-xl
           flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
-          bg-[rgb(var(--backgroundColor-state-enabled)/.575)]
+          ${isActive ? "bg-[rgb(var(--backgroundColor-state-enabled)/.65)]" : "bg-[rgb(var(--backgroundColor-state-enabled)/.575)]"}
           border border-[rgb(var(--borderColor-secondary)/.15)]
         `}
         style={{
@@ -64,10 +73,16 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
       {/* Info */}
       <div className="flex flex-1 flex-col justify-center min-w-0">
         <div className="flex items-start justify-between gap-2">
-          <p className="min-w-0 flex-1 truncate text-body-md font-bold text-primary" style={{ fontWeight: 700 }}>
+          <p
+            className="min-w-0 flex-1 truncate text-body-md font-bold"
+            style={{
+              fontWeight: 700,
+              color: isActive ? "rgb(var(--textColor-primary))" : "rgb(var(--textColor-primary))",
+            }}
+          >
             {conversation.name ?? "Không có tiêu đề"}
           </p>
-          <div className="flex shrink-0 items-center gap-2 text-[11px] text-secondary">
+          <div className={`flex shrink-0 items-center gap-2 text-[11px] ${isActive ? "text-[rgb(var(--textColor-primary))]" : "text-secondary"}`}>
             {conversation.isMuted && (
               <span
                 title="Đang tắt thông báo"
@@ -81,16 +96,16 @@ export default function ProjectItem({ conversation }: ProjectItemProps) {
           </div>
         </div>
 
-        <div className="mt-0.5 flex items-center gap-2 text-[12px] leading-[150%] text-[rgb(var(--textColor-secondary))]">
+        <div className={`mt-0.5 flex items-center gap-2 text-[12px] leading-[150%] ${isActive ? "text-[rgb(var(--textColor-primary))]" : "text-[rgb(var(--textColor-secondary))]"}`}>
           <span
             title={typeLabel}
             aria-label={typeLabel}
-            className="inline-flex items-center gap-1 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] px-2 py-0.5 text-caption text-secondary"
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-caption ${isActive ? "bg-[rgb(var(--backgroundColor-state-enabled)/.6)] text-[rgb(var(--textColor-primary))]" : "bg-[rgb(var(--backgroundColor-state-enabled)/.4)] text-secondary"}`}
           >
             <TypeIcon type={conversation.type} />
             <span className="sr-only">{typeLabel}</span>
           </span>
-          <span className="truncate text-body-sm text-secondary">
+          <span className={`truncate text-body-sm ${isActive ? "text-[rgb(var(--textColor-primary))]" : "text-secondary"}`}>
             {conversation.lastMessageText ?? conversation.description ?? "Chưa có tin nhắn"}
           </span>
           {conversation.unreadCount > 0 && (
