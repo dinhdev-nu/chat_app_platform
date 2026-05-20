@@ -1,28 +1,18 @@
 "use client";
 
-/**
- * ChatMain — Orchestrates the 3 UI states of the chat area:
- *
- *  State 1 — <ChatEmptyState>    : No active conversation selected.
- *  State 2 — <PromptInput>       : Conv selected but has no messages (reuse the design prompt UI).
- *  State 3 — <ChatActiveState>   : Conv with existing messages + active input.
- */
-
 import React, { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 import ChatEmptyState from "./ChatEmptyState";
 import ChatActiveState, { ChatMessage } from "./ChatActiveState";
 import PromptInput from "./PromptInput";
 
-// ─── Mock message data (replace with real API/store) ─────────────────────────
-
 const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   conv_01: [
     {
       id: "m1",
-      text: "Chào bạn, mình vừa xem qua bản thiết kế 🎨",
+      text: "Chào bạn, mình vừa xem qua bản thiết kế.",
       senderId: "user_other",
       senderName: "An Bình",
       senderAvatar: "/assets/home/iVBORw0KGg_3.png",
@@ -30,7 +20,7 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
     },
     {
       id: "m2",
-      text: "Mình thấy phần header chưa đồng nhất với các section dưới.",
+      text: "Phần header chưa đồng nhất với các section bên dưới.",
       senderId: "user_other",
       senderName: "An Bình",
       senderAvatar: "/assets/home/iVBORw0KGg_3.png",
@@ -52,35 +42,35 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
       timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
     },
   ],
-  // conv_02 → no messages → State 2
 };
-
-// ─── Page transition variant ──────────────────────────────────────────────────
-
-const pageVariant = {
-  initial: { opacity: 0, y: 8 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-  },
-  exit: {
-    opacity: 0,
-    y: 6,
-    transition: { duration: 0.12, ease: "easeInOut" },
-  },
-};
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 interface ChatMainProps {
-  /** Currently active conversation. Undefined → State 1. */
   activeConv?: ConversationListItem;
 }
 
 export default function ChatMain({ activeConv }: ChatMainProps) {
-  // Local state for demo messages (replace with store/API in production)
   const [messageStore, setMessageStore] = useState<Record<string, ChatMessage[]>>(MOCK_MESSAGES);
+  const shouldReduceMotion = useReducedMotion();
+
+  const pageVariant = shouldReduceMotion
+    ? {
+      initial: { opacity: 1, y: 0 },
+      animate: { opacity: 1, y: 0, transition: { duration: 0 } },
+      exit: { opacity: 1, y: 0, transition: { duration: 0 } },
+    }
+    : {
+      initial: { opacity: 0, y: 8 },
+      animate: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
+      },
+      exit: {
+        opacity: 0,
+        y: 6,
+        transition: { duration: 0.12, ease: "easeInOut" },
+      },
+    };
 
   const handleSend = (text: string) => {
     if (!activeConv) return;
@@ -91,6 +81,7 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
       timestamp: new Date().toISOString(),
       isOwn: true,
     };
+
     setMessageStore((prev) => ({
       ...prev,
       [activeConv.id]: [...(prev[activeConv.id] ?? []), newMsg],
@@ -99,7 +90,6 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
 
   const messages = activeConv ? (messageStore[activeConv.id] ?? []) : [];
 
-  // Determine which state to render
   let stateKey: "empty" | "new" | "active";
   if (!activeConv) {
     stateKey = "empty";
@@ -147,11 +137,7 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
             animate="animate"
             exit="exit"
           >
-            <ChatActiveState
-              conv={activeConv}
-              messages={messages}
-              onSend={handleSend}
-            />
+            <ChatActiveState conv={activeConv} messages={messages} onSend={handleSend} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -159,17 +145,14 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
   );
 }
 
-// ─── Demo wrapper (used in page.tsx for testing) ──────────────────────────────
-
 export function ChatMainDemo() {
   const [activeConv, setActiveConv] = useState<ConversationListItem | undefined>(undefined);
 
   return (
     <div
       className="flex h-screen w-full bg-transparent"
-      style={{ fontFamily: "var(--font-sans-theme, 'Google Sans', sans-serif)" }}
+      style={{ fontFamily: "var(--font-sans-theme, var(--font-sans), sans-serif)" }}
     >
-      {/* Mini sidebar for demo switching */}
       <div
         className="shrink-0 flex flex-col gap-1 p-3 border-r w-52 overflow-y-auto hide-scrollbar"
         style={{ borderColor: "rgb(var(--borderColor-secondary) / 0.12)" }}
@@ -178,10 +161,7 @@ export function ChatMainDemo() {
           type="button"
           className="text-left px-3 py-2 rounded-xl text-[13px] font-medium transition-all"
           style={{
-            background:
-              activeConv === undefined
-                ? "rgb(var(--backgroundColor-state-active) / 1)"
-                : "transparent",
+            background: activeConv === undefined ? "rgb(var(--backgroundColor-state-active) / 1)" : "transparent",
             color: "rgb(var(--textColor-primary))",
           }}
           onClick={() => setActiveConv(undefined)}
@@ -194,10 +174,7 @@ export function ChatMainDemo() {
             type="button"
             className="text-left px-3 py-2 rounded-xl text-[13px] font-medium transition-all truncate"
             style={{
-              background:
-                activeConv?.id === conv.id
-                  ? "rgb(var(--backgroundColor-state-active) / 1)"
-                  : "transparent",
+              background: activeConv?.id === conv.id ? "rgb(var(--backgroundColor-state-active) / 1)" : "transparent",
               color: "rgb(var(--textColor-primary))",
             }}
             onClick={() => setActiveConv(conv)}
@@ -207,7 +184,6 @@ export function ChatMainDemo() {
         ))}
       </div>
 
-      {/* Chat main area */}
       <div className="flex-1 overflow-hidden">
         <ChatMain activeConv={activeConv} />
       </div>

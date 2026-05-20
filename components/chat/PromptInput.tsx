@@ -148,6 +148,7 @@ export default function PromptInput({
                           <div
                             contentEditable
                             role="textbox"
+                            aria-label="Mô tả ý tưởng thiết kế"
                             translate="no"
                             className="tiptap ProseMirror"
                             tabIndex={0}
@@ -187,7 +188,7 @@ export default function PromptInput({
                           <div className="m-auto">
                             <button
                               type="button"
-                              tabIndex={0}
+                              aria-label="Thêm nội dung đính kèm"
                               className="
                                 flex items-center justify-center rounded-full p-2
                                 w-9 h-9 outline-none
@@ -259,7 +260,7 @@ export default function PromptInput({
                             {/* Palette button */}
                             <button
                               type="button"
-                              tabIndex={0}
+                              aria-label="Mở bảng màu"
                               className="
                                 flex items-center justify-center rounded-full aspect-square h-9
                                 transition-colors cursor-pointer shrink-0 outline-none
@@ -273,7 +274,7 @@ export default function PromptInput({
                             {/* Model Selector */}
                             <button
                               type="button"
-                              tabIndex={0}
+                              aria-label="Chọn mô hình"
                               className="
                                 relative overflow-visible flex items-center justify-center gap-1.5
                                 px-2 py-1.5 rounded-full h-9

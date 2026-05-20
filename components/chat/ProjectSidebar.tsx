@@ -212,7 +212,7 @@ export default function ProjectSidebar({
               style={{ fontWeight: 600 }}
             >
               <span className="relative z-10 flex items-center justify-center gap-1.5">
-                <span className="text-[#757575]">
+                <span className="text-[rgb(var(--textColor-secondary))]">
                   <UsersIcon size={20} />
                 </span>
                 Bạn bè
@@ -237,6 +237,9 @@ export default function ProjectSidebar({
                   placeholder={activeTab === "all" ? "Tìm kiếm hội thoại" : "Tìm kiếm bạn bè"}
                   className="w-full bg-transparent text-body-sm outline-none text-primary"
                   type="text"
+                  name="sidebarSearch"
+                  autoComplete="off"
+                  aria-label={activeTab === "all" ? "Tìm kiếm hội thoại" : "Tìm kiếm bạn bè"}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

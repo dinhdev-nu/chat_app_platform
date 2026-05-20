@@ -86,8 +86,10 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
           <span>KHÁM PHÁ</span>
         </div>
         <button
+          type="button"
           onClick={onClose}
-          className="p-1 rounded-full hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] text-secondary transition-colors"
+          aria-label="Đóng bảng khám phá"
+          className="p-1 rounded-full hover-surface text-secondary transition-colors"
         >
           <CloseIcon size={16} />
         </button>
@@ -95,29 +97,37 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
 
       <div className="flex flex-col gap-0 px-3 pb-2">
         <button
+          type="button"
           onClick={() => { onClose?.(); /* close panel */ onOpenFriends?.(); /* open friends tab */ }}
-          className="flex items-center gap-3 p-1.5 font-medium text-sm hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] rounded-xl transition-colors"
+          aria-label="Trò chuyện với bạn bè"
+          className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
           <PlusIcon size={16} />
           Trò chuyện với bạn bè
         </button>
         <button
+          type="button"
           onClick={() => { onOpenTheme?.(2); }}
-          className="flex items-center gap-3 p-1.5 font-medium text-sm hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] rounded-xl transition-colors"
+          aria-label="Tạo nhóm mới"
+          className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
           <PlusIcon size={16} />
           Tạo nhóm mới
         </button>
         <button
+          type="button"
           onClick={() => { onOpenTheme?.(3); }}
-          className="flex items-center gap-3 p-1.5 font-medium text-sm hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] rounded-xl transition-colors"
+          aria-label="Tạo kênh mới"
+          className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
           <PlusIcon size={16} />
           Tạo kênh mới
         </button>
         <button
+          type="button"
           onClick={() => { onOpenAddFriends?.(); }}
-          className="flex items-center gap-3 p-1.5 font-medium text-sm hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] rounded-xl transition-colors"
+          aria-label="Thêm bạn bè"
+          className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
           <PlusIcon size={16} />
           Thêm bạn bè
@@ -133,7 +143,7 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
         {incomingRequests.map((contact) => (
           <div
             key={contact.id}
-            className="flex items-center gap-3 p-2 rounded-xl hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+            className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
           >
             {/* Avatar */}
             <img
@@ -156,12 +166,12 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
 
             {/* Actions */}
             <div className="flex items-center gap-1 flex-shrink-0">
-              <button className="p-1 hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors" title="Accept">
+              <button type="button" aria-label={`Chấp nhận ${contact.username}`} className="p-1 hover-surface rounded-lg transition-colors" title="Accept">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
                   <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-64-64a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
                 </svg>
               </button>
-              <button className="p-1 hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] rounded-lg transition-colors" title="Decline">
+              <button type="button" aria-label={`Từ chối ${contact.username}`} className="p-1 hover-surface rounded-lg transition-colors" title="Decline">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
                   <path d="M205.66,50.34a8,8,0,0,0-11.32,0L128,117.66,61.66,51.34a8,8,0,0,0-11.32,11.32L116.69,129l-66.35,66.34a8,8,0,0,0,11.32,11.32L128,140.34l66.34,66.35a8,8,0,0,0,11.32-11.32L139.31,129l66.35-66.34A8,8,0,0,0,205.66,50.34Z"></path>
                 </svg>

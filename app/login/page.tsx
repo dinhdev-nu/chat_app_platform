@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import AuthHero from "../../components/login/login-hero";
+import { Navigation } from "@/components/landing/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -18,5 +19,10 @@ export default function LoginPage() {
         }, 700);
     };
 
-    return <AuthHero onSubmit={handleAuthSubmit} loading={loading} />;
+    return (
+        <main className="relative min-h-screen overflow-x-hidden">
+            <Navigation hideLinks />
+            <AuthHero onSubmit={handleAuthSubmit} loading={loading} />
+        </main>
+    );
 }

@@ -6,6 +6,7 @@ import ShareProjectModal from "./ShareProjectModal";
 
 export default function ChatHeader() {
   const [isShareOpen, setIsShareOpen] = useState(false);
+
   return (
     <>
       <header
@@ -16,26 +17,18 @@ export default function ChatHeader() {
         h-14 bg-transparent border-b border-transparent
       "
       >
-        {/* Left: Logo */}
         <div className="flex w-full flex-row gap-5 items-center">
-          <div role="link" tabIndex={0} className="select-none outline-none cursor-pointer">
+          <a href="/" className="select-none cursor-pointer no-underline focus-ring rounded-md">
             <img
               alt="Tên sản phẩm, Stitch (beta)"
               className="block dark:invert dark:opacity-90"
               src="/assets/home/ICA8c3ZnIH.svg"
             />
-          </div>
+          </a>
         </div>
 
-        {/* Right: Navigation icons */}
         <div className="flex gap-1 md:gap-2 items-center shrink-0">
-
-          {/* Docs */}
-          <span
-            tabIndex={0}
-            role="link"
-            className="no-underline hidden md:flex"
-          >
+          <button type="button" aria-label="Docs" className="no-underline hidden md:flex">
             <span
               className="
               cursor-pointer p-2 rounded-full select-none
@@ -43,21 +36,22 @@ export default function ChatHeader() {
               text-[rgb(var(--textColor-primary))]
               hover:bg-[rgb(var(--backgroundColor-state-hover))]
             "
-              aria-label="Docs"
             >
-              <span className="text-inherit"><DocsIcon /></span>
+              <span className="text-inherit" aria-hidden="true">
+                <DocsIcon />
+              </span>
               <span className="font-medium text-[13px] leading-[150%] text-[rgb(var(--textColor-primary))]">
                 Docs
               </span>
             </span>
-          </span>
+          </button>
 
-          {/* Discord */}
           <a
             href="https://discord.com/invite/googlelabs"
             target="_blank"
             rel="noopener noreferrer"
             className="no-underline hidden md:flex"
+            aria-label="Discord"
           >
             <span
               className="
@@ -65,18 +59,19 @@ export default function ChatHeader() {
               transition-colors text-[rgb(var(--textColor-primary))]
               hover:bg-[rgb(var(--backgroundColor-state-hover))]
             "
-              aria-label="Discord"
             >
-              <span className="text-inherit"><DiscordIcon /></span>
+              <span className="text-inherit" aria-hidden="true">
+                <DiscordIcon />
+              </span>
             </span>
           </a>
 
-          {/* X (Twitter) */}
           <a
             href="https://x.com/stitchbygoogle"
             target="_blank"
             rel="noopener noreferrer"
             className="no-underline hidden md:flex"
+            aria-label="X"
           >
             <span
               className="
@@ -84,16 +79,15 @@ export default function ChatHeader() {
               transition-colors text-[rgb(var(--textColor-primary))]
               hover:bg-[rgb(var(--backgroundColor-state-hover))]
             "
-              aria-label="X"
             >
-              <span className="text-inherit"><XIcon /></span>
+              <span className="text-inherit" aria-hidden="true">
+                <XIcon />
+              </span>
             </span>
           </a>
 
-          {/* Gift / What's New */}
           <button
             type="button"
-            tabIndex={0}
             aria-label="Tính năng mới"
             title="Có gì mới?"
             className="
@@ -102,27 +96,29 @@ export default function ChatHeader() {
             hover:bg-[rgb(var(--backgroundColor-state-hover))]
           "
           >
-            <span className="text-inherit"><GiftIcon /></span>
+            <span className="text-inherit" aria-hidden="true">
+              <GiftIcon />
+            </span>
           </button>
 
-          {/* More menu */}
           <button
             type="button"
-            tabIndex={0}
+            aria-label="Mở thêm tùy chọn"
+            title="Thêm tùy chọn"
             className="
             cursor-pointer p-2 rounded-full select-none
             transition-colors text-[rgb(var(--textColor-primary))]
             hover:bg-[rgb(var(--backgroundColor-state-hover))]
           "
           >
-            <MoreDotsIcon />
+            <span aria-hidden="true">
+              <MoreDotsIcon />
+            </span>
           </button>
 
-          {/* Avatar */}
           <div className="relative flex">
             <button
               type="button"
-              tabIndex={0}
               aria-label="Trình đơn tài khoản"
               className="rounded-full focus-ring"
               onClick={() => setIsShareOpen(true)}
@@ -131,8 +127,7 @@ export default function ChatHeader() {
                 className="
                 flex items-center justify-center rounded-full
                 text-lg font-medium select-none p-0
-                font-sans
-                text-white
+                font-sans text-white
                 bg-[rgb(var(--backgroundColor-secondary)/.5)]
                 border border-[rgb(var(--borderColor-wash)/.2)]
                 h-8 w-8 min-w-[2rem]
@@ -147,7 +142,6 @@ export default function ChatHeader() {
               </div>
             </button>
           </div>
-
         </div>
       </header>
       <ShareProjectModal open={isShareOpen} onOpenChange={setIsShareOpen} />

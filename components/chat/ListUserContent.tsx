@@ -1,11 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  BackIcon,
-  SearchIcon,
-  CloseIcon,
-} from "@/components/chat/icons";
+import { BackIcon, SearchIcon, CloseIcon } from "@/components/chat/icons";
 import { User, Send, Check, UserPlus } from "lucide-react";
 import { SearchUser, ContactStatus } from "@/components/chat/contact-data";
 
@@ -13,7 +9,6 @@ interface ListUserContentProps {
   onBack?: () => void;
 }
 
-// Mock Search Data
 const MOCK_SEARCH_USERS: SearchUser[] = [
   {
     id: "search_01",
@@ -57,7 +52,9 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
     if (user.outgoingStatus === ContactStatus.Accepted || user.incomingStatus === ContactStatus.Accepted) {
       return (
         <button
+          type="button"
           disabled
+          aria-label="Đã là bạn bè"
           title="Bạn bè"
           className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -65,10 +62,13 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
         </button>
       );
     }
+
     if (user.outgoingStatus === ContactStatus.Pending) {
       return (
         <button
+          type="button"
           disabled
+          aria-label="Đã gửi lời mời"
           title="Đã gửi"
           className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -76,20 +76,26 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
         </button>
       );
     }
+
     if (user.incomingStatus === ContactStatus.Pending) {
       return (
         <button
+          type="button"
+          aria-label="Chấp nhận lời mời"
           title="Chấp nhận"
-          className="p-2 rounded-lg bg-[rgb(var(--backgroundColor-state-enabled)/.575)] text-primary hover:bg-[rgba(0,0,0,0.06)] dark:hover:bg-[rgba(255,255,255,0.05)] transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+          className="p-2 rounded-lg bg-[rgb(var(--backgroundColor-state-enabled)/.575)] text-primary hover-surface-soft transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
         >
           <Check size={16} />
         </button>
       );
     }
+
     return (
       <button
+        type="button"
+        aria-label="Kết bạn"
         title="Kết bạn"
-        className="p-2 rounded-lg bg-transparent text-primary border border-chat-secondary hover:bg-[rgba(0,0,0,0.06)] dark:hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+        className="p-2 rounded-lg bg-transparent text-primary border border-chat-secondary hover-surface-soft transition-colors"
       >
         <UserPlus size={16} />
       </button>
@@ -98,13 +104,13 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
 
   return (
     <div className="flex flex-1 flex-col min-h-0 text-primary">
-      {/* ── Header ──────────────── */}
       <div className="flex items-center gap-2 flex-shrink-0 mb-4 px-1 pt-1">
         <div>
           <button
+            type="button"
             onClick={onBack}
-            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border-none bg-transparent text-primary hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] text-subtitle-sm p-1.5 h-auto rounded-full transition-colors"
-            tabIndex={0}
+            aria-label="Quay lại"
+            className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border-none bg-transparent text-primary hover-surface text-subtitle-sm p-1.5 h-auto rounded-full transition-colors"
           >
             <span className="text-inherit">
               <BackIcon size={16} />
@@ -112,14 +118,10 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
           </button>
         </div>
 
-        <span className="flex-1 text-sm font-medium text-primary py-1">
-          Thêm bạn bè
-        </span>
+        <span className="flex-1 text-sm font-medium text-primary py-1">Thêm bạn bè</span>
       </div>
 
-      {/* ── Scrollable content ─────────────────────────────── */}
       <div className="flex-1 flex flex-col gap-3 min-h-0 overflow-y-auto hide-scrollbar px-1 pb-4">
-        {/* Search Bar */}
         <div className="sticky top-0 z-10 pb-2 pt-1">
           <div
             className="
@@ -136,11 +138,16 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
               placeholder="Tìm kiếm bạn bè..."
               className="w-full bg-transparent text-body-sm outline-none text-primary placeholder:text-[rgb(var(--textColor-secondary))]"
               type="text"
+              name="friendSearch"
+              autoComplete="off"
+              aria-label="Tìm kiếm bạn bè"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
             {searchQuery && (
               <button
+                type="button"
+                aria-label="Xóa từ khóa tìm kiếm"
                 onClick={() => setSearchQuery("")}
                 className="text-secondary hover:text-primary pl-2"
               >
@@ -150,13 +157,12 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
           </div>
         </div>
 
-        {/* User List */}
         <div className="flex flex-col gap-1 mt-2">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => (
               <div
                 key={user.id}
-                className="flex items-center gap-3 p-2 rounded-xl hover:bg-[rgba(0,0,0,0.08)] dark:hover:bg-[rgba(255,255,255,0.05)] transition-colors"
+                className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
               >
                 <div className="relative">
                   <div className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0">
@@ -170,16 +176,10 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
                   </div>
                 </div>
                 <div className="flex flex-col flex-1 min-w-0 pr-2">
-                  <span className="text-sm font-semibold text-primary truncate">
-                    {user.username}
-                  </span>
-                  <span className="text-xs text-secondary truncate">
-                    {user.bio || "Sẵn sàng trò chuyện"}
-                  </span>
+                  <span className="text-sm font-semibold text-primary truncate">{user.username}</span>
+                  <span className="text-xs text-secondary truncate">{user.bio || "Sẵn sàng trò chuyện"}</span>
                 </div>
-                <div className="flex-shrink-0">
-                  {renderAction(user)}
-                </div>
+                <div className="flex-shrink-0">{renderAction(user)}</div>
               </div>
             ))
           ) : (
