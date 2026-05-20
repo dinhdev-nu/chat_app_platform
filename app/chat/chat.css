@@ -218,6 +218,16 @@
 .chat-root .bg-state-hover {
   background-color: rgb(var(--backgroundColor-state-hover) / 1);
 }
+.chat-root .hover\:bg-state-hover:hover {
+  background-color: rgb(var(--backgroundColor-state-hover) / 1);
+}
+.chat-root .enabled\:hover\:bg-state-hover:enabled:hover {
+  background-color: rgb(var(--backgroundColor-state-hover) / 1);
+}
+.chat-root .active\:bg-state-pressed:active,
+.chat-root .enabled\:active\:bg-state-pressed:enabled:active {
+  background-color: rgb(var(--backgroundColor-state-pressed) / 1);
+}
 .chat-root .hover-surface:hover {
   background-color: rgb(var(--backgroundColor-state-hover) / 0.65);
 }
@@ -341,6 +351,13 @@
   display: none;
 }
 .chat-root .hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.chat-root .no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.chat-root .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }

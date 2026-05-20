@@ -22,7 +22,7 @@ export default function DisplayToggle() {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-40">
+    <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+8.75rem)] right-4 z-40 md:bottom-4">
       <button
         type="button"
         tabIndex={0}

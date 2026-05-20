@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
+import type { ReactNode } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Info, MoreHorizontal, Phone, Video } from "lucide-react";
 import { ConversationListItem } from "./conversation-data";
-import { ArrowUpIcon, PlusIcon } from "./icons";
+import ChatInput from "./ChatInput";
 
 type ChatMessageType = "user" | "system";
 
@@ -37,6 +38,8 @@ const msgVariants = {
   },
 };
 
+const MESSAGE_GROUP_WINDOW_MS = 5 * 60 * 1000;
+
 function formatTime(iso: string) {
   return new Date(iso).toLocaleTimeString("vi-VN", {
     hour: "2-digit",
@@ -46,6 +49,17 @@ function formatTime(iso: string) {
 
 function isSystemMessage(msg: ChatMessage) {
   return msg.isSystem || msg.type === "system" || msg.senderId === "system";
+}
+
+function isGroupedWithMessage(current: ChatMessage, adjacent?: ChatMessage) {
+  if (!adjacent || isSystemMessage(current) || isSystemMessage(adjacent)) return false;
+  if (adjacent.senderId !== current.senderId) return false;
+
+  const currentTime = Date.parse(current.timestamp);
+  const adjacentTime = Date.parse(adjacent.timestamp);
+  if (!Number.isFinite(currentTime) || !Number.isFinite(adjacentTime)) return false;
+
+  return Math.abs(currentTime - adjacentTime) <= MESSAGE_GROUP_WINDOW_MS;
 }
 
 function SystemMessage({
@@ -81,14 +95,17 @@ function SystemMessage({
 function MessageBubble({
   msg,
   prevMsg,
+  nextMsg,
   reduceMotion,
 }: {
   msg: ChatMessage;
   prevMsg?: ChatMessage;
+  nextMsg?: ChatMessage;
   reduceMotion?: boolean;
 }) {
   const isOwn = msg.isOwn ?? false;
-  const sameAuthorAsPrev = prevMsg && prevMsg.senderId === msg.senderId;
+  const isGroupedWithPrev = isGroupedWithMessage(msg, prevMsg);
+  const isGroupedWithNext = isGroupedWithMessage(msg, nextMsg);
 
   return (
     <motion.div
@@ -96,11 +113,11 @@ function MessageBubble({
       initial={reduceMotion ? false : "hidden"}
       animate="visible"
       className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
-      style={{ marginTop: sameAuthorAsPrev ? 2 : 10 }}
+      style={{ marginTop: isGroupedWithPrev ? 2 : 10 }}
     >
       {!isOwn && (
         <div className="shrink-0 w-7 h-7 self-end">
-          {!sameAuthorAsPrev && (
+          {!isGroupedWithNext && (
             <div
               className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
               style={{
@@ -124,7 +141,7 @@ function MessageBubble({
       )}
 
       <div className={`relative max-w-[72%] flex flex-col ${isOwn ? "items-end" : "items-start"}`}>
-        {!isOwn && !sameAuthorAsPrev && msg.senderName && (
+        {!isOwn && !isGroupedWithPrev && msg.senderName && (
           <span
             className="text-[11px] font-medium mb-0.5 px-1"
             style={{ color: "rgb(var(--textColor-secondary))" }}
@@ -158,12 +175,14 @@ function MessageBubble({
           {msg.text}
         </div>
 
-        <span
-          className="text-[10px] mt-0.5 px-1"
-          style={{ color: "rgb(var(--textColor-secondary))", opacity: 0.6 }}
-        >
-          {formatTime(msg.timestamp)}
-        </span>
+        {!isGroupedWithNext && (
+          <span
+            className="text-[10px] mt-0.5 px-1"
+            style={{ color: "rgb(var(--textColor-secondary))", opacity: 0.6 }}
+          >
+            {formatTime(msg.timestamp)}
+          </span>
+        )}
       </div>
     </motion.div>
   );
@@ -186,7 +205,7 @@ function HeaderActionButton({
   children,
 }: {
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <button
@@ -271,26 +290,12 @@ function ConvHeader({ conv }: { conv: ConversationListItem }) {
 }
 
 export default function ChatActiveState({ conv, messages, onSend }: ChatActiveStateProps) {
-  const [inputText, setInputText] = useState("");
   const shouldReduceMotion = useReducedMotion() ?? false;
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: shouldReduceMotion ? "auto" : "smooth" });
   }, [messages.length, shouldReduceMotion]);
-
-  const handleSend = () => {
-    if (!inputText.trim()) return;
-    onSend?.(inputText.trim());
-    setInputText("");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
 
   return (
     <div className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)_auto] bg-transparent overflow-hidden">
@@ -311,7 +316,13 @@ export default function ChatActiveState({ conv, messages, onSend }: ChatActiveSt
               isSystemMessage(msg) ? (
                 <SystemMessage key={msg.id} msg={msg} reduceMotion={shouldReduceMotion} />
               ) : (
-                <MessageBubble key={msg.id} msg={msg} prevMsg={messages[i - 1]} reduceMotion={shouldReduceMotion} />
+                <MessageBubble
+                  key={msg.id}
+                  msg={msg}
+                  prevMsg={messages[i - 1]}
+                  nextMsg={messages[i + 1]}
+                  reduceMotion={shouldReduceMotion}
+                />
               )
             )}
           </AnimatePresence>
@@ -321,59 +332,17 @@ export default function ChatActiveState({ conv, messages, onSend }: ChatActiveSt
       </div>
 
       <motion.div
-        className="shrink-0 px-4 pb-4 pt-2"
+        className="shrink-0 flex justify-center px-4 pb-4 pt-2"
         initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       >
-        <div
-          className="flex items-center gap-2 w-full px-3 py-2 rounded-3xl transition-all duration-200"
-          style={{
-            background: "rgb(var(--backgroundColor-surface-container) / 0.5)",
-            backdropFilter: "blur(40px)",
-            WebkitBackdropFilter: "blur(40px)",
-            border: "1px solid rgb(var(--borderColor-secondary) / 0.15)",
-            boxShadow: "0 4px 24px -4px rgb(0 0 0 / 0.10), 0 1px 6px -1px rgb(0 0 0 / 0.06)",
-          }}
-        >
-          <button
-            type="button"
-            className="flex items-center justify-center rounded-full w-9 h-9 shrink-0 transition-all duration-150 ease-out focus-ring"
-            style={{ color: "rgb(var(--textColor-primary))" }}
-            aria-label="Đính kèm"
-          >
-            <PlusIcon size={18} />
-          </button>
-
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}...`}
-            name="chatMessage"
-            autoComplete="off"
-            aria-label={conv.name ? `Nhắn tin tới ${conv.name}` : "Nhắn tin"}
-            className="flex-1 bg-transparent outline-none border-none text-body-md placeholder:text-[rgb(var(--textColor-secondary)/.6)] min-w-0"
-            style={{ color: "rgb(var(--textColor-primary))", fontFamily: "inherit" }}
-          />
-
-          <motion.button
-            type="button"
-            className="flex items-center justify-center rounded-full w-9 h-9 shrink-0 transition-all duration-150 ease-out focus-ring"
-            style={{
-              color: inputText.trim() ? "rgb(var(--textColor-primary))" : "rgb(var(--textColor-disabled) / 0.5)",
-              cursor: inputText.trim() ? "pointer" : "not-allowed",
-            }}
-            aria-label="Gửi tin nhắn"
-            aria-disabled={!inputText.trim()}
-            onClick={handleSend}
-            whileHover={!shouldReduceMotion && inputText.trim() ? { scale: 1.1 } : {}}
-            whileTap={!shouldReduceMotion && inputText.trim() ? { scale: 0.9 } : {}}
-          >
-            <ArrowUpIcon size={18} />
-          </motion.button>
-        </div>
+        <ChatInput
+          ariaLabel={conv.name ? `Nhắn tin tới ${conv.name}` : "Nhắn tin"}
+          placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}...`}
+          sendLabel="Gửi tin nhắn"
+          onSend={onSend}
+        />
       </motion.div>
     </div>
   );

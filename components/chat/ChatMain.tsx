@@ -111,7 +111,7 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
       senderId: "user_other",
       senderName: "An Bình",
       senderAvatar: "/assets/home/iVBORw0KGg_3.png",
-      timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+      timestamp: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
     },
   ],
 };

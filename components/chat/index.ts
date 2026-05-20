@@ -3,6 +3,7 @@ export { default as ProjectSidebar } from "./ProjectSidebar";
 export { default as ProjectItem } from "./ProjectItem";
 export { default as ContactItem } from "./ContactItem";
 export { default as PromptInput } from "./PromptInput";
+export { default as ChatInput } from "./ChatInput";
 export { default as DotPattern } from "./DotPattern";
 export { default as DisplayToggle } from "./DisplayToggle";
 export { default as ShareProjectModal } from "./ShareProjectModal";
