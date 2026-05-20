@@ -1,166 +1,103 @@
 "use client";
 
+import Image from "next/image";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { ForumIcon, UsersIcon, PlusIcon, SparkleIcon } from "./icons";
-
-interface ChatEmptyStateProps {
-  onNewDM?: () => void;
-  onNewGroup?: () => void;
-}
-
-const QUICK_ACTIONS = [
-  { icon: <ForumIcon size={14} />, label: "Nhắn tin mới" },
-  { icon: <UsersIcon size={14} />, label: "Tạo nhóm" },
-  { icon: <PlusIcon size={14} />, label: "Thêm bạn bè" },
-];
-
-// ease tuple typed as const to satisfy framer-motion v12 Easing type
-const EASE_SPRING = [0.16, 1, 0.3, 1] as [number, number, number, number];
 
 const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
+  initial: { opacity: 0 },
+  animate: {
     opacity: 1,
-    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
+    },
   },
 };
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: {
+const fadeUpVariants = {
+  initial: { opacity: 0, y: 16 },
+  animate: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.45, ease: EASE_SPRING },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
-export default function ChatEmptyState({ onNewDM, onNewGroup }: ChatEmptyStateProps) {
+const fadeVariants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.6 },
+  },
+};
+
+export default function IntegrationsSection() {
+  // Chỉ trigger animate sau khi client đã hydrate xong
+  // Tránh flash: SSR render visible → JS set opacity:0 → animate
+  const [isReady, setIsReady] = useState(false);
+  useEffect(() => { setIsReady(true); }, []);
+
   return (
-    <div className="relative flex flex-1 flex-col items-center justify-center w-full h-full overflow-hidden bg-transparent select-none">
-      {/* Background orbs — very subtle, direct animate props (no variants needed) */}
+    <section
+      id="integrations"
+      aria-labelledby="integrations-heading"
+      className="relative w-full h-full flex flex-col overflow-hidden"
+    >
       <motion.div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 280,
-          height: 280,
-          top: "20%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          background:
-            "radial-gradient(circle, rgb(var(--textColor-accent) / 0.06) 0%, transparent 70%)",
-          filter: "blur(40px)",
-        }}
-        animate={{ y: [0, -12, 0], opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute rounded-full pointer-events-none"
-        style={{
-          width: 180,
-          height: 180,
-          bottom: "28%",
-          right: "18%",
-          background:
-            "radial-gradient(circle, rgb(var(--colors-violet-400) / 0.05) 0%, transparent 70%)",
-          filter: "blur(32px)",
-        }}
-        animate={{ y: [0, -12, 0], opacity: [0.4, 0.7, 0.4] }}
-        transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-      />
-
-      {/* Main content */}
-      <motion.div
-        className="relative z-10 flex flex-col items-center gap-8 px-6 max-w-sm text-center"
         variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        initial="initial"
+        animate={isReady ? "animate" : "initial"}
+        className="flex flex-col items-center my-auto py-8 px-4 w-full"
       >
-        {/* Icon cluster */}
-        <motion.div variants={itemVariants} className="relative flex items-center justify-center">
-          {/* Outer ring */}
-          <div
-            className="absolute rounded-full"
-            style={{
-              width: 96,
-              height: 96,
-              border: "1px solid rgb(var(--borderColor-secondary) / 0.12)",
-              background: "rgb(var(--backgroundColor-surface-container) / 0.3)",
-            }}
+        <div className="relative z-10 text-center">
+          {/* Eyebrow label */}
+          <motion.span
+            variants={fadeVariants}
+            className="inline-flex items-center gap-4 text-xs font-mono text-secondary mb-4 justify-center"
+          >
+            <span className="w-8 h-px bg-chat-secondary" aria-hidden="true" />
+            Bắt đầu trò chuyện
+            <span className="w-8 h-px bg-chat-secondary" aria-hidden="true" />
+          </motion.span>
+
+          {/* Heading */}
+          <motion.h2
+            id="integrations-heading"
+            variants={fadeUpVariants as any}
+            className="text-4xl md:text-5xl lg:text-6xl font-display tracking-tight leading-[1.1] text-primary"
+          >
+            Kết nối
+            <br />
+            <span className="text-secondary">mọi người.</span>
+          </motion.h2>
+
+          {/* Description */}
+          <motion.p
+            variants={fadeVariants}
+            className="mt-4 text-base md:text-lg text-secondary leading-relaxed max-w-md mx-auto"
+          >
+            Trải nghiệm nhắn tin mượt mà và an toàn. Giữ liên lạc với bạn bè, đồng nghiệp và những người thân yêu mọi lúc, mọi nơi trên mọi thiết bị.
+          </motion.p>
+        </div>
+
+        {/* Decorative image */}
+        <motion.div
+          variants={fadeVariants}
+          className="relative w-[150%] sm:w-[120%] max-w-4xl flex justify-center shrink-0 -mt-4 pointer-events-none"
+        >
+          <Image
+            src="/images/alpha_1.png"
+            alt=""
+            aria-hidden="true"
+            width={896}
+            height={280}
+            sizes="(max-width: 640px) 150vw, (max-width: 1024px) 120vw, 800px"
+            className="w-full h-auto"
+            priority={false}
           />
-          {/* Icon wrapper */}
-          <motion.div
-            className="relative z-10 flex items-center justify-center rounded-full"
-            style={{
-              width: 64,
-              height: 64,
-              background: "rgb(var(--backgroundColor-surface-container) / 0.5)",
-              border: "1px solid rgb(var(--borderColor-secondary) / 0.15)",
-              backdropFilter: "blur(40px)",
-              WebkitBackdropFilter: "blur(40px)",
-              boxShadow:
-                "0 4px 24px -4px rgb(0 0 0 / 0.10), 0 1px 6px -1px rgb(0 0 0 / 0.06)",
-            }}
-            animate={{ rotate: [0, 5, -5, 0] }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <ForumIcon size={28} className="text-[rgb(var(--textColor-secondary))]" />
-          </motion.div>
-
-          {/* Satellite sparkle */}
-          <motion.div
-            className="absolute"
-            style={{ top: 2, right: 4 }}
-            animate={{ scale: [1, 1.25, 1], opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-          >
-            <SparkleIcon size={14} className="text-[rgb(var(--textColor-accent))]" />
-          </motion.div>
-        </motion.div>
-
-        {/* Text */}
-        <motion.div variants={itemVariants} className="flex flex-col gap-2">
-          <h2
-            className="font-sans font-semibold leading-tight"
-            style={{
-              fontSize: "clamp(1.15rem, 3vw, 1.35rem)",
-              color: "rgb(var(--textColor-primary))",
-            }}
-          >
-            Chưa có cuộc trò chuyện nào
-          </h2>
-          <p
-            className="text-body-sm leading-relaxed"
-            style={{ color: "rgb(var(--textColor-secondary))" }}
-          >
-            Chọn một cuộc trò chuyện từ danh sách hoặc bắt đầu nhắn tin với bạn bè.
-          </p>
-        </motion.div>
-
-        {/* Quick action pills */}
-        <motion.div variants={itemVariants} className="flex flex-wrap justify-center gap-2">
-          {QUICK_ACTIONS.map((action, i) => (
-            <motion.button
-              key={i}
-              type="button"
-              className="inline-flex items-center gap-1.5 py-1.5 px-3 rounded-full text-[13px] font-medium leading-[150%] transition-all duration-150 ease-out focus-ring"
-              style={{
-                background: "rgb(var(--backgroundColor-state-enabled) / 0.575)",
-                backdropFilter: "blur(40px)",
-                WebkitBackdropFilter: "blur(40px)",
-                border: "1px solid rgb(var(--borderColor-secondary) / 0.15)",
-                boxShadow: "0 1px 2px 0 rgba(0,0,0,0.05)",
-                color: "rgb(var(--textColor-primary))",
-              }}
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={i === 0 ? onNewDM : i === 1 ? onNewGroup : undefined}
-            >
-              <span style={{ color: "rgb(var(--textColor-secondary))" }}>{action.icon}</span>
-              {action.label}
-            </motion.button>
-          ))}
         </motion.div>
       </motion.div>
-    </div>
+    </section>
   );
 }
