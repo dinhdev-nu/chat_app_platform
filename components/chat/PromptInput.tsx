@@ -4,14 +4,12 @@ import React, { useState } from "react";
 import {
   PlusIcon,
   PaletteIcon,
-  CloseIcon,
   MobileDeviceIcon,
   DesktopDeviceIcon,
   SparkleIcon,
   ChevronDownIcon,
   LiveModeIcon,
   ArrowUpIcon,
-  ListBulletIcon,
 } from "./icons";
 import { ConversationListItem } from "./conversation-data";
 
@@ -25,49 +23,21 @@ const SUGGESTION_PROMPTS = [
 ];
 
 interface PromptInputProps {
-  isProjectSidebarOpen?: boolean;
-  onToggleProjects?: () => void;
   conv?: ConversationListItem;
 }
 
-export default function PromptInput({
-  isProjectSidebarOpen = false,
-  onToggleProjects,
-  conv,
-}: PromptInputProps) {
+export default function PromptInput({ conv }: PromptInputProps) {
   const [deviceMode, setDeviceMode] = useState<"app" | "web">("app");
   const [promptText, setPromptText] = useState("");
 
   return (
     <section
       id="create-scroll-container"
-      className="relative hide-scrollbar flex max-w-full flex-1 flex-col items-center md:overflow-y-auto"
+      className="relative hide-scrollbar flex max-w-full flex-1 flex-col items-center overflow-y-auto"
     >
-      {/* Mobile menu button */}
-      <button
-        type="button"
-        className="
-          fixed right-2 top-16 z-20 md:hidden
-          flex items-center justify-center rounded-xl
-          h-10 w-10
-          bg-[rgb(var(--backgroundColor-surface-container)/.5)]
-          backdrop-blur-[40px]
-          border border-[rgb(var(--borderColor-secondary)/.15)]
-          text-[rgb(var(--textColor-primary))]
-        "
-        aria-label="Open menu"
-        aria-expanded={isProjectSidebarOpen}
-        aria-controls="recent-projects-panel"
-        onClick={onToggleProjects}
-      >
-        <span className="text-inherit">
-          <ListBulletIcon />
-        </span>
-      </button>
-
       {/* Outer wrapper */}
       <div
-        className="flex w-full flex-1 flex-col items-center py-8 md:py-12 bg-transparent"
+        className="flex min-h-full w-full flex-1 flex-col items-center justify-center bg-transparent pb-8 pt-20 md:py-12"
       >
         <div
           className="flex w-full flex-col items-center px-2 md:px-4 [max-width:calc(100vw-16px)]"

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { LogOut } from "lucide-react";
 
 interface UpdateUserRequest {
   name: string;
@@ -13,6 +14,7 @@ interface UpdateProfileModalProps {
   onOpenChange: (open: boolean) => void;
   initialData?: UpdateUserRequest;
   onSave?: (data: UpdateUserRequest) => void | Promise<void>;
+  onLogout?: () => void | Promise<void>;
 }
 
 const FOCUS_GUARD: React.CSSProperties = {
@@ -34,10 +36,12 @@ export default function UpdateProfileModal({
   onOpenChange,
   initialData,
   onSave,
+  onLogout,
 }: UpdateProfileModalProps) {
   const [shouldRender, setShouldRender] = useState(open);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [name, setName] = useState(initialData?.name ?? "");
   const [avatarUrl, setAvatarUrl] = useState(initialData?.avatarUrl ?? "");
   const [bio, setBio] = useState(initialData?.bio ?? "");
@@ -92,6 +96,16 @@ export default function UpdateProfileModal({
     }
   };
 
+  const handleLogout = async () => {
+    if (isLoggingOut || !onLogout) return;
+    setIsLoggingOut(true);
+    try {
+      await onLogout();
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   const avatarFallback = name.trim().charAt(0).toUpperCase() || "U";
   const showAvatar = avatarUrl.trim() && !avatarError;
 
@@ -125,7 +139,7 @@ export default function UpdateProfileModal({
           <div className="flex flex-col w-full justify-between gap-3">
             <div className="flex flex-col gap-8">
               <h1 id="update-profile-title" className="text-title-md">
-                Cập nhật hồ sơ
+                Hồ sơ
               </h1>
 
               <div className="flex flex-col gap-2">
@@ -242,6 +256,23 @@ export default function UpdateProfileModal({
                   <span className="font-medium text-sm">Lưu thay đổi</span>
                 )}
               </button>
+              {onLogout ? (
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isSaving || isLoggingOut}
+                  className="flex h-8 w-full items-center justify-center gap-2 rounded-lg bg-transparent
+                    px-3 text-subtitle-md text-[rgb(var(--textColor-danger))]
+                    border border-[rgb(var(--borderColor-error)/.35)]
+                    transition-colors enabled:hover:bg-[rgb(var(--backgroundColor-error)/.08)]
+                    enabled:active:bg-[rgb(var(--backgroundColor-error)/.14)]
+                    disabled:cursor-not-allowed disabled:opacity-50
+                    focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2"
+                >
+                  <LogOut size={15} aria-hidden="true" />
+                  <span className="font-medium text-sm">{isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}</span>
+                </button>
+              ) : null}
               <div className="h-2" />
             </div>
           </div>

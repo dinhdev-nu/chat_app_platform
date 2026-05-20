@@ -32,6 +32,10 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
     setIsPanelOpen(false);
   };
 
+  const toggleProjectSidebar = () => {
+    setIsProjectSidebarOpen((isOpen) => !isOpen);
+  };
+
   return (
     <div
       dir="ltr"
@@ -40,7 +44,7 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
       <div
         className="text-foreground relative flex h-svh w-full bg-[rgb(var(--backgroundColor-primary))] text-[rgb(var(--textColor-primary))]"
       >
-        <main className="relative flex flex-1 flex-col overflow-y-auto">
+        <main className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
           {/* Dot Pattern Background */}
           <DotPattern />
 
@@ -48,7 +52,7 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
           <ChatHeader />
 
           {/* Main Content Area */}
-          <div className="relative flex flex-1 md:overflow-hidden">
+          <div className="relative flex min-h-0 flex-1 overflow-hidden">
             {/* Left Sidebar */}
             <ProjectSidebar
               isMobileOpen={isProjectSidebarOpen}
@@ -63,8 +67,12 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
             />
 
             {/* Center: Chat main */}
-            <div className="flex-1 overflow-hidden">
-              <ChatMain activeConv={activeConv} />
+            <div className="min-h-0 flex-1 overflow-hidden">
+              <ChatMain
+                activeConv={activeConv}
+                isProjectSidebarOpen={isProjectSidebarOpen}
+                onToggleProjects={toggleProjectSidebar}
+              />
             </div>
           </div>
 

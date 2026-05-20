@@ -1,11 +1,18 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { DocsIcon, DiscordIcon, XIcon, GiftIcon, MoreDotsIcon } from "./icons";
 import ShareProjectModal from "./ShareProjectModal";
 
 export default function ChatHeader() {
+  const router = useRouter();
   const [isShareOpen, setIsShareOpen] = useState(false);
+
+  const handleLogout = () => {
+    setIsShareOpen(false);
+    router.push("/login");
+  };
 
   return (
     <>
@@ -144,7 +151,7 @@ export default function ChatHeader() {
           </div>
         </div>
       </header>
-      <ShareProjectModal open={isShareOpen} onOpenChange={setIsShareOpen} />
+      <ShareProjectModal open={isShareOpen} onOpenChange={setIsShareOpen} onLogout={handleLogout} />
     </>
   );
 }

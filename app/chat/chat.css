@@ -345,6 +345,25 @@
   scrollbar-width: none;
 }
 
+.chat-root .message-scrollbar {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.chat-root .message-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-root .message-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-root .message-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+.chat-root .message-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
 /* ===== Glass Shadow ===== */
 .chat-root .shadow-glass-soft {
   box-shadow:

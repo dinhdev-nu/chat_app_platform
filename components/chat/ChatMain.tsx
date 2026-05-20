@@ -7,6 +7,7 @@ import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 import ChatEmptyState from "./ChatEmptyState";
 import ChatActiveState, { ChatMessage } from "./ChatActiveState";
 import PromptInput from "./PromptInput";
+import MobileProjectSidebarToggle from "./MobileProjectSidebarToggle";
 
 const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   conv_01: [
@@ -20,6 +21,45 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
     },
     {
       id: "m2",
+      text: "Chào bạn, mình vừa xem qua bản thiết kế.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    },
+    {
+      id: "m3",
+      text: "Chào bạn, mình vừa xem qua bản thiết kế.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    }, {
+      id: "m4",
+      text: "Chào bạn, mình vừa xem qua bản thiết kế.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    },
+    {
+      id: "m5",
+      text: "Chào bạn, mình vừa xem qua bản thiết kế.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    },
+    {
+      id: "m_system_1",
+      text: "An Bình đã tham gia hội thoại.",
+      senderId: "system",
+      timestamp: new Date(Date.now() - 1000 * 60 * 7.5).toISOString(),
+      type: "system",
+      isSystem: true,
+    },
+    {
+      id: "m6",
       text: "Phần header chưa đồng nhất với các section bên dưới.",
       senderId: "user_other",
       senderName: "An Bình",
@@ -27,14 +67,46 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
       timestamp: new Date(Date.now() - 1000 * 60 * 7).toISOString(),
     },
     {
-      id: "m3",
+      id: "m7",
       text: "Ừ mình thấy rồi, để mình chỉnh lại spacing.",
       senderId: "user_me",
       timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
       isOwn: true,
     },
     {
-      id: "m4",
+      id: "m8",
+      text: "Mình vừa đẩy bản wireframe mới lên rồi, bạn xem giúp nhé.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+    },
+    {
+      id: "m9",
+      text: "Mình vừa đẩy bản wireframe mới lên rồi, bạn xem giúp nhé.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+    },
+    {
+      id: "m10",
+      text: "Mình vừa đẩy bản wireframe mới lên rồi, bạn xem giúp nhé.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+    },
+    {
+      id: "m11",
+      text: "Mình vừa đẩy bản wireframe mới lên rồi, bạn xem giúp nhé.",
+      senderId: "user_other",
+      senderName: "An Bình",
+      senderAvatar: "/assets/home/iVBORw0KGg_3.png",
+      timestamp: new Date(Date.now() - 1000 * 60 * 2).toISOString(),
+    },
+    {
+      id: "m12",
       text: "Mình vừa đẩy bản wireframe mới lên rồi, bạn xem giúp nhé.",
       senderId: "user_other",
       senderName: "An Bình",
@@ -46,9 +118,15 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
 
 interface ChatMainProps {
   activeConv?: ConversationListItem;
+  isProjectSidebarOpen?: boolean;
+  onToggleProjects?: () => void;
 }
 
-export default function ChatMain({ activeConv }: ChatMainProps) {
+export default function ChatMain({
+  activeConv,
+  isProjectSidebarOpen = false,
+  onToggleProjects,
+}: ChatMainProps) {
   const [messageStore, setMessageStore] = useState<Record<string, ChatMessage[]>>(MOCK_MESSAGES);
   const shouldReduceMotion = useReducedMotion();
 
@@ -100,12 +178,16 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
   }
 
   return (
-    <div className="relative flex flex-1 flex-col w-full h-full overflow-hidden bg-transparent">
+    <div className="relative flex min-h-0 flex-1 flex-col w-full h-full overflow-hidden bg-transparent">
+      {onToggleProjects ? (
+        <MobileProjectSidebarToggle isOpen={isProjectSidebarOpen} onToggle={onToggleProjects} />
+      ) : null}
+
       <AnimatePresence mode="sync" initial={false}>
         {stateKey === "empty" && (
           <motion.div
             key="empty"
-            className="absolute inset-0 flex"
+            className="absolute inset-0 flex min-h-0"
             variants={pageVariant as any}
             initial="initial"
             animate="animate"
@@ -118,7 +200,7 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
         {stateKey === "new" && activeConv && (
           <motion.div
             key={`new-${activeConv.id}`}
-            className="absolute inset-0 flex"
+            className="absolute inset-0 flex min-h-0"
             variants={pageVariant as any}
             initial="initial"
             animate="animate"
@@ -131,7 +213,7 @@ export default function ChatMain({ activeConv }: ChatMainProps) {
         {stateKey === "active" && activeConv && (
           <motion.div
             key={`active-${activeConv.id}`}
-            className="absolute inset-0 flex"
+            className="absolute inset-0 flex min-h-0"
             variants={pageVariant as any}
             initial="initial"
             animate="animate"

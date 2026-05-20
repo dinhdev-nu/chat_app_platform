@@ -2,8 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { Info, MoreHorizontal, Phone, Video } from "lucide-react";
 import { ConversationListItem } from "./conversation-data";
 import { ArrowUpIcon, PlusIcon } from "./icons";
+
+type ChatMessageType = "user" | "system";
 
 export interface ChatMessage {
   id: string;
@@ -12,6 +15,8 @@ export interface ChatMessage {
   senderName?: string;
   senderAvatar?: string;
   timestamp: string;
+  type?: ChatMessageType;
+  isSystem?: boolean;
   isOwn?: boolean;
 }
 
@@ -37,6 +42,40 @@ function formatTime(iso: string) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function isSystemMessage(msg: ChatMessage) {
+  return msg.isSystem || msg.type === "system" || msg.senderId === "system";
+}
+
+function SystemMessage({
+  msg,
+  reduceMotion,
+}: {
+  msg: ChatMessage;
+  reduceMotion?: boolean;
+}) {
+  return (
+    <motion.div
+      variants={msgVariants as any}
+      initial={reduceMotion ? false : "hidden"}
+      animate="visible"
+      className="my-3 flex justify-center px-3"
+    >
+      <div
+        className="inline-flex max-w-[86%] items-center gap-2 rounded-2xl px-3 py-1.5 text-[12px] leading-[1.45]"
+        style={{
+          background: "rgb(var(--backgroundColor-surface-container) / 0.36)",
+          border: "1px solid rgb(var(--borderColor-secondary) / 0.12)",
+          color: "rgb(var(--textColor-secondary))",
+        }}
+      >
+        <Info size={14} strokeWidth={1.5} aria-hidden="true" className="shrink-0" />
+        <span className="min-w-0 text-center">{msg.text}</span>
+        <span className="hidden shrink-0 opacity-60 sm:inline">{formatTime(msg.timestamp)}</span>
+      </div>
+    </motion.div>
+  );
 }
 
 function MessageBubble({
@@ -132,13 +171,39 @@ function MessageBubble({
 
 function DateSeparator({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 my-3 select-none">
-      <div className="flex-1 h-px" style={{ background: "rgb(var(--borderColor-secondary) / 0.12)" }} />
+    <div className="flex items-center justify-center gap-3 my-3 select-none">
+      <div className="h-px w-8 shrink-0" style={{ background: "rgb(var(--borderColor-secondary) / 0.12)" }} />
       <span className="text-caption shrink-0 px-2" style={{ color: "rgb(var(--textColor-secondary))", opacity: 0.7 }}>
         {label}
       </span>
-      <div className="flex-1 h-px" style={{ background: "rgb(var(--borderColor-secondary) / 0.12)" }} />
+      <div className="h-px w-8 shrink-0" style={{ background: "rgb(var(--borderColor-secondary) / 0.12)" }} />
     </div>
+  );
+}
+
+function HeaderActionButton({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      className="
+        cursor-pointer p-2 rounded-full select-none shrink-0
+        transition-colors text-[rgb(var(--textColor-primary))]
+        hover:bg-[rgb(var(--backgroundColor-state-hover))]
+        focus-ring
+      "
+    >
+      <span className="text-inherit" aria-hidden="true">
+        {children}
+      </span>
+    </button>
   );
 }
 
@@ -147,8 +212,8 @@ function ConvHeader({ conv }: { conv: ConversationListItem }) {
 
   return (
     <div
-      className="shrink-0 flex items-center gap-3 px-4 py-3 border-b"
-      style={{ borderColor: "rgb(var(--borderColor-secondary) / 0.12)", background: "transparent" }}
+      className="shrink-0 flex items-center gap-3 py-3 pl-4 pr-5 md:px-6"
+      style={{ background: "transparent" }}
     >
       <div className="relative shrink-0">
         {conv.avatarUrl ? (
@@ -189,6 +254,18 @@ function ConvHeader({ conv }: { conv: ConversationListItem }) {
           {typeLabel}
         </span>
       </div>
+
+      <div className="ml-auto flex shrink-0 items-center gap-1 pr-12 md:gap-2 md:pr-1">
+        <HeaderActionButton label="Gọi thoại">
+          <Phone size={20} strokeWidth={1.5} aria-hidden="true" />
+        </HeaderActionButton>
+        <HeaderActionButton label="Gọi video">
+          <Video size={20} strokeWidth={1.5} aria-hidden="true" />
+        </HeaderActionButton>
+        <HeaderActionButton label="Tùy chọn khác">
+          <MoreHorizontal size={24} strokeWidth={1.5} aria-hidden="true" />
+        </HeaderActionButton>
+      </div>
     </div>
   );
 }
@@ -216,7 +293,7 @@ export default function ChatActiveState({ conv, messages, onSend }: ChatActiveSt
   };
 
   return (
-    <div className="flex flex-col w-full h-full bg-transparent overflow-hidden">
+    <div className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)_auto] bg-transparent overflow-hidden">
       <motion.div
         initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -225,14 +302,18 @@ export default function ChatActiveState({ conv, messages, onSend }: ChatActiveSt
         <ConvHeader conv={conv} />
       </motion.div>
 
-      <div className="flex-1 overflow-y-auto hide-scrollbar px-4 py-3" style={{ display: "flex", flexDirection: "column" }}>
-        <div className="flex flex-col justify-end flex-1 min-h-0">
+      <div className="message-scrollbar min-h-0 overflow-y-scroll overscroll-contain px-4 py-3">
+        <div className="flex min-h-full flex-col justify-end">
           <DateSeparator label="Hôm nay" />
 
           <AnimatePresence initial={false}>
-            {messages.map((msg, i) => (
-              <MessageBubble key={msg.id} msg={msg} prevMsg={messages[i - 1]} reduceMotion={shouldReduceMotion} />
-            ))}
+            {messages.map((msg, i) =>
+              isSystemMessage(msg) ? (
+                <SystemMessage key={msg.id} msg={msg} reduceMotion={shouldReduceMotion} />
+              ) : (
+                <MessageBubble key={msg.id} msg={msg} prevMsg={messages[i - 1]} reduceMotion={shouldReduceMotion} />
+              )
+            )}
           </AnimatePresence>
 
           <div ref={messagesEndRef} />
