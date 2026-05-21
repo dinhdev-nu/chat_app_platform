@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { GridIcon, SearchIcon, CloseIcon, UserGroupIcon, UsersIcon, PlusIcon } from "./icons";
 import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 import { ContactUserResponse, MOCK_CONTACT_USERS } from "./contact-data";
@@ -31,81 +32,104 @@ export default function ProjectSidebar({
   activeTab: activeTabProp,
   onActiveTabChange,
 }: ProjectSidebarProps) {
-  const [activeTab, setActiveTab] = useState<SidebarFilter>("all");
+  const isMobile = useIsMobile();
+  const isHiddenOnMobile = isMobile && !isMobileOpen;
+  const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState<SidebarFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const query = searchQuery.trim().toLowerCase();
+  const activeTab = activeTabProp ?? uncontrolledActiveTab;
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const query = useMemo(() => deferredSearchQuery.trim().toLowerCase(), [deferredSearchQuery]);
 
   const tabsRef = useRef<HTMLDivElement | null>(null);
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
   const [indicator, setIndicator] = useState({ left: 0, width: 0, visible: false });
 
-  function measureActive() {
+  const measureActive = useCallback(() => {
     const container = tabsRef.current;
-    if (!container) return setIndicator((s) => ({ ...s, visible: false }));
+    if (!container) {
+      setIndicator((current) => (current.visible ? { ...current, visible: false } : current));
+      return;
+    }
+
     const index = activeTab === "all" ? 0 : 1;
     const btn = buttonsRef.current[index];
-    if (!btn) return setIndicator((s) => ({ ...s, visible: false }));
+    if (!btn) {
+      setIndicator((current) => (current.visible ? { ...current, visible: false } : current));
+      return;
+    }
 
     const cRect = container.getBoundingClientRect();
     const bRect = btn.getBoundingClientRect();
-    const left = bRect.left - cRect.left + container.scrollLeft;
-    setIndicator({ left, width: bRect.width, visible: true });
-  }
+    const left = Math.round(bRect.left - cRect.left + container.scrollLeft);
+    const width = Math.round(bRect.width);
 
-  // sync controlled prop -> internal state
-  useEffect(() => {
-    if (activeTabProp && activeTabProp !== activeTab) {
-      setActiveTab(activeTabProp);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTabProp]);
+    setIndicator((current) => {
+      if (current.visible && current.left === left && current.width === width) {
+        return current;
+      }
+
+      return { left, width, visible: true };
+    });
+  }, [activeTab]);
 
   useEffect(() => {
     measureActive();
     const onResize = () => measureActive();
     window.addEventListener("resize", onResize);
-    const RO = (window as any).ResizeObserver;
-    const ro = RO ? new RO(measureActive) : undefined;
+    const ro = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measureActive);
     if (ro && tabsRef.current) ro.observe(tabsRef.current);
     buttonsRef.current.forEach((b) => b && ro?.observe(b));
     return () => {
       window.removeEventListener("resize", onResize);
       ro?.disconnect?.();
     };
-  }, [activeTab, searchQuery]);
+  }, [measureActive]);
 
-  const visibleConversations = [...conversations]
-    .sort((left, right) => {
-      const leftTime = left.lastActivityAt ? new Date(left.lastActivityAt).getTime() : 0;
-      const rightTime = right.lastActivityAt ? new Date(right.lastActivityAt).getTime() : 0;
-      return rightTime - leftTime;
-    })
-    .filter((conversation) => {
-      if (query.length === 0) return true;
+  const selectTab = useCallback(
+    (tab: SidebarFilter) => {
+      if (activeTabProp === undefined) {
+        setUncontrolledActiveTab(tab);
+      }
+      onActiveTabChange?.(tab);
+    },
+    [activeTabProp, onActiveTabChange],
+  );
 
-      return [conversation.name, conversation.description, conversation.lastMessageText]
-        .filter(Boolean)
-        .some((value) => value?.toLowerCase().includes(query));
-    });
+  const visibleConversations = useMemo(() => {
+    return conversations
+      .filter((conversation) => {
+        if (query.length === 0) return true;
 
-  const visibleContacts = [...contacts]
-    .sort((left, right) => {
-      const leftTime = left.lastSeenAt ? new Date(left.lastSeenAt).getTime() : 0;
-      const rightTime = right.lastSeenAt ? new Date(right.lastSeenAt).getTime() : 0;
-      return rightTime - leftTime;
-    })
-    .filter((contact) => {
-      if (query.length === 0) return true;
+        return [conversation.name, conversation.description, conversation.lastMessageText]
+          .some((value) => value?.toLowerCase().includes(query));
+      })
+      .sort((left, right) => {
+        const leftTime = left.lastActivityAt ? new Date(left.lastActivityAt).getTime() : 0;
+        const rightTime = right.lastActivityAt ? new Date(right.lastActivityAt).getTime() : 0;
+        return rightTime - leftTime;
+      });
+  }, [conversations, query]);
 
-      return [contact.username, contact.bio]
-        .filter(Boolean)
-        .some((value) => value?.toLowerCase().includes(query));
-    });
+  const visibleContacts = useMemo(() => {
+    return contacts
+      .filter((contact) => {
+        if (query.length === 0) return true;
+
+        return [contact.username, contact.bio]
+          .some((value) => value?.toLowerCase().includes(query));
+      })
+      .sort((left, right) => {
+        const leftTime = left.lastSeenAt ? new Date(left.lastSeenAt).getTime() : 0;
+        const rightTime = right.lastSeenAt ? new Date(right.lastSeenAt).getTime() : 0;
+        return rightTime - leftTime;
+      });
+  }, [contacts, query]);
 
   return (
     <section
       id="recent-projects-panel"
+      aria-hidden={isHiddenOnMobile}
+      inert={isHiddenOnMobile}
       className={`
         flex flex-col gap-2 fixed inset-x-0 bottom-0 z-20 p-4
         overflow-y-auto rounded-t-2xl
@@ -178,12 +202,8 @@ export default function ProjectSidebar({
                 text-subtitle-sm font-bold cursor-pointer transition-colors z-10 text-center
                 ${activeTab === "all" ? "text-primary" : "text-secondary"}
               `}
-              tabIndex={0}
               ref={(el) => { buttonsRef.current[0] = el; }}
-              onClick={() => {
-                setActiveTab("all");
-                onActiveTabChange?.("all");
-              }}
+              onClick={() => selectTab("all")}
               style={{ fontWeight: 600 }}
             >
               <span className="relative z-10 flex items-center justify-center gap-1.5">
@@ -203,12 +223,8 @@ export default function ProjectSidebar({
                 text-subtitle-sm font-bold cursor-pointer transition-colors z-10 text-center
                 ${activeTab === "friends" ? "text-primary" : "text-secondary"}
               `}
-              tabIndex={0}
               ref={(el) => { buttonsRef.current[1] = el; }}
-              onClick={() => {
-                setActiveTab("friends");
-                onActiveTabChange?.("friends");
-              }}
+              onClick={() => selectTab("friends")}
               style={{ fontWeight: 600 }}
             >
               <span className="relative z-10 flex items-center justify-center gap-1.5">

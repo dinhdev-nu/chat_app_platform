@@ -7,11 +7,13 @@ import {
   DisplayToggle,
   ChatMain,
 } from "@/components/chat";
-import Panel from "@/components/chat/Panel";
-import React, { useState } from "react";
+import dynamic from "next/dynamic";
+import React, { useCallback, useState } from "react";
 import "./chat.css";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
 import type { ContactUserResponse } from "@/components/chat/contact-data";
+
+const Panel = dynamic(() => import("@/components/chat/Panel"), { ssr: false });
 
 interface ChatPageClientProps {
   conversationList?: ConversationListItem[];
@@ -22,19 +24,37 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
   const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [sidebarActiveTab, setSidebarActiveTab] = useState<"all" | "friends">("all");
-  const [activeConv, setActiveConv] = useState<ConversationListItem | undefined>(
-    conversationList && conversationList.length > 0 ? undefined : undefined
-  );
+  const [activeConv, setActiveConv] = useState<ConversationListItem | undefined>(undefined);
 
-  const openFriends = () => {
+  const closeProjectSidebar = useCallback(() => {
+    setIsProjectSidebarOpen(false);
+  }, []);
+
+  const openPanel = useCallback(() => {
+    setIsPanelOpen(true);
+  }, []);
+
+  const closePanel = useCallback(() => {
+    setIsPanelOpen(false);
+  }, []);
+
+  const openFriends = useCallback(() => {
     setIsProjectSidebarOpen(true);
     setSidebarActiveTab("friends");
     setIsPanelOpen(false);
-  };
+  }, []);
 
-  const toggleProjectSidebar = () => {
+  const toggleProjectSidebar = useCallback(() => {
     setIsProjectSidebarOpen((isOpen) => !isOpen);
-  };
+  }, []);
+
+  const handleActiveTabChange = useCallback((tab: "all" | "friends") => {
+    setSidebarActiveTab(tab);
+  }, []);
+
+  const handleSelectConversation = useCallback((conversation: ConversationListItem) => {
+    setActiveConv(conversation);
+  }, []);
 
   return (
     <div
@@ -56,14 +76,14 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
             {/* Left Sidebar */}
             <ProjectSidebar
               isMobileOpen={isProjectSidebarOpen}
-              onClose={() => setIsProjectSidebarOpen(false)}
-              onOpenPanel={() => setIsPanelOpen(true)}
+              onClose={closeProjectSidebar}
+              onOpenPanel={openPanel}
               activeTab={sidebarActiveTab}
-              onActiveTabChange={(t) => setSidebarActiveTab(t)}
+              onActiveTabChange={handleActiveTabChange}
               conversations={conversationList}
               contacts={contactList}
               activeConversationId={activeConv?.id}
-              onSelectConversation={(conv) => setActiveConv(conv)}
+              onSelectConversation={handleSelectConversation}
             />
 
             {/* Center: Chat main */}
@@ -81,7 +101,12 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
         </main>
 
         {/* Panel (right side) */}
-        <Panel isOpen={isPanelOpen} onClose={() => setIsPanelOpen(false)} onOpenFriends={openFriends} />
+        <Panel
+          isOpen={isPanelOpen}
+          onClose={closePanel}
+          onOpenFriends={openFriends}
+          contacts={contactList}
+        />
 
         {/* Toast Container */}
         <div

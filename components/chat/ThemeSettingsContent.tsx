@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useCallback, useDeferredValue, useMemo, useState } from "react";
 import {
   BackIcon,
   SearchIcon,
@@ -9,14 +9,29 @@ import {
   UsersIcon,
   CheckIcon,
 } from "@/components/chat/icons";
-import { MOCK_CONTACT_USERS } from "@/components/chat/contact-data";
+import { ContactUserResponse, MOCK_CONTACT_USERS } from "@/components/chat/contact-data";
+
+interface CreateConversationPayload {
+  name: string;
+  type: 2 | 3;
+  avatar_url?: string;
+  description?: string;
+  member_user_ids: string[];
+}
 
 interface ThemeSettingsContentProps {
   onBack?: () => void;
   initialType?: 2 | 3;
+  contacts?: ContactUserResponse[];
+  onCreateConversation?: (payload: CreateConversationPayload) => void;
 }
 
-export default function ThemeSettingsContent({ onBack, initialType = 2 }: ThemeSettingsContentProps) {
+export default function ThemeSettingsContent({
+  onBack,
+  initialType = 2,
+  contacts = MOCK_CONTACT_USERS,
+  onCreateConversation,
+}: ThemeSettingsContentProps) {
   const [activeTab, setActiveTab] = useState<"info" | "members">("info");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -24,31 +39,38 @@ export default function ThemeSettingsContent({ onBack, initialType = 2 }: ThemeS
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [memberIds, setMemberIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-
-  React.useEffect(() => {
-    setType(initialType);
-  }, [initialType]);
-
-  const filteredUsers = MOCK_CONTACT_USERS.filter((u) =>
-    u.username.toLowerCase().includes(searchQuery.toLowerCase())
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const normalizedSearchQuery = useMemo(
+    () => deferredSearchQuery.trim().toLowerCase(),
+    [deferredSearchQuery],
   );
 
-  const toggleMember = (id: string) => {
+  const filteredUsers = useMemo(
+    () => contacts.filter((user) => user.username.toLowerCase().includes(normalizedSearchQuery)),
+    [contacts, normalizedSearchQuery],
+  );
+
+  const selectedMemberIds = useMemo(() => new Set(memberIds), [memberIds]);
+  const canSave = name.trim().length > 0 && memberIds.length > 0;
+
+  const toggleMember = useCallback((id: string) => {
     setMemberIds((prev) =>
       prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
     );
-  };
+  }, []);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
+    if (!canSave) return;
+
     const payload = {
-      name,
+      name: name.trim(),
       type,
       avatar_url: avatarUrl || undefined,
-      description: description || undefined,
+      description: description.trim() || undefined,
       member_user_ids: memberIds,
     };
-    console.log("Create Payload:", payload);
-  };
+    onCreateConversation?.(payload);
+  }, [avatarUrl, canSave, description, memberIds, name, onCreateConversation, type]);
 
   return (
     <div className="flex flex-1 flex-col gap-2 min-h-0 text-primary">
@@ -229,7 +251,7 @@ export default function ThemeSettingsContent({ onBack, initialType = 2 }: ThemeS
           <div className="flex flex-col gap-1 mt-2 pb-4">
             {filteredUsers.length > 0 ? (
               filteredUsers.map((user) => {
-                const isSelected = memberIds.includes(user.id);
+                const isSelected = selectedMemberIds.has(user.id);
                 return (
                   <button
                     key={user.id}
@@ -276,7 +298,7 @@ export default function ThemeSettingsContent({ onBack, initialType = 2 }: ThemeS
           <button
             type="button"
             onClick={handleSave}
-            disabled={!name.trim() || memberIds.length === 0}
+            disabled={!canSave}
             className="flex items-center justify-center gap-2 bg-clip-border focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2 border border-[rgb(var(--textColor-primary)/0.13)] shadow-sm enabled-hover-surface enabled:active:bg-[rgb(var(--backgroundColor-state-active))] disabled:opacity-50 disabled:cursor-not-allowed backdrop-blur-glass text-subtitle-md px-3 h-9 flex-1 min-w-24 rounded-[20px] bg-[rgb(var(--backgroundColor-state-enabled))] text-primary transition-colors"
           >
             <span className="font-medium text-sm">{type === 2 ? "Tạo nhóm" : "Tạo kênh"}</span>

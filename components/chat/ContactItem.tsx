@@ -11,14 +11,12 @@ interface ContactItemProps {
     contact: ContactUserResponse;
 }
 
-export default function ContactItem({ contact }: ContactItemProps) {
+function ContactItem({ contact }: ContactItemProps) {
     const initials = contact.username.trim().slice(0, 2).toUpperCase() || "FR";
     const lastSeenLabel = formatContactLastSeen(contact.lastSeenAt);
 
     return (
         <li
-            role="button"
-            tabIndex={0}
             className="
         flex items-center justify-between gap-3 p-2 rounded-xl
         transition-colors duration-200 ease-out
@@ -73,3 +71,5 @@ export default function ContactItem({ contact }: ContactItemProps) {
         </li>
     );
 }
+
+export default React.memo(ContactItem);

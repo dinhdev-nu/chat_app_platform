@@ -14,7 +14,7 @@ type Props = {
     onSelectConversation?: (conv: ConversationListItem) => void;
 };
 
-export default function SidebarList({
+function SidebarList({
     activeTab,
     conversations,
     contacts,
@@ -39,6 +39,8 @@ export default function SidebarList({
                         transform: activeTab === "all" ? "translateY(0px)" : "translateY(2px)",
                     }}
                     className="px-0"
+                    aria-hidden={activeTab !== "all"}
+                    inert={activeTab !== "all"}
                 >
                     <ul>
                         {conversations.map((conversation) => (
@@ -60,6 +62,8 @@ export default function SidebarList({
                         transform: activeTab === "friends" ? "translateY(0px)" : "translateY(2px)",
                     }}
                     className="px-0"
+                    aria-hidden={activeTab !== "friends"}
+                    inert={activeTab !== "friends"}
                 >
                     <ul>
                         {contacts.map((contact) => (
@@ -71,3 +75,5 @@ export default function SidebarList({
         </div>
     );
 }
+
+export default React.memo(SidebarList);

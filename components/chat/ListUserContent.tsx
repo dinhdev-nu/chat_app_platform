@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useDeferredValue, useMemo, useState } from "react";
 import { BackIcon, SearchIcon, CloseIcon } from "@/components/chat/icons";
 import { User, Send, Check, UserPlus } from "lucide-react";
 import { SearchUser, ContactStatus } from "@/components/chat/contact-data";
 
 interface ListUserContentProps {
   onBack?: () => void;
+  users?: SearchUser[];
 }
 
 const MOCK_SEARCH_USERS: SearchUser[] = [
@@ -15,14 +16,12 @@ const MOCK_SEARCH_USERS: SearchUser[] = [
     username: "An Bình",
     avatarUrl: "/assets/home/iVBORw0KGg_3.png",
     bio: "Thiết kế landing page và tối ưu flow onboarding.",
-    lastSeenAt: "2026-05-16T09:10:00.000Z",
     outgoingStatus: ContactStatus.Accepted,
   },
   {
     id: "search_02",
     username: "Hoàng Tuấn",
     bio: "Frontend Developer",
-    lastSeenAt: "2026-05-15T09:10:00.000Z",
     outgoingStatus: ContactStatus.Pending,
   },
   {
@@ -30,77 +29,80 @@ const MOCK_SEARCH_USERS: SearchUser[] = [
     username: "Minh Nguyệt",
     avatarUrl: "/assets/home/iVBORw0KGg_5.png",
     bio: null,
-    lastSeenAt: "2026-05-16T12:00:00.000Z",
     incomingStatus: ContactStatus.Pending,
   },
   {
     id: "search_04",
     username: "Hải Đăng",
     bio: "Sẵn sàng trò chuyện",
-    lastSeenAt: "2026-05-16T10:00:00.000Z",
   },
 ];
 
-export default function ListUserContent({ onBack }: ListUserContentProps) {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const filteredUsers = MOCK_SEARCH_USERS.filter((u) =>
-    u.username.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const renderAction = (user: SearchUser) => {
-    if (user.outgoingStatus === ContactStatus.Accepted || user.incomingStatus === ContactStatus.Accepted) {
-      return (
-        <button
-          type="button"
-          disabled
-          aria-label="Đã là bạn bè"
-          title="Bạn bè"
-          className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <User size={16} />
-        </button>
-      );
-    }
-
-    if (user.outgoingStatus === ContactStatus.Pending) {
-      return (
-        <button
-          type="button"
-          disabled
-          aria-label="Đã gửi lời mời"
-          title="Đã gửi"
-          className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          <Send size={16} />
-        </button>
-      );
-    }
-
-    if (user.incomingStatus === ContactStatus.Pending) {
-      return (
-        <button
-          type="button"
-          aria-label="Chấp nhận lời mời"
-          title="Chấp nhận"
-          className="p-2 rounded-lg bg-[rgb(var(--backgroundColor-state-enabled)/.575)] text-primary hover-surface-soft transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
-        >
-          <Check size={16} />
-        </button>
-      );
-    }
-
+function renderAction(user: SearchUser) {
+  if (user.outgoingStatus === ContactStatus.Accepted || user.incomingStatus === ContactStatus.Accepted) {
     return (
       <button
         type="button"
-        aria-label="Kết bạn"
-        title="Kết bạn"
-        className="p-2 rounded-lg bg-transparent text-primary border border-chat-secondary hover-surface-soft transition-colors"
+        disabled
+        aria-label="Đã là bạn bè"
+        title="Bạn bè"
+        className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        <UserPlus size={16} />
+        <User size={16} />
       </button>
     );
-  };
+  }
+
+  if (user.outgoingStatus === ContactStatus.Pending) {
+    return (
+      <button
+        type="button"
+        disabled
+        aria-label="Đã gửi lời mời"
+        title="Đã gửi"
+        className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <Send size={16} />
+      </button>
+    );
+  }
+
+  if (user.incomingStatus === ContactStatus.Pending) {
+    return (
+      <button
+        type="button"
+        aria-label="Chấp nhận lời mời"
+        title="Chấp nhận"
+        className="p-2 rounded-lg bg-[rgb(var(--backgroundColor-state-enabled)/.575)] text-primary hover-surface-soft transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+      >
+        <Check size={16} />
+      </button>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      aria-label="Kết bạn"
+      title="Kết bạn"
+      className="p-2 rounded-lg bg-transparent text-primary border border-chat-secondary hover-surface-soft transition-colors"
+    >
+      <UserPlus size={16} />
+    </button>
+  );
+}
+
+function ListUserContent({ onBack, users = MOCK_SEARCH_USERS }: ListUserContentProps) {
+  const [searchQuery, setSearchQuery] = useState("");
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const normalizedSearchQuery = useMemo(
+    () => deferredSearchQuery.trim().toLowerCase(),
+    [deferredSearchQuery],
+  );
+  const filteredUsers = useMemo(
+    () => users.filter((user) => user.username.toLowerCase().includes(normalizedSearchQuery)),
+    [normalizedSearchQuery, users],
+  );
 
   return (
     <div className="flex flex-1 flex-col min-h-0 text-primary">
@@ -192,3 +194,5 @@ export default function ListUserContent({ onBack }: ListUserContentProps) {
     </div>
   );
 }
+
+export default React.memo(ListUserContent);

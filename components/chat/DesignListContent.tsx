@@ -7,7 +7,6 @@ import {
 
 interface DesignListContentProps {
   onClose?: () => void;
-  onSelectPreset?: (preset: string) => void;
   onOpenFriends?: () => void;
   onOpenAddFriends?: () => void;
   onOpenTheme?: (type?: 2 | 3) => void;
@@ -18,65 +17,29 @@ interface ContactUserIncomingResponse {
   username: string;
   avatarUrl?: string | null;
   bio?: string | null;
-  lastSeenAt?: string | null;
-  createdAt: string;
 }
 
-export default function DesignListContent({ onClose, onSelectPreset, onOpenFriends, onOpenAddFriends, onOpenTheme }: DesignListContentProps) {
-  const presets = [
-    { name: "Alexandria", topColor: "#0f4a8a", bottomColor: "#fde047", btnColor: "#3b82f6" },
-    { name: "Bauhaus", topColor: "#b91c1c", bottomColor: "#1d4ed8", btnColor: "#1f2937" },
-    { name: "Glacier", topColor: "#7dd3fc", bottomColor: "#c4b5fd", btnColor: "#7dd3fc", btnText: "#000" },
-    { name: "Carbon", topColor: "#1d4ed8", bottomColor: "#15803d", btnColor: "#2563eb" },
-    { name: "Neon Tokyo", topColor: "#10b981", bottomColor: "#facc15", btnColor: "#f43f5e" },
-    { name: "Terra", topColor: "#4ade80", bottomColor: "#a16207", btnColor: "#4ade80" },
-  ];
+const INCOMING_REQUESTS: ContactUserIncomingResponse[] = [
+  {
+    id: "1",
+    username: "Alex Nguyen",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
+    bio: "Love to chat",
+  },
+  {
+    id: "2",
+    username: "Emma Smith",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=emma",
+    bio: "Coffee enthusiast",
+  },
+  {
+    id: "3",
+    username: "John Doe",
+    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
+  },
+];
 
-  const incomingRequests: ContactUserIncomingResponse[] = [
-    {
-      id: "1",
-      username: "Alex Nguyen",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
-      bio: "Love to chat",
-      createdAt: "2024-05-15T10:30:00Z"
-    },
-    {
-      id: "2",
-      username: "Emma Smith",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=emma",
-      bio: "Coffee enthusiast",
-      createdAt: "2024-05-14T14:20:00Z"
-    },
-    {
-      id: "3",
-      username: "John Doe",
-      avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
-      createdAt: "2024-05-13T09:15:00Z"
-    },
-  ];
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-      if (diffHours === 0) {
-        const diffMins = Math.floor(diffMs / (1000 * 60));
-        return `${diffMins}m`;
-      }
-      return `${diffHours}h`;
-    } else if (diffDays === 1) {
-      return "1d";
-    } else if (diffDays < 7) {
-      return `${diffDays}d`;
-    } else {
-      return date.toLocaleDateString("vi-VN", { month: "short", day: "numeric" });
-    }
-  };
-
+function DesignListContent({ onClose, onOpenFriends, onOpenAddFriends, onOpenTheme }: DesignListContentProps) {
   return (
     <div className="flex flex-1 flex-col min-h-0 text-primary">
       {/* Header */}
@@ -98,7 +61,10 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
       <div className="flex flex-col gap-0 px-3 pb-2">
         <button
           type="button"
-          onClick={() => { onClose?.(); /* close panel */ onOpenFriends?.(); /* open friends tab */ }}
+          onClick={() => {
+            onClose?.();
+            onOpenFriends?.();
+          }}
           aria-label="Trò chuyện với bạn bè"
           className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
@@ -140,7 +106,7 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
 
       {/* Incoming Requests List */}
       <div className="flex-1 overflow-y-auto px-3 pb-4 flex flex-col gap-2 hide-scrollbar">
-        {incomingRequests.map((contact) => (
+        {INCOMING_REQUESTS.map((contact) => (
           <div
             key={contact.id}
             className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
@@ -183,3 +149,5 @@ export default function DesignListContent({ onClose, onSelectPreset, onOpenFrien
     </div>
   );
 }
+
+export default React.memo(DesignListContent);

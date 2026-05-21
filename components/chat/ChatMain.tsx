@@ -1,14 +1,20 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 import ChatEmptyState from "./ChatEmptyState";
 import ChatActiveState from "./ChatActiveState";
+import type { ChatTypingUser } from "./ChatActiveState";
 import type { ChatMessage } from "./chat-message-types";
+import { isSystemMessage } from "./chat-message-utils";
 import PromptInput from "./PromptInput";
 import MobileProjectSidebarToggle from "./MobileProjectSidebarToggle";
+
+const CURRENT_USER_ID = "user_me";
+const MOCK_TYPING_DELAY_MS = 1800;
+const MOCK_REPLY_DELAY_MS = 2600;
 
 const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   conv_01: [
@@ -117,6 +123,23 @@ const MOCK_MESSAGES: Record<string, ChatMessage[]> = {
   ],
 };
 
+function getConversationTypingUser(
+  conv: ConversationListItem,
+  messages: ChatMessage[],
+): ChatTypingUser {
+  const latestOtherMessage = messages.findLast((message) => {
+    if (isSystemMessage(message)) return false;
+
+    return !(message.isOwn ?? message.senderId === CURRENT_USER_ID);
+  });
+
+  return {
+    id: latestOtherMessage?.senderId ?? `${conv.id}_assistant`,
+    name: latestOtherMessage?.senderName ?? conv.name ?? "Ai đó",
+    avatarUrl: latestOtherMessage?.senderAvatar ?? conv.avatarUrl,
+  };
+}
+
 interface ChatMainProps {
   activeConv?: ConversationListItem;
   isProjectSidebarOpen?: boolean;
@@ -129,7 +152,17 @@ export default function ChatMain({
   onToggleProjects,
 }: ChatMainProps) {
   const [messageStore, setMessageStore] = useState<Record<string, ChatMessage[]>>(MOCK_MESSAGES);
+  const [typingStore, setTypingStore] = useState<Record<string, ChatTypingUser[]>>({});
+  const typingTimeoutsRef = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const typingTimeouts = typingTimeoutsRef.current;
+
+    return () => {
+      Object.values(typingTimeouts).forEach((timeoutId) => clearTimeout(timeoutId));
+    };
+  }, []);
 
   const pageVariant = shouldReduceMotion
     ? {
@@ -153,18 +186,61 @@ export default function ChatMain({
 
   const handleSend = (text: string) => {
     if (!activeConv) return;
+    const conversationId = activeConv.id;
+    const existingMessages = messageStore[conversationId] ?? [];
+    const typingUser = getConversationTypingUser(activeConv, existingMessages);
     const newMsg: ChatMessage = {
       id: `m_${Date.now()}`,
       text,
-      senderId: "user_me",
+      senderId: CURRENT_USER_ID,
       timestamp: new Date().toISOString(),
       isOwn: true,
     };
 
     setMessageStore((prev) => ({
       ...prev,
-      [activeConv.id]: [...(prev[activeConv.id] ?? []), newMsg],
+      [conversationId]: [...(prev[conversationId] ?? []), newMsg],
     }));
+
+    if (typingTimeoutsRef.current[conversationId]) {
+      clearTimeout(typingTimeoutsRef.current[conversationId]);
+    }
+
+    setTypingStore((prev) => {
+      const next = { ...prev };
+      delete next[conversationId];
+      return next;
+    });
+
+    typingTimeoutsRef.current[conversationId] = setTimeout(() => {
+      setTypingStore((prev) => ({
+        ...prev,
+        [conversationId]: [typingUser],
+      }));
+
+      typingTimeoutsRef.current[conversationId] = setTimeout(() => {
+        const replyMessage: ChatMessage = {
+          id: `m_${Date.now()}_reply`,
+          text: "Mình nhận được rồi, để mình xem tiếp nhé.",
+          senderId: typingUser.id,
+          senderName: typingUser.name,
+          senderAvatar: typingUser.avatarUrl ?? undefined,
+          timestamp: new Date().toISOString(),
+        };
+
+        setMessageStore((prev) => ({
+          ...prev,
+          [conversationId]: [...(prev[conversationId] ?? []), replyMessage],
+        }));
+
+        setTypingStore((prev) => {
+          const next = { ...prev };
+          delete next[conversationId];
+          return next;
+        });
+        delete typingTimeoutsRef.current[conversationId];
+      }, MOCK_REPLY_DELAY_MS - MOCK_TYPING_DELAY_MS);
+    }, MOCK_TYPING_DELAY_MS);
   };
 
   const handleEditMessage = (messageId: string, text: string) => {
@@ -280,6 +356,8 @@ export default function ChatMain({
             <ChatActiveState
               conv={activeConv}
               messages={messages}
+              currentUserId={CURRENT_USER_ID}
+              typingUsers={typingStore[activeConv.id]}
               onSend={handleSend}
               onEditMessage={handleEditMessage}
               onReactMessage={handleReactMessage}
