@@ -1,4 +1,6 @@
 export { default as ChatHeader } from "./ChatHeader";
+export { default as HeaderActions } from "./HeaderActions";
+export { default as NewFeaturesPanel } from "./NewFeaturesPanel";
 export { default as ProjectSidebar } from "./ProjectSidebar";
 export { default as ProjectItem } from "./ProjectItem";
 export { default as ContactItem } from "./ContactItem";

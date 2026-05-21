@@ -125,7 +125,39 @@ export function MobileIcon({ size = 12, className }: IconProps) {
 export function PlusIcon({ size = 18, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M224,128a8,8,0,0,1-8,8H136v80a8,8,0,0,1-16,0V136H40a8,8,0,0,1,0-16h80V40a8,8,0,0,1,16,0v80h80A8,8,0,0,1,224,128Z" />
+      <path d="M232,128a12,12,0,0,1-12,12H140v80a12,12,0,0,1-24,0V140H36a12,12,0,0,1,0-24h80V36a12,12,0,0,1,24,0v80h80A12,12,0,0,1,232,128Z" />
+    </svg>
+  );
+}
+
+export function SlashIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 15 15" width={size} height={size} fill="currentColor" className={className}>
+      <text x="50%" y="50%" dominantBaseline="central" textAnchor="middle" fontSize={18} fontWeight={300} fontFamily="inherit">
+        /
+      </text>
+    </svg>
+  );
+}
+
+export function LayoutToolIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 20 20" fill="none" className={className}>
+      <path
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M15.6 3.396H4.25c-.314 0-.568.283-.568.633v12.665c0 .35.254.633.568.633H15.6c.314 0 .568-.284.568-.633V4.029c0-.35-.254-.633-.567-.633ZM6.8 10.361h6.25M9.925 7.236v6.25"
+      />
+      <path stroke="currentColor" strokeLinecap="round" d="M17.747 5.02v10.682M19.312 6.019v8.685" />
+    </svg>
+  );
+}
+
+export function VoiceSparkleIcon({ size = 20, className }: IconProps) {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width={size} height={size} fill="currentColor" className={className}>
+      <path d="M18.062 14.5a1 1 0 1 1 1.732 1A9 9 0 0 1 13 19.942V22a1 1 0 0 1-2 0v-2.058A9 9 0 0 1 4.206 15.5a1 1 0 0 1 1.731-1 7.002 7.002 0 0 0 9.563 2.563 7.003 7.003 0 0 0 2.562-2.563ZM12 1a4.98 4.98 0 0 1 2.141.48 5.976 5.976 0 0 0-.89 1.795A3 3 0 0 0 9 6v5a3 3 0 0 0 6 0V9.47a5.992 5.992 0 0 0 2 1.186V11a5 5 0 0 1-9.992.257L7 11V6a5 5 0 0 1 5-5Zm7 0c.155 0 .283.121.304.275a4 4 0 0 0 3.42 3.414c.154.021.276.15.276.306a.315.315 0 0 1-.277.307 4 4 0 0 0-3.42 3.423A.312.312 0 0 1 19 9a.313.313 0 0 1-.304-.275 4 4 0 0 0-3.42-3.423.315.315 0 0 1-.276-.307c0-.156.122-.284.276-.306a4 4 0 0 0 3.418-3.414A.314.314 0 0 1 19 1Z" />
     </svg>
   );
 }
