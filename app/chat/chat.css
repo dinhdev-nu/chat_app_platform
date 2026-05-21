@@ -318,6 +318,12 @@
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
+.chat-root .text-caption-sm {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 150%;
+  letter-spacing: 0.02em;
+}
 
 /* ===== Tiptap Editor Styles ===== */
 .chat-root .create-tiptap .tiptap-editor .tiptap {
@@ -360,6 +366,66 @@
 .chat-root .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+.chat-root .thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+.chat-root .thin-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.chat-root .thin-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.chat-root .thin-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+.chat-root .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* ===== Menu State Utilities ===== */
+.chat-root .hover\:bg-state-menu-hover:hover,
+.chat-root .data-\[highlighted\]\:bg-state-menu-hover[data-highlighted] {
+  background-color: rgb(var(--backgroundColor-state-menu-hover) / 0.08);
+}
+.dark .chat-root .hover\:bg-state-menu-hover:hover,
+.dark .chat-root .data-\[highlighted\]\:bg-state-menu-hover[data-highlighted] {
+  background-color: rgb(var(--backgroundColor-state-menu-hover) / 0.12);
+}
+.chat-root .active\:before\:bg-state-menu-active:active::before {
+  background-color: rgb(var(--backgroundColor-state-menu-active) / 0.1);
+}
+.dark .chat-root .active\:before\:bg-state-menu-active:active::before {
+  background-color: rgb(var(--backgroundColor-state-menu-active) / 0.14);
+}
+.chat-root .data-\[highlighted\]\:before\:bg-state-menu-hover[data-highlighted]::before {
+  background-color: rgb(var(--backgroundColor-state-menu-hover) / 0.08);
+}
+.dark .chat-root .data-\[highlighted\]\:before\:bg-state-menu-hover[data-highlighted]::before {
+  background-color: rgb(var(--backgroundColor-state-menu-hover) / 0.12);
+}
+.chat-root .data-\[highlighted\]\:before\:hidden[data-highlighted]::before {
+  display: none;
+}
+
+@keyframes m3-menu-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(2px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chat-root .motion-safe\:animate-m3-menu-item-enter {
+    animation: m3-menu-item-enter 0.16s cubic-bezier(0.2, 0, 0, 1) both;
+    animation-delay: calc(var(--stagger-index, 0) * 20ms);
+  }
 }
 
 .chat-root .message-scrollbar {

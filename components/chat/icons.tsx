@@ -319,3 +319,19 @@ export function BellSlashIcon({ size = 16, className }: IconProps) {
     </svg>
   );
 }
+
+export function EmojiIcon({ size = 16, className }: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      fill="currentColor"
+      viewBox="0 0 20 20" // <-- Sửa ở đây từ 256 256 thành 20 20
+      className={className}
+    >
+      <path d="M13.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM8 8.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm-.75 3.941a.75.75 0 1 0-1 1.118A5.614 5.614 0 0 0 10 15a5.614 5.614 0 0 0 3.75-1.441.75.75 0 0 0-1-1.118A4.113 4.113 0 0 1 10 13.5a4.113 4.113 0 0 1-2.75-1.059z" />
+      <path d="M10 .5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19zM2 10a8 8 0 1 1 16 0 8 8 0 0 1-16 0z" />
+    </svg>
+  );
+}

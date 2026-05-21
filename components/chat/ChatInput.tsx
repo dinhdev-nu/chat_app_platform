@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 
+import IconSelector from "./IconSelector";
 import { ArrowUpIcon, ChevronDownIcon, PaletteIcon, PlusIcon } from "./icons";
 
 const FILE_ACCEPT =
@@ -73,8 +74,11 @@ export default function ChatInput({
   sendLabel = "Tạo",
   onSend,
 }: ChatInputProps) {
+  const paletteButtonRef = useRef<HTMLButtonElement>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
   const [editorResetKey, setEditorResetKey] = useState(0);
   const [inputText, setInputText] = useState("");
+  const [isIconSelectorOpen, setIsIconSelectorOpen] = useState(false);
 
   const trimmedText = inputText.trim();
   const canSend = Boolean(onSend && trimmedText);
@@ -98,6 +102,30 @@ export default function ChatInput({
     }
   };
 
+  const handlePaletteToggle = () => {
+    setIsIconSelectorOpen((isOpen) => !isOpen);
+  };
+
+  const handleSelectIcon = (iconText: string) => {
+    const nextText = `${inputText}${iconText}`;
+    const editor = editorRef.current;
+
+    setInputText(nextText);
+    setIsIconSelectorOpen(false);
+
+    if (!editor) return;
+
+    editor.textContent = nextText;
+    editor.focus();
+
+    const selection = window.getSelection();
+    const range = document.createRange();
+    range.selectNodeContents(editor);
+    range.collapse(false);
+    selection?.removeAllRanges();
+    selection?.addRange(range);
+  };
+
   return (
     <div
       className="relative z-[1] flex h-[101px] w-full max-w-[720px] flex-col justify-end overflow-hidden rounded-[24px] cursor-text bg-surface-container backdrop-blur-glass text-primary border border-secondary shadow-lg outline-none"
@@ -117,6 +145,7 @@ export default function ChatInput({
               <div className="relative w-full overflow-auto">
                 <div className="tiptap-editor">
                   <div
+                    ref={editorRef}
                     key={editorResetKey}
                     contentEditable
                     role="textbox"
@@ -138,7 +167,6 @@ export default function ChatInput({
 
             <div className="flex items-center gap-2 flex-shrink-0 pt-5">
               <input accept={FILE_ACCEPT} multiple tabIndex={-1} type="file" className={hiddenInputClass} data-base-ui-inert="" />
-
               <div data-base-ui-inert="">
                 <button
                   type="button"
@@ -184,19 +212,21 @@ export default function ChatInput({
                     </span>
                   </button>
                 </div>
-
                 <div data-base-ui-inert="">
                   <button
+                    ref={paletteButtonRef}
+                    id="chat-input-palette-trigger"
                     type="button"
                     tabIndex={0}
                     aria-haspopup="menu"
-                    aria-expanded={true}
+                    aria-expanded={isIconSelectorOpen}
                     aria-controls="chat-input-palette-menu"
                     className="outline-none select-none focus-ring disabled:opacity-50 disabled:cursor-not-allowed p-2 flex items-center justify-center rounded-full size-7 bg-transparent hover:bg-[rgb(var(--backgroundColor-state-hover))] active:bg-[rgb(var(--backgroundColor-state-pressed))] data-[popup-open]:bg-[rgb(var(--backgroundColor-state-hover))] transition-colors cursor-pointer shrink-0"
-                    data-popup-open=""
-                    data-pressed=""
+                    data-popup-open={isIconSelectorOpen ? "" : undefined}
+                    data-pressed={isIconSelectorOpen ? "" : undefined}
                     aria-label="Màu sắc"
                     style={{ transform: "none" }}
+                    onClick={handlePaletteToggle}
                   >
                     <span className="text-primary">
                       <PaletteIcon />
@@ -219,7 +249,7 @@ export default function ChatInput({
                   aria-label="Chọn mô hình"
                   style={{ transform: "none" }}
                 >
-                  <span className="whitespace-nowrap">3 Flash</span>
+                  <span className="whitespace-nowrap">Nhanh</span>
                   <span className="text-inherit">
                     <ChevronDownIcon />
                   </span>
@@ -258,6 +288,16 @@ export default function ChatInput({
           </div>
         </div>
       </div>
+
+      {isIconSelectorOpen ? (
+        <IconSelector
+          id="chat-input-palette-menu"
+          labelledBy="chat-input-palette-trigger"
+          anchorRef={paletteButtonRef}
+          onClose={() => setIsIconSelectorOpen(false)}
+          onSelectIcon={handleSelectIcon}
+        />
+      ) : null}
     </div>
   );
 }

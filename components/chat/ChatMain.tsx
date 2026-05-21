@@ -5,7 +5,8 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 import ChatEmptyState from "./ChatEmptyState";
-import ChatActiveState, { ChatMessage } from "./ChatActiveState";
+import ChatActiveState from "./ChatActiveState";
+import type { ChatMessage } from "./chat-message-types";
 import PromptInput from "./PromptInput";
 import MobileProjectSidebarToggle from "./MobileProjectSidebarToggle";
 
@@ -166,6 +167,63 @@ export default function ChatMain({
     }));
   };
 
+  const handleEditMessage = (messageId: string, text: string) => {
+    if (!activeConv) return;
+
+    setMessageStore((prev) => ({
+      ...prev,
+      [activeConv.id]: (prev[activeConv.id] ?? []).map((message) =>
+        message.id === messageId
+          ? { ...message, text, editedAt: new Date().toISOString() }
+          : message
+      ),
+    }));
+  };
+
+  const handleReactMessage = (messageId: string, emoji: string) => {
+    if (!activeConv) return;
+
+    setMessageStore((prev) => ({
+      ...prev,
+      [activeConv.id]: (prev[activeConv.id] ?? []).map((message) => {
+        if (message.id !== messageId) return message;
+
+        const reactions = message.reactions ?? [];
+        const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
+
+        if (!existingReaction) {
+          return {
+            ...message,
+            reactions: [...reactions, { emoji, count: 1, reactedByMe: true }],
+          };
+        }
+
+        if (existingReaction.reactedByMe) {
+          const nextCount = existingReaction.count - 1;
+          return {
+            ...message,
+            reactions: reactions
+              .map((reaction) =>
+                reaction.emoji === emoji
+                  ? { ...reaction, count: nextCount, reactedByMe: false }
+                  : reaction
+              )
+              .filter((reaction) => reaction.count > 0),
+          };
+        }
+
+        return {
+          ...message,
+          reactions: reactions.map((reaction) =>
+            reaction.emoji === emoji
+              ? { ...reaction, count: reaction.count + 1, reactedByMe: true }
+              : reaction
+          ),
+        };
+      }),
+    }));
+  };
+
   const messages = activeConv ? (messageStore[activeConv.id] ?? []) : [];
 
   let stateKey: "empty" | "new" | "active";
@@ -219,7 +277,13 @@ export default function ChatMain({
             animate="animate"
             exit="exit"
           >
-            <ChatActiveState conv={activeConv} messages={messages} onSend={handleSend} />
+            <ChatActiveState
+              conv={activeConv}
+              messages={messages}
+              onSend={handleSend}
+              onEditMessage={handleEditMessage}
+              onReactMessage={handleReactMessage}
+            />
           </motion.div>
         )}
       </AnimatePresence>

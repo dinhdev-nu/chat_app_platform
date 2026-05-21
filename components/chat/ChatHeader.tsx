@@ -54,7 +54,7 @@ export default function ChatHeader() {
           </button>
 
           <a
-            href="https://discord.com/invite/googlelabs"
+            href="https://discord.com"
             target="_blank"
             rel="noopener noreferrer"
             className="no-underline hidden md:flex"
@@ -74,7 +74,7 @@ export default function ChatHeader() {
           </a>
 
           <a
-            href="https://x.com/stitchbygoogle"
+            href="https://x.com"
             target="_blank"
             rel="noopener noreferrer"
             className="no-underline hidden md:flex"
