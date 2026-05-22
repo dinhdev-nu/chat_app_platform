@@ -5,8 +5,12 @@ import { FC } from "react";
 import { motion, Variants } from "framer-motion";
 
 interface AuthHeroProps {
-  onSubmit?: (email: string) => void;
-  loading?: boolean;
+  onSendOtp?: (email: string) => void | Promise<void>;
+  onVerifyOtp?: (email: string, otp: string) => void | Promise<void>;
+  error?: string | null;
+  isSendingOtp?: boolean;
+  isVerifyingOtp?: boolean;
+  otpExpiresAt?: string | null;
 }
 
 const containerVariants: Variants = {
@@ -25,7 +29,14 @@ const lineVariants: Variants = {
   },
 };
 
-const AuthHero: FC<AuthHeroProps> = ({ onSubmit, loading }) => {
+const AuthHero: FC<AuthHeroProps> = ({
+  onSendOtp,
+  onVerifyOtp,
+  error,
+  isSendingOtp,
+  isVerifyingOtp,
+  otpExpiresAt,
+}) => {
   return (
     <main className="relative h-screen flex items-center justify-center lg:items-start lg:justify-start overflow-hidden bg-black">
       {/* Background video */}
@@ -66,7 +77,14 @@ const AuthHero: FC<AuthHeroProps> = ({ onSubmit, loading }) => {
 
         {/* AuthCard has its own entrance animation */}
         <motion.div variants={lineVariants}>
-          <AuthCard onSubmit={onSubmit} loading={loading} />
+          <AuthCard
+            onSendOtp={onSendOtp}
+            onVerifyOtp={onVerifyOtp}
+            error={error}
+            isSendingOtp={isSendingOtp}
+            isVerifyingOtp={isVerifyingOtp}
+            otpExpiresAt={otpExpiresAt}
+          />
         </motion.div>
       </motion.div>
     </main>

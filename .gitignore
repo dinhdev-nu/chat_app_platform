@@ -9,6 +9,8 @@
 
 /template
 /docs 
+.env
+
 # production
 /build
 

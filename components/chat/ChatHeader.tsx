@@ -1,18 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import HeaderActions from "./HeaderActions";
 import ShareProjectModal from "./ShareProjectModal";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function ChatHeader() {
-  const router = useRouter();
   const [isShareOpen, setIsShareOpen] = useState(false);
-
-  const handleLogout = () => {
-    setIsShareOpen(false);
-    router.push("/login");
-  };
+  const user = useAuthStore((state) => state.user);
 
   return (
     <>
@@ -34,9 +29,13 @@ export default function ChatHeader() {
           </a>
         </div>
 
-        <HeaderActions onAccountClick={() => setIsShareOpen(true)} />
+        <HeaderActions
+          userName={user?.name ?? user?.email}
+          userAvatarUrl={user?.avatarUrl}
+          onAccountClick={() => setIsShareOpen(true)}
+        />
       </header>
-      <ShareProjectModal open={isShareOpen} onOpenChange={setIsShareOpen} onLogout={handleLogout} />
+      <ShareProjectModal open={isShareOpen} onOpenChange={setIsShareOpen} />
     </>
   );
 }

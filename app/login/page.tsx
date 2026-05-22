@@ -1,28 +1,53 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import AuthHero from "../../components/login/login-hero";
 import { Navigation } from "@/components/landing/navigation";
+import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginPage() {
-    const router = useRouter();
-    const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const error = useAuthStore((state) => state.error);
+  const isSendingOtp = useAuthStore((state) => state.isSendingOtp);
+  const isVerifyingOtp = useAuthStore((state) => state.isVerifyingOtp);
+  const otpExpiresAt = useAuthStore((state) => state.otpExpiresAt);
+  const sendOtp = useAuthStore((state) => state.sendOtp);
+  const verifyOtp = useAuthStore((state) => state.verifyOtp);
 
-    const handleAuthSubmit = (email: string) => {
-        if (loading) return;
-        setLoading(true);
-        console.log("auth submit", email);
-        setTimeout(() => {
-            setLoading(false);
-            router.push("/");
-        }, 700);
-    };
+  useEffect(() => {
+    if (accessToken) {
+      router.replace("/chat");
+    }
+  }, [accessToken, router]);
 
-    return (
-        <main className="relative min-h-screen overflow-x-hidden">
-            <Navigation hideLinks />
-            <AuthHero onSubmit={handleAuthSubmit} loading={loading} />
-        </main>
-    );
+  const handleSendOtp = useCallback(
+    async (email: string) => {
+      await sendOtp(email);
+    },
+    [sendOtp],
+  );
+
+  const handleVerifyOtp = useCallback(
+    async (email: string, otp: string) => {
+      await verifyOtp(email, otp);
+      router.replace("/chat");
+    },
+    [router, verifyOtp],
+  );
+
+  return (
+    <main className="relative min-h-screen overflow-x-hidden">
+      <Navigation hideLinks />
+      <AuthHero
+        onSendOtp={handleSendOtp}
+        onVerifyOtp={handleVerifyOtp}
+        error={error}
+        isSendingOtp={isSendingOtp}
+        isVerifyingOtp={isVerifyingOtp}
+        otpExpiresAt={otpExpiresAt}
+      />
+    </main>
+  );
 }

@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { motion, AnimatePresence, Variants } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
+import type { Variants } from "framer-motion";
 import {
   InputOTP,
   InputOTPGroup,
@@ -11,11 +13,14 @@ import {
 } from "@/components/ui/input-otp";
 
 interface AuthCardProps {
-  onSubmit?: (email: string) => void;
-  loading?: boolean;
+  onSendOtp?: (email: string) => void | Promise<void>;
+  onVerifyOtp?: (email: string, otp: string) => void | Promise<void>;
+  error?: string | null;
+  isSendingOtp?: boolean;
+  isVerifyingOtp?: boolean;
+  otpExpiresAt?: string | null;
 }
 
-// Shared animation variants
 const fadeSlideVariants: Variants = {
   enter: (dir: number) => ({
     x: dir > 0 ? 40 : -40,
@@ -42,18 +47,49 @@ const itemVariants: Variants = {
   }),
 };
 
-export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
+function formatOtpExpiry(otpExpiresAt?: string | null) {
+  if (!otpExpiresAt) return null;
+
+  const expiresAt = Date.parse(otpExpiresAt);
+  if (!Number.isFinite(expiresAt)) return null;
+
+  const seconds = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+  const minutes = Math.floor(seconds / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
+export default function AuthCard({
+  onSendOtp,
+  onVerifyOtp,
+  error,
+  isSendingOtp = false,
+  isVerifyingOtp = false,
+  otpExpiresAt,
+}: AuthCardProps) {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [step, setStep] = useState<"email" | "otp">("email");
-  // 1 = forward (email → otp), -1 = backward (otp → email)
   const [direction, setDirection] = useState(1);
 
-  const goToOtp = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!email) return;
-    setDirection(1);
-    setStep("otp");
+  const normalizedEmail = email.trim().toLowerCase();
+  const otpExpiryLabel = formatOtpExpiry(otpExpiresAt);
+  const isEmailSubmitDisabled = isSendingOtp || !normalizedEmail || !onSendOtp;
+  const isOtpSubmitDisabled = isVerifyingOtp || otp.length !== 6 || !onVerifyOtp;
+
+  const goToOtp = async (event?: FormEvent) => {
+    event?.preventDefault();
+    if (isEmailSubmitDisabled) return;
+
+    try {
+      await onSendOtp?.(normalizedEmail);
+      setOtp("");
+      setDirection(1);
+      setStep("otp");
+    } catch {
+      // Store-level error is rendered below.
+    }
   };
 
   const goBack = () => {
@@ -61,10 +97,26 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
     setStep("email");
   };
 
-  const handleOtpSubmit = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (otp.length !== 6) return;
-    onSubmit?.(email);
+  const handleOtpSubmit = async (event?: FormEvent) => {
+    event?.preventDefault();
+    if (isOtpSubmitDisabled) return;
+
+    try {
+      await onVerifyOtp?.(normalizedEmail, otp);
+    } catch {
+      // Store-level error is rendered below.
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (!normalizedEmail || isSendingOtp || !onSendOtp) return;
+
+    try {
+      await onSendOtp(normalizedEmail);
+      setOtp("");
+    } catch {
+      // Store-level error is rendered below.
+    }
   };
 
   return (
@@ -74,10 +126,8 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
       transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
       className="relative w-full max-w-[320px] mx-auto overflow-hidden rounded-[1.9rem] border border-border/40 bg-card/40 backdrop-blur-2xl shadow-2xl"
     >
-      {/* Glassmorphism glare */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.15),transparent_50%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.05),transparent_40%)] z-0" />
 
-      {/* Fixed-height content area — AnimatePresence handles step transitions */}
       <div className="relative z-10 p-6">
         <AnimatePresence mode="wait" custom={direction}>
           {step === "email" ? (
@@ -89,12 +139,13 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
               animate="center"
               exit="exit"
             >
-              {/* ── STEP 1: EMAIL ── */}
               <form onSubmit={goToOtp} className="space-y-4">
                 <motion.div custom={0} variants={itemVariants} initial="hidden" animate="visible">
                   <button
                     type="button"
-                    className="w-full inline-flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl border border-border/50 bg-secondary/30 text-foreground hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
+                    disabled
+                    aria-disabled={true}
+                    className="w-full inline-flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl border border-border/50 bg-secondary/30 text-foreground opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
                   >
                     <img src="/google.svg" alt="" width={20} height={20} className="w-5 h-5" />
                     Continue with Google
@@ -120,22 +171,38 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
                     autoComplete="email"
                     spellCheck={false}
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2.5 text-foreground placeholder:text-foreground/60 shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:bg-black/40 hover:border-white/30"
+                    disabled={isSendingOtp}
+                    onChange={(event) => setEmail(event.target.value)}
+                    className="w-full rounded-xl border border-white/20 bg-black/20 px-3 py-2.5 text-foreground placeholder:text-foreground/60 shadow-inner focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all hover:bg-black/40 hover:border-white/30 disabled:opacity-60"
                   />
                 </motion.label>
 
-                <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
+                {error ? (
+                  <motion.p
+                    custom={3}
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="text-xs text-red-200 text-center"
+                    role="alert"
+                  >
+                    {error}
+                  </motion.p>
+                ) : null}
+
+                <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
+                    className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-60 disabled:cursor-not-allowed hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
+                    disabled={isEmailSubmitDisabled}
+                    aria-disabled={isEmailSubmitDisabled}
                   >
-                    Continue with email
+                    {isSendingOtp ? "Sending code..." : "Continue with email"}
                   </button>
                 </motion.div>
 
                 <motion.p
-                  custom={4}
+                  custom={5}
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
@@ -161,9 +228,7 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
               animate="center"
               exit="exit"
             >
-              {/* ── STEP 2: OTP ── */}
               <form onSubmit={handleOtpSubmit} className="flex flex-col space-y-5">
-                {/* Header row */}
                 <motion.div
                   custom={0}
                   variants={itemVariants}
@@ -190,10 +255,10 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
                   className="text-sm text-muted-foreground leading-snug"
                 >
                   We sent a 6-digit code to{" "}
-                  <span className="text-foreground font-medium break-all">{email}</span>
+                  <span className="text-foreground font-medium break-all">{normalizedEmail}</span>
+                  {otpExpiryLabel ? <span>. Expires in {otpExpiryLabel}</span> : null}
                 </motion.p>
 
-                {/* OTP slots — 6×w-9 (36px) + 5×gap-1.5 (6px) = 246px → fits 272px content area */}
                 <motion.div
                   custom={2}
                   variants={itemVariants}
@@ -214,21 +279,34 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
                   </InputOTP>
                 </motion.div>
 
-                <motion.div custom={3} variants={itemVariants} initial="hidden" animate="visible">
+                {error ? (
+                  <motion.p
+                    custom={3}
+                    variants={itemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="text-xs text-red-200 text-center"
+                    role="alert"
+                  >
+                    {error}
+                  </motion.p>
+                ) : null}
+
+                <motion.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-60 hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
-                    disabled={loading || otp.length !== 6}
-                    aria-disabled={loading || otp.length !== 6}
+                    className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-60 disabled:cursor-not-allowed hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
+                    disabled={isOtpSubmitDisabled}
+                    aria-disabled={isOtpSubmitDisabled}
                   >
-                    {loading ? (
+                    {isVerifyingOtp ? (
                       <span className="inline-flex items-center gap-2">
                         <motion.span
                           className="block w-4 h-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
                           animate={{ rotate: 360 }}
                           transition={{ repeat: Infinity, duration: 0.7, ease: "linear" }}
                         />
-                        Verifying…
+                        Verifying...
                       </span>
                     ) : (
                       "Verify code"
@@ -237,7 +315,7 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
                 </motion.div>
 
                 <motion.p
-                  custom={4}
+                  custom={5}
                   variants={itemVariants}
                   initial="hidden"
                   animate="visible"
@@ -246,9 +324,11 @@ export default function AuthCard({ onSubmit, loading = false }: AuthCardProps) {
                   Didn&apos;t receive it?{" "}
                   <button
                     type="button"
-                    className="text-foreground underline hover:no-underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-ring"
+                    disabled={isSendingOtp}
+                    onClick={handleResendOtp}
+                    className="text-foreground underline hover:no-underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                   >
-                    Resend
+                    {isSendingOtp ? "Sending..." : "Resend"}
                   </button>
                 </motion.p>
               </form>

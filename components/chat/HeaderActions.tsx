@@ -40,6 +40,8 @@ const menuLinkClass =
   "inline cursor-pointer focus-visible:outline-0 no-underline hover:text-inherit";
 
 interface HeaderActionsProps {
+  userName?: string | null;
+  userAvatarUrl?: string | null;
   onAccountClick?: () => void;
   onFaqClick?: () => void;
   onFeedbackClick?: () => void;
@@ -287,6 +289,8 @@ function HeaderMoreMenu({
 }
 
 export default function HeaderActions({
+  userName,
+  userAvatarUrl,
   onAccountClick,
   onFaqClick,
   onFeedbackClick,
@@ -295,6 +299,7 @@ export default function HeaderActions({
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   const [isNewFeaturesOpen, setIsNewFeaturesOpen] = useState(false);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const userInitials = userName?.trim().slice(0, 2).toUpperCase() || "U";
 
   const toggleNewFeatures = (event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation();
@@ -387,12 +392,16 @@ export default function HeaderActions({
           onClick={onAccountClick}
         >
           <div className="flex items-center justify-center rounded-full text-lg font-medium select-none p-0 font-sans text-white bg-[rgb(var(--backgroundColor-secondary)/.5)] border border-[rgb(var(--borderColor-wash)/.2)] h-8 w-8 min-w-[2rem]">
-            <img
-              alt="Profile image"
-              className="rounded-full h-8 w-8 min-w-[2rem]"
-              referrerPolicy="no-referrer"
-              src="/assets/home/iVBORw0KGg_3.png"
-            />
+            {userAvatarUrl ? (
+              <img
+                alt={userName ? `${userName} avatar` : "Profile image"}
+                className="rounded-full h-8 w-8 min-w-[2rem] object-cover"
+                referrerPolicy="no-referrer"
+                src={userAvatarUrl}
+              />
+            ) : (
+              <span className="text-[12px] font-semibold text-primary">{userInitials}</span>
+            )}
           </div>
         </button>
       </div>
