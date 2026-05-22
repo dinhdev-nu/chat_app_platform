@@ -10,5 +10,12 @@ export const API_ENDPOINTS = {
   },
   user: {
     current: "/users/me",
+    search: "/users/search",
+  },
+  contacts: {
+    list: "/contacts",
+    requests: "/contacts/requests",
+    incomingRequests: "/contacts/requests/incoming",
+    acceptRequest: "/contacts/requests/accept",
   },
 } as const;

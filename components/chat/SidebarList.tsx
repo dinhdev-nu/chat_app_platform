@@ -12,6 +12,8 @@ type Props = {
     contacts: ContactUserResponse[];
     activeConversationId?: string;
     onSelectConversation?: (conv: ConversationListItem) => void;
+    isContactsLoading?: boolean;
+    contactsError?: string | null;
 };
 
 function SidebarList({
@@ -20,6 +22,8 @@ function SidebarList({
     contacts,
     activeConversationId,
     onSelectConversation,
+    isContactsLoading = false,
+    contactsError,
 }: Props) {
     return (
         <div className="relative w-full overflow-hidden">
@@ -43,14 +47,20 @@ function SidebarList({
                     inert={activeTab !== "all"}
                 >
                     <ul>
-                        {conversations.map((conversation) => (
-                            <ProjectItem
-                                key={conversation.id}
-                                conversation={conversation}
-                                isActive={conversation.id === activeConversationId}
-                                onSelect={onSelectConversation}
-                            />
-                        ))}
+                        {conversations.length > 0 ? (
+                            conversations.map((conversation) => (
+                                <ProjectItem
+                                    key={conversation.id}
+                                    conversation={conversation}
+                                    isActive={conversation.id === activeConversationId}
+                                    onSelect={onSelectConversation}
+                                />
+                            ))
+                        ) : (
+                            <li className="px-3 py-8 text-center text-sm text-secondary">
+                                Chưa có hội thoại
+                            </li>
+                        )}
                     </ul>
                 </div>
 
@@ -66,9 +76,23 @@ function SidebarList({
                     inert={activeTab !== "friends"}
                 >
                     <ul>
-                        {contacts.map((contact) => (
-                            <ContactItem key={contact.id} contact={contact} />
-                        ))}
+                        {isContactsLoading && contacts.length === 0 ? (
+                            <li className="px-3 py-8 text-center text-sm text-secondary">
+                                Đang tải bạn bè...
+                            </li>
+                        ) : contactsError ? (
+                            <li className="px-3 py-8 text-center text-sm text-[rgb(var(--textColor-danger))]" role="alert">
+                                {contactsError}
+                            </li>
+                        ) : contacts.length > 0 ? (
+                            contacts.map((contact) => (
+                                <ContactItem key={contact.id} contact={contact} />
+                            ))
+                        ) : (
+                            <li className="px-3 py-8 text-center text-sm text-secondary">
+                                Chưa có bạn bè
+                            </li>
+                        )}
                     </ul>
                 </div>
             </div>

@@ -209,7 +209,7 @@ export default function UpdateProfileModal({
                     type="text"
                     placeholder="Tên hiển thị..."
                     value={name}
-                    maxLength={255}
+                    maxLength={50}
                     onChange={(event) => setName(event.target.value)}
                     name="profileName"
                     autoComplete="name"
@@ -225,7 +225,7 @@ export default function UpdateProfileModal({
                   type="url"
                   placeholder="URL ảnh đại diện (tùy chọn)"
                   value={avatarUrl}
-                  maxLength={255}
+                  maxLength={512}
                   onChange={(event) => {
                     setAvatarUrl(event.target.value);
                     setAvatarError(false);
@@ -239,7 +239,7 @@ export default function UpdateProfileModal({
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs text-secondary font-medium">Giới thiệu bản thân</h3>
-                  <p className="text-xs text-secondary">{bio.length}/500</p>
+                  <p className="text-xs text-secondary">{bio.length}/300</p>
                 </div>
                 <label htmlFor="profile-bio" className="sr-only">
                   Giới thiệu bản thân
@@ -249,7 +249,7 @@ export default function UpdateProfileModal({
                   rows={2}
                   placeholder="Thêm mô tả về bạn..."
                   value={bio}
-                  maxLength={500}
+                  maxLength={300}
                   onChange={(event) => setBio(event.target.value)}
                   name="profileBio"
                   autoComplete="off"

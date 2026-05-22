@@ -5,16 +5,41 @@ import { useState } from "react";
 import DesignListContent from "./DesignListContent";
 import ThemeSettingsContent from "./ThemeSettingsContent";
 import ListUserContent from "./ListUserContent";
-import type { ContactUserResponse } from "./contact-data";
+import type { ContactRequestStatusResponse, ContactUserResponse, SearchUser } from "@/types/user";
 
 interface PanelProps {
   isOpen?: boolean;
   onClose?: () => void;
   onOpenFriends?: () => void;
   contacts?: ContactUserResponse[];
+  incomingRequests?: SearchUser[];
+  searchResults?: SearchUser[];
+  isIncomingLoading?: boolean;
+  isSearchingUsers?: boolean;
+  incomingError?: string | null;
+  searchError?: string | null;
+  pendingContactActionIds?: string[];
+  onAcceptContactRequest?: (senderUserId: string) => Promise<void> | void;
+  onSearchUsers?: (query: string) => Promise<SearchUser[]> | SearchUser[];
+  onSendContactRequest?: (targetUserId: string) => Promise<ContactRequestStatusResponse | undefined> | ContactRequestStatusResponse | undefined;
 }
 
-export default function Panel({ isOpen = false, onClose, onOpenFriends, contacts }: PanelProps) {
+export default function Panel({
+  isOpen = false,
+  onClose,
+  onOpenFriends,
+  contacts,
+  incomingRequests,
+  searchResults,
+  isIncomingLoading,
+  isSearchingUsers,
+  incomingError,
+  searchError,
+  pendingContactActionIds,
+  onAcceptContactRequest,
+  onSearchUsers,
+  onSendContactRequest,
+}: PanelProps) {
   const [activeView, setActiveView] = useState<"list" | "details" | "friends">("list");
   const [initialThemeType, setInitialThemeType] = useState<2 | 3>(2);
 
@@ -69,6 +94,11 @@ export default function Panel({ isOpen = false, onClose, onOpenFriends, contacts
                     setInitialThemeType(type);
                     setActiveView("details");
                   }}
+                  incomingRequests={incomingRequests}
+                  isIncomingLoading={isIncomingLoading}
+                  incomingError={incomingError}
+                  pendingContactActionIds={pendingContactActionIds}
+                  onAcceptContactRequest={onAcceptContactRequest}
                 />
               </div>
 
@@ -94,7 +124,13 @@ export default function Panel({ isOpen = false, onClose, onOpenFriends, contacts
               >
                 <ListUserContent
                   onBack={() => setActiveView("list")}
-                  users={contacts}
+                  users={searchResults}
+                  isSearching={isSearchingUsers}
+                  error={searchError}
+                  pendingActionIds={pendingContactActionIds}
+                  onSearchUsers={onSearchUsers}
+                  onSendContactRequest={onSendContactRequest}
+                  onAcceptContactRequest={onAcceptContactRequest}
                 />
               </div>
             </div>

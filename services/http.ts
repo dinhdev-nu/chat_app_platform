@@ -3,7 +3,7 @@ import type { AxiosError } from "axios";
 
 import { API_BASE_URL } from "@/constants/config";
 import { ApiClientError } from "@/types/api";
-import type { ApiErrorEnvelope, ApiEnvelope } from "@/types/api";
+import type { ApiErrorEnvelope, ApiEnvelope, ApiPaginatedEnvelope, PaginatedResult } from "@/types/api";
 
 let accessTokenProvider: () => string | null | undefined = () => null;
 
@@ -31,6 +31,13 @@ http.interceptors.request.use((config) => {
 
 export function unwrapApiData<T>(body: ApiEnvelope<T>): T {
   return body.data;
+}
+
+export function unwrapPaginatedApiData<T>(body: ApiPaginatedEnvelope<T>): PaginatedResult<T> {
+  return {
+    data: body.data,
+    pagination: body.meta.pagination,
+  };
 }
 
 export function normalizeApiError(error: unknown): ApiClientError {

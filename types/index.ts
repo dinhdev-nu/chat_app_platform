@@ -1,4 +1,20 @@
-export type { ApiEnvelope, ApiErrorEnvelope, ApiErrorBody } from "./api";
+export type {
+  ApiEnvelope,
+  ApiPaginatedEnvelope,
+  ApiErrorEnvelope,
+  ApiErrorBody,
+  PaginatedResult,
+  PaginationMeta,
+} from "./api";
 export { ApiClientError } from "./api";
-export type { AuthUser, UpdateUserRequest } from "./user";
+export type {
+  AuthUser,
+  ContactRequestStatusResponse,
+  ContactUserResponse,
+  CursorPaginationParams,
+  SearchUser,
+  SearchUsersParams,
+  UpdateUserRequest,
+} from "./user";
+export { ContactStatus } from "./user";
 export type { SendOtpRequest, SendOtpResponse, VerifyOtpRequest, LoginResponse } from "./auth";

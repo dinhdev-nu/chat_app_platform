@@ -1,7 +1,9 @@
 import React from "react";
+
+import type { SearchUser } from "@/types/user";
 import {
-  PaletteIcon,
   CloseIcon,
+  PaletteIcon,
   PlusIcon,
 } from "./icons";
 
@@ -10,39 +12,30 @@ interface DesignListContentProps {
   onOpenFriends?: () => void;
   onOpenAddFriends?: () => void;
   onOpenTheme?: (type?: 2 | 3) => void;
+  incomingRequests?: SearchUser[];
+  isIncomingLoading?: boolean;
+  incomingError?: string | null;
+  pendingContactActionIds?: string[];
+  onAcceptContactRequest?: (senderUserId: string) => Promise<void> | void;
 }
 
-interface ContactUserIncomingResponse {
-  id: string;
-  username: string;
-  avatarUrl?: string | null;
-  bio?: string | null;
-}
+function DesignListContent({
+  onClose,
+  onOpenFriends,
+  onOpenAddFriends,
+  onOpenTheme,
+  incomingRequests = [],
+  isIncomingLoading = false,
+  incomingError,
+  pendingContactActionIds = [],
+  onAcceptContactRequest,
+}: DesignListContentProps) {
+  const handleAccept = (senderUserId: string) => {
+    void Promise.resolve(onAcceptContactRequest?.(senderUserId)).catch(() => undefined);
+  };
 
-const INCOMING_REQUESTS: ContactUserIncomingResponse[] = [
-  {
-    id: "1",
-    username: "Alex Nguyen",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=alex",
-    bio: "Love to chat",
-  },
-  {
-    id: "2",
-    username: "Emma Smith",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=emma",
-    bio: "Coffee enthusiast",
-  },
-  {
-    id: "3",
-    username: "John Doe",
-    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=john",
-  },
-];
-
-function DesignListContent({ onClose, onOpenFriends, onOpenAddFriends, onOpenTheme }: DesignListContentProps) {
   return (
     <div className="flex flex-1 flex-col min-h-0 text-primary">
-      {/* Header */}
       <div className="flex items-center justify-between p-4 flex-shrink-0">
         <div className="flex items-center gap-2 font-medium text-sm">
           <PaletteIcon size={20} />
@@ -104,47 +97,62 @@ function DesignListContent({ onClose, onOpenFriends, onOpenAddFriends, onOpenThe
         Yêu cầu
       </div>
 
-      {/* Incoming Requests List */}
       <div className="flex-1 overflow-y-auto px-3 pb-4 flex flex-col gap-2 hide-scrollbar">
-        {INCOMING_REQUESTS.map((contact) => (
-          <div
-            key={contact.id}
-            className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
-          >
-            {/* Avatar */}
-            <img
-              src={contact.avatarUrl || `https://api.dicebear.com/7.x/avataaars/svg?seed=${contact.username}`}
-              alt={contact.username}
-              className="w-10 h-10 rounded-full flex-shrink-0"
-            />
-
-            {/* User Info */}
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-semibold text-primary truncate" style={{ fontWeight: 600 }}>
-                {contact.username}
-              </div>
-              {contact.bio && (
-                <div className="text-xs text-secondary line-clamp-1">
-                  {contact.bio}
-                </div>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <button type="button" aria-label={`Chấp nhận ${contact.username}`} className="p-1 hover-surface rounded-lg transition-colors" title="Accept">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-64-64a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
-                </svg>
-              </button>
-              <button type="button" aria-label={`Từ chối ${contact.username}`} className="p-1 hover-surface rounded-lg transition-colors" title="Decline">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M205.66,50.34a8,8,0,0,0-11.32,0L128,117.66,61.66,51.34a8,8,0,0,0-11.32,11.32L116.69,129l-66.35,66.34a8,8,0,0,0,11.32,11.32L128,140.34l66.34,66.35a8,8,0,0,0,11.32-11.32L139.31,129l66.35-66.34A8,8,0,0,0,205.66,50.34Z"></path>
-                </svg>
-              </button>
-            </div>
+        {isIncomingLoading && incomingRequests.length === 0 ? (
+          <div className="px-2 py-8 text-center text-sm text-secondary">Đang tải yêu cầu...</div>
+        ) : incomingError ? (
+          <div className="px-2 py-8 text-center text-sm text-[rgb(var(--textColor-danger))]" role="alert">
+            {incomingError}
           </div>
-        ))}
+        ) : incomingRequests.length > 0 ? (
+          incomingRequests.map((contact) => {
+            const isPending = pendingContactActionIds.includes(contact.id);
+            const initials = contact.username.trim().slice(0, 2).toUpperCase() || "US";
+
+            return (
+              <div
+                key={contact.id}
+                className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
+              >
+                <div
+                  className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden bg-[rgb(var(--backgroundColor-state-enabled)/.5)] bg-cover bg-center flex items-center justify-center"
+                  style={{ backgroundImage: contact.avatarUrl ? `url(${contact.avatarUrl})` : undefined }}
+                  aria-hidden="true"
+                >
+                  {!contact.avatarUrl ? (
+                    <span className="text-xs font-semibold text-primary">{initials}</span>
+                  ) : null}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="text-xs font-semibold text-primary truncate" style={{ fontWeight: 600 }}>
+                    {contact.username}
+                  </div>
+                  {contact.bio ? (
+                    <div className="text-xs text-secondary line-clamp-1">
+                      {contact.bio}
+                    </div>
+                  ) : null}
+                </div>
+
+                <button
+                  type="button"
+                  aria-label={`Chấp nhận ${contact.username}`}
+                  className="p-1 hover-surface rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+                  title="Chấp nhận"
+                  disabled={isPending || !onAcceptContactRequest}
+                  onClick={() => handleAccept(contact.id)}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-64-64a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z" />
+                  </svg>
+                </button>
+              </div>
+            );
+          })
+        ) : (
+          <div className="px-2 py-8 text-center text-sm text-secondary">Không có yêu cầu mới</div>
+        )}
       </div>
     </div>
   );

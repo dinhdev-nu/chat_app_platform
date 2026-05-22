@@ -15,6 +15,7 @@ interface AuthState {
   otpEmail: string | null;
   otpExpiresAt: string | null;
   error: string | null;
+  hasHydrated: boolean;
   isSendingOtp: boolean;
   isVerifyingOtp: boolean;
   isLoggingOut: boolean;
@@ -22,10 +23,12 @@ interface AuthState {
   sendOtp: (email: string) => Promise<void>;
   verifyOtp: (email: string, otp: string) => Promise<AuthUser>;
   logout: () => Promise<void>;
+  refreshProfile: () => Promise<AuthUser>;
   updateProfile: (payload: UpdateUserRequest) => Promise<AuthUser>;
   clearError: () => void;
   clearSession: () => void;
   ensureDeviceId: () => string;
+  setHasHydrated: (hasHydrated: boolean) => void;
 }
 
 function createDeviceId() {
@@ -57,6 +60,7 @@ export const useAuthStore = create<AuthState>()(
       otpEmail: null,
       otpExpiresAt: null,
       error: null,
+      hasHydrated: false,
       isSendingOtp: false,
       isVerifyingOtp: false,
       isLoggingOut: false,
@@ -73,6 +77,8 @@ export const useAuthStore = create<AuthState>()(
       },
 
       clearError: () => set({ error: null }),
+
+      setHasHydrated: (hasHydrated) => set({ hasHydrated }),
 
       clearSession: () => {
         const deviceId = get().deviceId;
@@ -159,6 +165,22 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
+      refreshProfile: async () => {
+        set({ error: null });
+
+        try {
+          const currentUser = await userService.getCurrentUser();
+
+          set({ user: currentUser });
+
+          return currentUser;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "KhÃ´ng thá»ƒ táº£i há»“ sÆ¡";
+          set({ error: message });
+          throw error;
+        }
+      },
+
       updateProfile: async (payload) => {
         set({ isUpdatingProfile: true, error: null });
 
@@ -186,6 +208,9 @@ export const useAuthStore = create<AuthState>()(
         expiresAt: state.expiresAt,
         deviceId: state.deviceId,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 );

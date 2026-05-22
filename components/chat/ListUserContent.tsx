@@ -1,44 +1,54 @@
 "use client";
 
-import React, { useDeferredValue, useMemo, useState } from "react";
-import { BackIcon, SearchIcon, CloseIcon } from "@/components/chat/icons";
-import { User, Send, Check, UserPlus } from "lucide-react";
-import { SearchUser, ContactStatus } from "@/components/chat/contact-data";
+import React, { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { Check, Loader2, Send, User, UserPlus } from "lucide-react";
+
+import { BackIcon, CloseIcon, SearchIcon } from "@/components/chat/icons";
+import { ContactStatus } from "@/types/user";
+import type { ContactRequestStatusResponse, SearchUser } from "@/types/user";
 
 interface ListUserContentProps {
   onBack?: () => void;
   users?: SearchUser[];
+  isSearching?: boolean;
+  error?: string | null;
+  pendingActionIds?: string[];
+  onSearchUsers?: (query: string) => Promise<SearchUser[]> | SearchUser[];
+  onSendContactRequest?: (targetUserId: string) => Promise<ContactRequestStatusResponse | undefined> | ContactRequestStatusResponse | undefined;
+  onAcceptContactRequest?: (senderUserId: string) => Promise<void> | void;
 }
 
-const MOCK_SEARCH_USERS: SearchUser[] = [
-  {
-    id: "search_01",
-    username: "An Bình",
-    avatarUrl: "/assets/home/iVBORw0KGg_3.png",
-    bio: "Thiết kế landing page và tối ưu flow onboarding.",
-    outgoingStatus: ContactStatus.Accepted,
-  },
-  {
-    id: "search_02",
-    username: "Hoàng Tuấn",
-    bio: "Frontend Developer",
-    outgoingStatus: ContactStatus.Pending,
-  },
-  {
-    id: "search_03",
-    username: "Minh Nguyệt",
-    avatarUrl: "/assets/home/iVBORw0KGg_5.png",
-    bio: null,
-    incomingStatus: ContactStatus.Pending,
-  },
-  {
-    id: "search_04",
-    username: "Hải Đăng",
-    bio: "Sẵn sàng trò chuyện",
-  },
-];
+interface UserActionProps {
+  user: SearchUser;
+  isPending: boolean;
+  onSendContactRequest?: ListUserContentProps["onSendContactRequest"];
+  onAcceptContactRequest?: ListUserContentProps["onAcceptContactRequest"];
+}
 
-function renderAction(user: SearchUser) {
+function runAction(action?: () => Promise<unknown> | unknown) {
+  void Promise.resolve(action?.()).catch(() => undefined);
+}
+
+function UserAction({
+  user,
+  isPending,
+  onSendContactRequest,
+  onAcceptContactRequest,
+}: UserActionProps) {
+  if (isPending) {
+    return (
+      <button
+        type="button"
+        disabled
+        aria-label="Đang xử lý"
+        title="Đang xử lý"
+        className="p-2 rounded-lg text-secondary disabled:opacity-60 disabled:cursor-wait"
+      >
+        <Loader2 size={16} className="animate-spin" />
+      </button>
+    );
+  }
+
   if (user.outgoingStatus === ContactStatus.Accepted || user.incomingStatus === ContactStatus.Accepted) {
     return (
       <button
@@ -46,7 +56,7 @@ function renderAction(user: SearchUser) {
         disabled
         aria-label="Đã là bạn bè"
         title="Bạn bè"
-        className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-lg text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <User size={16} />
       </button>
@@ -60,7 +70,7 @@ function renderAction(user: SearchUser) {
         disabled
         aria-label="Đã gửi lời mời"
         title="Đã gửi"
-        className="p-2 rounded-lg text-secondary hover:text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-lg text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <Send size={16} />
       </button>
@@ -73,7 +83,9 @@ function renderAction(user: SearchUser) {
         type="button"
         aria-label="Chấp nhận lời mời"
         title="Chấp nhận"
-        className="p-2 rounded-lg bg-[rgb(var(--backgroundColor-state-enabled)/.575)] text-primary hover-surface-soft transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]"
+        disabled={!onAcceptContactRequest}
+        className="p-2 rounded-lg bg-[rgb(var(--backgroundColor-state-enabled)/.575)] text-primary hover-surface-soft transition-colors shadow-[0_1px_2px_0_rgba(0,0,0,0.05)] disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={() => runAction(() => onAcceptContactRequest?.(user.id))}
       >
         <Check size={16} />
       </button>
@@ -85,24 +97,51 @@ function renderAction(user: SearchUser) {
       type="button"
       aria-label="Kết bạn"
       title="Kết bạn"
-      className="p-2 rounded-lg bg-transparent text-primary border border-chat-secondary hover-surface-soft transition-colors"
+      disabled={!onSendContactRequest}
+      className="p-2 rounded-lg bg-transparent text-primary border border-chat-secondary hover-surface-soft transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+      onClick={() => runAction(() => onSendContactRequest?.(user.id))}
     >
       <UserPlus size={16} />
     </button>
   );
 }
 
-function ListUserContent({ onBack, users = MOCK_SEARCH_USERS }: ListUserContentProps) {
+function ListUserContent({
+  onBack,
+  users = [],
+  isSearching = false,
+  error,
+  pendingActionIds = [],
+  onSearchUsers,
+  onSendContactRequest,
+  onAcceptContactRequest,
+}: ListUserContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const normalizedSearchQuery = useMemo(
     () => deferredSearchQuery.trim().toLowerCase(),
     [deferredSearchQuery],
   );
-  const filteredUsers = useMemo(
-    () => users.filter((user) => user.username.toLowerCase().includes(normalizedSearchQuery)),
-    [normalizedSearchQuery, users],
-  );
+  const pendingActionIdSet = useMemo(() => new Set(pendingActionIds), [pendingActionIds]);
+
+  useEffect(() => {
+    if (!onSearchUsers) return;
+
+    const timeoutId = window.setTimeout(() => {
+      void Promise.resolve(onSearchUsers(searchQuery.trim())).catch(() => undefined);
+    }, 250);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [onSearchUsers, searchQuery]);
+
+  const filteredUsers = useMemo(() => {
+    if (onSearchUsers) return users;
+    if (!normalizedSearchQuery) return users;
+
+    return users.filter((user) => user.username.toLowerCase().includes(normalizedSearchQuery));
+  }, [normalizedSearchQuery, onSearchUsers, users]);
+
+  const hasQuery = searchQuery.trim().length > 0;
 
   return (
     <div className="flex flex-1 flex-col min-h-0 text-primary">
@@ -144,9 +183,9 @@ function ListUserContent({ onBack, users = MOCK_SEARCH_USERS }: ListUserContentP
               autoComplete="off"
               aria-label="Tìm kiếm bạn bè"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(event) => setSearchQuery(event.target.value)}
             />
-            {searchQuery && (
+            {searchQuery ? (
               <button
                 type="button"
                 aria-label="Xóa từ khóa tìm kiếm"
@@ -155,38 +194,62 @@ function ListUserContent({ onBack, users = MOCK_SEARCH_USERS }: ListUserContentP
               >
                 <CloseIcon size={14} />
               </button>
-            )}
+            ) : null}
           </div>
         </div>
 
+        {error ? (
+          <div className="text-center text-sm text-[rgb(var(--textColor-danger))] py-3" role="alert">
+            {error}
+          </div>
+        ) : null}
+
         <div className="flex flex-col gap-1 mt-2">
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
-              <div
-                key={user.id}
-                className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
-              >
-                <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0">
-                    {user.avatarUrl ? (
-                      <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-[rgb(var(--backgroundColor-state-enabled)/.5)] text-primary font-medium">
-                        {user.username.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+          {isSearching ? (
+            <div className="flex items-center justify-center gap-2 text-sm text-secondary py-8">
+              <Loader2 size={16} className="animate-spin" />
+              Đang tìm...
+            </div>
+          ) : filteredUsers.length > 0 ? (
+            filteredUsers.map((user) => {
+              const initials = user.username.trim().charAt(0).toUpperCase() || "U";
+
+              return (
+                <div
+                  key={user.id}
+                  className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
+                >
+                  <div className="relative">
+                    <div
+                      className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0 bg-cover bg-center flex items-center justify-center"
+                      style={{ backgroundImage: user.avatarUrl ? `url(${user.avatarUrl})` : undefined }}
+                      aria-hidden="true"
+                    >
+                      {!user.avatarUrl ? (
+                        <div className="w-full h-full flex items-center justify-center bg-[rgb(var(--backgroundColor-state-enabled)/.5)] text-primary font-medium">
+                          {initials}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="flex flex-col flex-1 min-w-0 pr-2">
+                    <span className="text-sm font-semibold text-primary truncate">{user.username}</span>
+                    <span className="text-xs text-secondary truncate">{user.bio || "Sẵn sàng trò chuyện"}</span>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <UserAction
+                      user={user}
+                      isPending={pendingActionIdSet.has(user.id)}
+                      onSendContactRequest={onSendContactRequest}
+                      onAcceptContactRequest={onAcceptContactRequest}
+                    />
                   </div>
                 </div>
-                <div className="flex flex-col flex-1 min-w-0 pr-2">
-                  <span className="text-sm font-semibold text-primary truncate">{user.username}</span>
-                  <span className="text-xs text-secondary truncate">{user.bio || "Sẵn sàng trò chuyện"}</span>
-                </div>
-                <div className="flex-shrink-0">{renderAction(user)}</div>
-              </div>
-            ))
+              );
+            })
           ) : (
             <div className="text-center text-sm text-secondary py-8">
-              {searchQuery ? "Không tìm thấy người dùng nào" : "Nhập để tìm kiếm bạn bè"}
+              {hasQuery ? "Không tìm thấy người dùng nào" : "Nhập để tìm kiếm bạn bè"}
             </div>
           )}
         </div>

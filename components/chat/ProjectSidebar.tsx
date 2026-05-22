@@ -17,6 +17,8 @@ interface ProjectSidebarProps {
   onSelectConversation?: (conv: ConversationListItem) => void;
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
+  isContactsLoading?: boolean;
+  contactsError?: string | null;
   activeTab?: SidebarFilter;
   onActiveTabChange?: (tab: SidebarFilter) => void;
 }
@@ -27,6 +29,8 @@ export default function ProjectSidebar({
   onOpenPanel,
   conversations = MOCK_CONVERSATIONS,
   contacts = MOCK_CONTACT_USERS,
+  isContactsLoading = false,
+  contactsError,
   activeConversationId,
   onSelectConversation,
   activeTab: activeTabProp,
@@ -279,6 +283,8 @@ export default function ProjectSidebar({
             contacts={visibleContacts}
             activeConversationId={activeConversationId}
             onSelectConversation={onSelectConversation}
+            isContactsLoading={isContactsLoading}
+            contactsError={contactsError}
           />
         </div>
       </div>

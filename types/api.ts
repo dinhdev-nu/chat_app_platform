@@ -9,6 +9,23 @@ export interface ApiEnvelope<T> {
   data: T;
 }
 
+export interface PaginationMeta {
+  limit: number;
+  hasNext: boolean;
+  nextCursor?: string;
+}
+
+export interface ApiPaginatedEnvelope<T> extends ApiEnvelope<T[]> {
+  meta: {
+    pagination: PaginationMeta;
+  };
+}
+
+export interface PaginatedResult<T> {
+  data: T[];
+  pagination: PaginationMeta;
+}
+
 export interface ApiErrorEnvelope {
   success: false;
   message: string;
