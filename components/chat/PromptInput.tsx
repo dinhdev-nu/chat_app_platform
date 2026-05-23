@@ -1,22 +1,51 @@
 "use client";
 
+import { useCallback, useMemo, useState } from "react";
+
+import { useAuthStore } from "@/stores/authStore";
 import ChatInput from "./ChatInput";
 import type { ConversationListItem } from "./conversation-data";
 
-const SUGGESTION_PROMPTS = [
-  "Tôi là (tên của bạn). Rất vui được gặp bạn.",
+const STATIC_SUGGESTION_PROMPTS = [
   "Chào ngày mới! Ngày hôm nay của bạn thế nào rồi?",
   "Bạn có rảnh không?",
   "Bạn có thể giúp mình một chút được không?",
-  "Mình muốn giới thiệu về bản thân — bạn có muốn nghe không?",
+  "Mình muốn giới thiệu về bản thân, bạn có muốn nghe không?",
   "Bạn đang làm gì đấy?",
 ];
 
-interface PromptInputProps {
-  conv?: ConversationListItem;
+function getSuggestionPrompts(currentUserName?: string) {
+  const name = currentUserName?.trim();
+
+  return [
+    name ? `Tôi là ${name}. Rất vui được gặp bạn.` : "Rất vui được gặp bạn.",
+    ...STATIC_SUGGESTION_PROMPTS,
+  ];
 }
 
-export default function PromptInput({ conv }: PromptInputProps) {
+interface PromptInputProps {
+  conv?: ConversationListItem;
+  onSend?: (text: string) => void;
+}
+
+export default function PromptInput({ conv, onSend }: PromptInputProps) {
+  const currentUserName = useAuthStore((state) => state.user?.name);
+  const suggestionPrompts = useMemo(
+    () => getSuggestionPrompts(currentUserName),
+    [currentUserName],
+  );
+  const [suggestedTextRequest, setSuggestedTextRequest] = useState<{
+    key: number;
+    text: string;
+  } | null>(null);
+
+  const handleSelectSuggestion = useCallback((text: string) => {
+    setSuggestedTextRequest((currentRequest) => ({
+      key: (currentRequest?.key ?? 0) + 1,
+      text,
+    }));
+  }, []);
+
   return (
     <section
       id="create-scroll-container"
@@ -47,8 +76,8 @@ export default function PromptInput({ conv }: PromptInputProps) {
                   [-webkit-mask-image:linear-gradient(to_right,black_calc(100%-24px),transparent)]
                 "
               >
-                {SUGGESTION_PROMPTS.map((prompt, i) => (
-                  <div className="shrink-0" key={i}>
+                {suggestionPrompts.map((prompt) => (
+                  <div className="shrink-0" key={prompt}>
                     <button
                       type="button"
                       className="
@@ -62,6 +91,7 @@ export default function PromptInput({ conv }: PromptInputProps) {
                         shadow-[0_1px_2px_0_rgba(0,0,0,0.05)]
                         text-[rgb(var(--textColor-primary))]
                       "
+                      onClick={() => handleSelectSuggestion(prompt)}
                     >
                       <span className="truncate min-w-0 whitespace-nowrap">{prompt}</span>
                     </button>
@@ -70,7 +100,14 @@ export default function PromptInput({ conv }: PromptInputProps) {
               </div>
 
               <div className="flex w-full self-start justify-center md:border-none transition-all duration-300 rounded-3xl">
-                <ChatInput />
+                <ChatInput
+                  ariaLabel={conv?.name ? `Nhắn tin tới ${conv.name}` : undefined}
+                  placeholder={conv?.name ? `Nhắn tin tới ${conv.name}...` : undefined}
+                  sendLabel={conv ? "Gửi tin nhắn" : undefined}
+                  suggestedText={suggestedTextRequest?.text}
+                  suggestedTextKey={suggestedTextRequest?.key}
+                  onSend={onSend}
+                />
               </div>
             </div>
           </div>

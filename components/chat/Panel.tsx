@@ -123,6 +123,7 @@ export default function Panel({
                 inert={activeView !== "friends"}
               >
                 <ListUserContent
+                  isActive={activeView === "friends"}
                   onBack={() => setActiveView("list")}
                   users={searchResults}
                   isSearching={isSearchingUsers}

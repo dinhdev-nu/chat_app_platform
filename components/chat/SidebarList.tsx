@@ -12,6 +12,7 @@ type Props = {
     contacts: ContactUserResponse[];
     activeConversationId?: string;
     onSelectConversation?: (conv: ConversationListItem) => void;
+    onSelectContact?: (contact: ContactUserResponse) => void;
     isContactsLoading?: boolean;
     contactsError?: string | null;
 };
@@ -22,6 +23,7 @@ function SidebarList({
     contacts,
     activeConversationId,
     onSelectConversation,
+    onSelectContact,
     isContactsLoading = false,
     contactsError,
 }: Props) {
@@ -86,7 +88,11 @@ function SidebarList({
                             </li>
                         ) : contacts.length > 0 ? (
                             contacts.map((contact) => (
-                                <ContactItem key={contact.id} contact={contact} />
+                                <ContactItem
+                                    key={contact.id}
+                                    contact={contact}
+                                    onSelect={onSelectContact}
+                                />
                             ))
                         ) : (
                             <li className="px-3 py-8 text-center text-sm text-secondary">

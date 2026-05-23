@@ -134,7 +134,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
       const requestId = latestSearchRequestId.current + 1;
       latestSearchRequestId.current = requestId;
 
-      if (!enabled || !trimmedQuery) {
+      if (!enabled) {
         setSearchResults([]);
         setSearchError(null);
         setIsSearchingUsers(false);

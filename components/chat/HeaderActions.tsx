@@ -248,8 +248,40 @@ function HeaderMoreMenu({
           className="flex flex-col gap-1 py-2 px-1 overflow-auto thin-scrollbar border border-secondary outline-0 rounded-xl box-border text-subtitle-md text-primary bg-surface-container backdrop-blur-glass shadow-xl motion-safe:transition-[transform,scale,opacity] motion-safe:data-[ending-style]:scale-90 motion-safe:data-[ending-style]:opacity-0 motion-safe:data-[starting-style]:scale-90 motion-safe:data-[starting-style]:opacity-0 max-w-[calc(100vw-16px)] max-h-[var(--available-height)]"
         >
           <HeaderMoreItem
-            id="header-more-faq"
+            id="header-more-docs"
             index={1}
+            icon={<DocsIcon size={20} />}
+            href="/docs"
+            onSelect={onClose}
+            className="md:hidden"
+          >
+            Docs
+          </HeaderMoreItem>
+          <HeaderMoreItem
+            id="header-more-discord"
+            index={2}
+            icon={<DiscordIcon size={20} />}
+            href="https://discord.com"
+            external
+            onSelect={onClose}
+            className="md:hidden"
+          >
+            Discord
+          </HeaderMoreItem>
+          <HeaderMoreItem
+            id="header-more-x"
+            index={3}
+            icon={<XIcon size={20} />}
+            href="https://x.com"
+            external
+            onSelect={onClose}
+            className="md:hidden"
+          >
+            X
+          </HeaderMoreItem>
+          <HeaderMoreItem
+            id="header-more-faq"
+            index={4}
             icon={<FAQsIcon size={20} />}
             onSelect={() => { onFaqClick?.(); onClose(); }}
           >
@@ -257,7 +289,7 @@ function HeaderMoreMenu({
           </HeaderMoreItem>
           <HeaderMoreItem
             id="header-more-forum"
-            index={2}
+            index={5}
             icon={<ForumIcon size={20} />}
             href="/chat?header_more=forum"
             onSelect={onClose}
@@ -266,7 +298,7 @@ function HeaderMoreMenu({
           </HeaderMoreItem>
           <HeaderMoreItem
             id="header-more-prompt-guide"
-            index={3}
+            index={6}
             icon={<DocsIcon size={20} />}
             href="/chat?header_more=prompt-guide"
             onSelect={onClose}
@@ -275,7 +307,7 @@ function HeaderMoreMenu({
           </HeaderMoreItem>
           <HeaderMoreItem
             id="header-more-feedback"
-            index={4}
+            index={7}
             icon={<FlySendIcon size={20} />}
             onSelect={() => { onFeedbackClick?.(); onClose(); }}
           >

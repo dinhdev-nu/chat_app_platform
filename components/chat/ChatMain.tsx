@@ -144,12 +144,14 @@ interface ChatMainProps {
   activeConv?: ConversationListItem;
   isProjectSidebarOpen?: boolean;
   onToggleProjects?: () => void;
+  onCreateConversation?: (conversation: ConversationListItem, firstMessageText: string) => ConversationListItem | undefined;
 }
 
 export default function ChatMain({
   activeConv,
   isProjectSidebarOpen = false,
   onToggleProjects,
+  onCreateConversation,
 }: ChatMainProps) {
   const [messageStore, setMessageStore] = useState<Record<string, ChatMessage[]>>(MOCK_MESSAGES);
   const [typingStore, setTypingStore] = useState<Record<string, ChatTypingUser[]>>({});
@@ -186,9 +188,10 @@ export default function ChatMain({
 
   const handleSend = (text: string) => {
     if (!activeConv) return;
-    const conversationId = activeConv.id;
+    const targetConversation = onCreateConversation?.(activeConv, text) ?? activeConv;
+    const conversationId = targetConversation.id;
     const existingMessages = messageStore[conversationId] ?? [];
-    const typingUser = getConversationTypingUser(activeConv, existingMessages);
+    const typingUser = getConversationTypingUser(targetConversation, existingMessages);
     const newMsg: ChatMessage = {
       id: `m_${Date.now()}`,
       text,
@@ -340,7 +343,7 @@ export default function ChatMain({
             animate="animate"
             exit="exit"
           >
-            <PromptInput conv={activeConv} />
+            <PromptInput conv={activeConv} onSend={handleSend} />
           </motion.div>
         )}
 

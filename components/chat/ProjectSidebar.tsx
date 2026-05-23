@@ -15,6 +15,7 @@ interface ProjectSidebarProps {
   onOpenPanel?: () => void;
   activeConversationId?: string;
   onSelectConversation?: (conv: ConversationListItem) => void;
+  onSelectContact?: (contact: ContactUserResponse) => void;
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
   isContactsLoading?: boolean;
@@ -33,6 +34,7 @@ export default function ProjectSidebar({
   contactsError,
   activeConversationId,
   onSelectConversation,
+  onSelectContact,
   activeTab: activeTabProp,
   onActiveTabChange,
 }: ProjectSidebarProps) {
@@ -283,6 +285,7 @@ export default function ProjectSidebar({
             contacts={visibleContacts}
             activeConversationId={activeConversationId}
             onSelectConversation={onSelectConversation}
+            onSelectContact={onSelectContact}
             isContactsLoading={isContactsLoading}
             contactsError={contactsError}
           />

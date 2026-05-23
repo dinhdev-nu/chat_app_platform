@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent } from "react";
 
 import IconSelector from "./IconSelector";
@@ -24,19 +24,32 @@ const hiddenInputClass =
 const iconButtonClass =
   "outline-none select-none focus-ring disabled:opacity-50 disabled:cursor-not-allowed p-2 flex items-center justify-center rounded-full size-7 bg-transparent hover:bg-[rgb(var(--backgroundColor-state-hover))] active:bg-[rgb(var(--backgroundColor-state-pressed))] data-[popup-open]:bg-[rgb(var(--backgroundColor-state-hover))] transition-colors cursor-pointer shrink-0";
 
-const iconTokenClass = "flex items-center justify-center text-primary";
-
 interface ChatInputProps {
   ariaLabel?: string;
   placeholder?: string;
   sendLabel?: string;
+  suggestedText?: string;
+  suggestedTextKey?: number;
   onSend?: (text: string) => void;
+}
+
+function focusEditorEnd(editor: HTMLElement) {
+  editor.focus();
+
+  const selection = window.getSelection();
+  const range = document.createRange();
+  range.selectNodeContents(editor);
+  range.collapse(false);
+  selection?.removeAllRanges();
+  selection?.addRange(range);
 }
 
 export default function ChatInput({
   ariaLabel = "Bạn muốn thay đổi hoặc tạo nội dung gì?",
   placeholder = "Bạn muốn thay đổi hoặc tạo nội dung gì?",
   sendLabel = "Tạo",
+  suggestedText,
+  suggestedTextKey,
   onSend,
 }: ChatInputProps) {
   const paletteButtonRef = useRef<HTMLButtonElement>(null);
@@ -56,6 +69,22 @@ export default function ChatInput({
 
   const trimmedText = inputText.trim();
   const canSend = Boolean(onSend && trimmedText);
+
+  useEffect(() => {
+    if (suggestedTextKey === undefined || suggestedText === undefined) return;
+
+    const editor = editorRef.current;
+    if (editor) {
+      editor.textContent = suggestedText;
+      focusEditorEnd(editor);
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setInputText(suggestedText);
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [suggestedText, suggestedTextKey]);
 
   const handleEditorInput = (event: FormEvent<HTMLDivElement>) => {
     setInputText(event.currentTarget.textContent ?? "");
@@ -85,14 +114,7 @@ export default function ChatInput({
     if (!editor) return;
 
     editor.textContent = nextText;
-    editor.focus();
-
-    const selection = window.getSelection();
-    const range = document.createRange();
-    range.selectNodeContents(editor);
-    range.collapse(false);
-    selection?.removeAllRanges();
-    selection?.addRange(range);
+    focusEditorEnd(editor);
   };
 
   return (

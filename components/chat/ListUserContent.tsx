@@ -8,6 +8,7 @@ import { ContactStatus } from "@/types/user";
 import type { ContactRequestStatusResponse, SearchUser } from "@/types/user";
 
 interface ListUserContentProps {
+  isActive?: boolean;
   onBack?: () => void;
   users?: SearchUser[];
   isSearching?: boolean;
@@ -107,6 +108,7 @@ function UserAction({
 }
 
 function ListUserContent({
+  isActive = true,
   onBack,
   users = [],
   isSearching = false,
@@ -117,6 +119,7 @@ function ListUserContent({
   onAcceptContactRequest,
 }: ListUserContentProps) {
   const [searchQuery, setSearchQuery] = useState("");
+  const [hasActivatedSearch, setHasActivatedSearch] = useState(false);
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const normalizedSearchQuery = useMemo(
     () => deferredSearchQuery.trim().toLowerCase(),
@@ -125,23 +128,24 @@ function ListUserContent({
   const pendingActionIdSet = useMemo(() => new Set(pendingActionIds), [pendingActionIds]);
 
   useEffect(() => {
-    if (!onSearchUsers) return;
+    if (!isActive || !hasActivatedSearch || !onSearchUsers) return;
 
     const timeoutId = window.setTimeout(() => {
-      void Promise.resolve(onSearchUsers(searchQuery.trim())).catch(() => undefined);
+      void Promise.resolve(onSearchUsers(deferredSearchQuery.trim())).catch(() => undefined);
     }, 250);
 
     return () => window.clearTimeout(timeoutId);
-  }, [onSearchUsers, searchQuery]);
+  }, [deferredSearchQuery, hasActivatedSearch, isActive, onSearchUsers]);
 
   const filteredUsers = useMemo(() => {
-    if (onSearchUsers) return users;
+    if (onSearchUsers) return isActive && hasActivatedSearch ? users : [];
     if (!normalizedSearchQuery) return users;
 
     return users.filter((user) => user.username.toLowerCase().includes(normalizedSearchQuery));
-  }, [normalizedSearchQuery, onSearchUsers, users]);
+  }, [hasActivatedSearch, isActive, normalizedSearchQuery, onSearchUsers, users]);
 
-  const hasQuery = searchQuery.trim().length > 0;
+  const showSearchError = hasActivatedSearch ? error : null;
+  const showSearching = hasActivatedSearch && isSearching;
 
   return (
     <div className="flex flex-1 flex-col min-h-0 text-primary">
@@ -183,6 +187,7 @@ function ListUserContent({
               autoComplete="off"
               aria-label="Tìm kiếm bạn bè"
               value={searchQuery}
+              onFocus={() => setHasActivatedSearch(true)}
               onChange={(event) => setSearchQuery(event.target.value)}
             />
             {searchQuery ? (
@@ -198,14 +203,14 @@ function ListUserContent({
           </div>
         </div>
 
-        {error ? (
+        {showSearchError ? (
           <div className="text-center text-sm text-[rgb(var(--textColor-danger))] py-3" role="alert">
-            {error}
+            {showSearchError}
           </div>
         ) : null}
 
         <div className="flex flex-col gap-1 mt-2">
-          {isSearching ? (
+          {showSearching ? (
             <div className="flex items-center justify-center gap-2 text-sm text-secondary py-8">
               <Loader2 size={16} className="animate-spin" />
               Đang tìm...
@@ -249,7 +254,7 @@ function ListUserContent({
             })
           ) : (
             <div className="text-center text-sm text-secondary py-8">
-              {hasQuery ? "Không tìm thấy người dùng nào" : "Nhập để tìm kiếm bạn bè"}
+              {hasActivatedSearch ? "Không tìm thấy người dùng nào" : "Nhập để tìm kiếm bạn bè"}
             </div>
           )}
         </div>
