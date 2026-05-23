@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/constants/config";
-import type { ApiEnvelope, ApiPaginatedEnvelope } from "@/types/api";
+import type { ApiEnvelope, ApiPaginatedEnvelope, PaginatedResult } from "@/types/api";
 import type {
   AuthUser,
   ContactRequestStatusResponse,
@@ -28,6 +28,15 @@ function toSearchParams({ q = "", cursor, limit = 20 }: SearchUsersParams = {}) 
   return {
     q: q.trim(),
     ...toCursorParams({ cursor, limit }),
+  };
+}
+
+function ensurePaginatedListData<T>(result: PaginatedResult<T>): PaginatedResult<T> {
+  const data: unknown = result.data;
+
+  return {
+    ...result,
+    data: Array.isArray(data) ? data : [],
   };
 }
 
@@ -62,7 +71,7 @@ export const userService = {
         params: toSearchParams(params),
       });
 
-      return unwrapPaginatedApiData(response.data);
+      return ensurePaginatedListData(unwrapPaginatedApiData(response.data));
     } catch (error) {
       throw normalizeApiError(error);
     }
@@ -88,7 +97,7 @@ export const userService = {
         { params: toCursorParams(params) },
       );
 
-      return unwrapPaginatedApiData(response.data);
+      return ensurePaginatedListData(unwrapPaginatedApiData(response.data));
     } catch (error) {
       throw normalizeApiError(error);
     }
@@ -109,7 +118,7 @@ export const userService = {
         { params: toCursorParams(params) },
       );
 
-      return unwrapPaginatedApiData(response.data);
+      return ensurePaginatedListData(unwrapPaginatedApiData(response.data));
     } catch (error) {
       throw normalizeApiError(error);
     }

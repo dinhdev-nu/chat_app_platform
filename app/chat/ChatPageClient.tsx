@@ -56,6 +56,11 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>(undefined);
   const canLoadProtectedData = hasHydrated && Boolean(accessToken);
   const chatContacts = useChatContacts({ enabled: canLoadProtectedData });
+  const {
+    hasRequestedIncomingRequests,
+    isLoadingIncoming,
+    loadIncomingRequests,
+  } = chatContacts;
   const contacts = contactList ?? chatContacts.contacts;
   const conversations = useMemo(
     () => conversationList ?? contacts.map(contactToConversation),
@@ -86,6 +91,25 @@ export default function ChatPageClient({ conversationList, contactList }: ChatPa
       }
     });
   }, [accessToken, clearSession, hasHydrated, refreshProfile, router]);
+
+  useEffect(() => {
+    if (
+      !isPanelOpen ||
+      !canLoadProtectedData ||
+      hasRequestedIncomingRequests ||
+      isLoadingIncoming
+    ) {
+      return;
+    }
+
+    void loadIncomingRequests();
+  }, [
+    canLoadProtectedData,
+    hasRequestedIncomingRequests,
+    isLoadingIncoming,
+    loadIncomingRequests,
+    isPanelOpen,
+  ]);
 
   const closeProjectSidebar = useCallback(() => {
     setIsProjectSidebarOpen(false);

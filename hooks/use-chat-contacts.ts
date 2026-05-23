@@ -62,6 +62,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
   const [searchResults, setSearchResults] = useState<SearchUser[]>([]);
   const [contactsPagination, setContactsPagination] = useState<PaginationMeta | null>(null);
   const [incomingPagination, setIncomingPagination] = useState<PaginationMeta | null>(null);
+  const [hasRequestedIncomingRequests, setHasRequestedIncomingRequests] = useState(false);
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
   const [isLoadingIncoming, setIsLoadingIncoming] = useState(false);
   const [isSearchingUsers, setIsSearchingUsers] = useState(false);
@@ -99,6 +100,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
       if (!enabled) return;
       if (!silent) setIsLoadingIncoming(true);
       setIncomingError(null);
+      if (!append) setHasRequestedIncomingRequests(true);
 
       try {
         const result = await userService.getIncomingContactRequests({ cursor, limit });
@@ -120,11 +122,11 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
     if (!enabled) return;
 
     const timeoutId = window.setTimeout(() => {
-      void Promise.all([loadContacts(), loadIncomingRequests()]);
+      void loadContacts();
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
-  }, [enabled, loadContacts, loadIncomingRequests]);
+  }, [enabled, loadContacts]);
 
   const searchUsers = useCallback(
     async (query: string) => {
@@ -176,6 +178,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
 
       try {
         const result = await userService.sendContactRequest(targetUserId);
+        const targetUser = searchResults.find((user) => user.id === targetUserId);
 
         setSearchResults((currentResults) =>
           currentResults.map((user) => {
@@ -192,11 +195,8 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
           }),
         );
 
-        if (result.status === "accepted") {
-          await Promise.all([
-            loadContacts({ silent: true }),
-            loadIncomingRequests({ silent: true }),
-          ]);
+        if (result.status === "accepted" && targetUser) {
+          setContacts((currentContacts) => appendUniqueContact(currentContacts, toContactUser(targetUser)));
         }
 
         return result;
@@ -209,7 +209,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
         setPendingContactActionIds((ids) => removePendingId(ids, targetUserId));
       }
     },
-    [enabled, loadContacts, loadIncomingRequests],
+    [enabled, searchResults],
   );
 
   const acceptContactRequest = useCallback(
@@ -239,10 +239,6 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
           setContacts((currentContacts) => appendUniqueContact(currentContacts, toContactUser(acceptedUser)));
         }
 
-        await Promise.all([
-          loadContacts({ silent: true }),
-          loadIncomingRequests({ silent: true }),
-        ]);
       } catch (error) {
         const message = getApiErrorMessage(error);
         setIncomingError(message);
@@ -252,7 +248,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
         setPendingContactActionIds((ids) => removePendingId(ids, senderUserId));
       }
     },
-    [enabled, incomingRequests, loadContacts, loadIncomingRequests, searchResults],
+    [enabled, incomingRequests, searchResults],
   );
 
   const loadMoreContacts = useCallback(async () => {
@@ -273,6 +269,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
     searchResults: enabled ? searchResults : [],
     contactsPagination: enabled ? contactsPagination : null,
     incomingPagination: enabled ? incomingPagination : null,
+    hasRequestedIncomingRequests: enabled ? hasRequestedIncomingRequests : false,
     isLoadingContacts: enabled ? isLoadingContacts : false,
     isLoadingIncoming: enabled ? isLoadingIncoming : false,
     isSearchingUsers: enabled ? isSearchingUsers : false,
