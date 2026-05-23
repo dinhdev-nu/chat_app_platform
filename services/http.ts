@@ -1,6 +1,7 @@
 import axios from "axios";
 import type { AxiosError } from "axios";
 
+import { getApiErrorMessageByCode } from "@/constants/api-errors";
 import { API_BASE_URL } from "@/constants/config";
 import { ApiClientError } from "@/types/api";
 import type { ApiErrorEnvelope, ApiEnvelope, ApiPaginatedEnvelope, PaginatedResult } from "@/types/api";
@@ -45,10 +46,11 @@ export function normalizeApiError(error: unknown): ApiClientError {
     const axiosError = error as AxiosError<ApiErrorEnvelope>;
     const responseError = axiosError.response?.data?.error;
 
-    if (responseError?.message) {
-      return new ApiClientError(responseError.message, {
+    if (responseError?.code || responseError?.message) {
+      return new ApiClientError(getApiErrorMessageByCode(responseError.code) ?? responseError.message, {
         code: responseError.code,
         status: axiosError.response?.status,
+        serverMessage: responseError.message,
       });
     }
 

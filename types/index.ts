@@ -1,5 +1,6 @@
 export type {
   ApiEnvelope,
+  ApiErrorCode,
   ApiPaginatedEnvelope,
   ApiErrorEnvelope,
   ApiErrorBody,
