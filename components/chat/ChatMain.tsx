@@ -11,6 +11,7 @@ import type { ChatMessage } from "./chat-message-types";
 import { isSystemMessage } from "./chat-message-utils";
 import PromptInput from "./PromptInput";
 import MobileProjectSidebarToggle from "./MobileProjectSidebarToggle";
+import { messageService } from "@/services/messageService";
 
 const CURRENT_USER_ID = "user_me";
 const MOCK_TYPING_DELAY_MS = 1800;
@@ -144,7 +145,7 @@ interface ChatMainProps {
   activeConv?: ConversationListItem;
   isProjectSidebarOpen?: boolean;
   onToggleProjects?: () => void;
-  onCreateConversation?: (conversation: ConversationListItem, firstMessageText: string) => ConversationListItem | undefined;
+  onCreateConversation?: (conversation: ConversationListItem, firstMessageText: string) => Promise<ConversationListItem | undefined> | ConversationListItem | undefined;
 }
 
 export default function ChatMain({
@@ -186,9 +187,9 @@ export default function ChatMain({
       },
     };
 
-  const handleSend = (text: string) => {
+  const handleSend = async (text: string) => {
     if (!activeConv) return;
-    const targetConversation = onCreateConversation?.(activeConv, text) ?? activeConv;
+    const targetConversation = (await onCreateConversation?.(activeConv, text)) ?? activeConv;
     const conversationId = targetConversation.id;
     const existingMessages = messageStore[conversationId] ?? [];
     const typingUser = getConversationTypingUser(targetConversation, existingMessages);
@@ -214,6 +215,12 @@ export default function ChatMain({
       delete next[conversationId];
       return next;
     });
+
+    try {
+      await messageService.sendMessage(conversationId, text);
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
 
     typingTimeoutsRef.current[conversationId] = setTimeout(() => {
       setTypingStore((prev) => ({

@@ -13,8 +13,12 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "./chat.css";
+import { useConversations } from "@/hooks/use-conversations";
+import { conversationService } from "@/services/conversationService";
+import { toHexId, mapCreatedConversationToListItem } from "@/types/conversation";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
-import type { ContactUserResponse } from "@/types/user";
+import type { ContactUserResponse, SearchUser } from "@/types/user";
+import { userService } from "@/services/userService";
 
 const Panel = dynamic(() => import("@/components/chat/Panel"), { ssr: false });
 
@@ -43,26 +47,16 @@ function getDraftContactConversationId(contactId: string) {
   return `${DRAFT_CONTACT_CONVERSATION_PREFIX}${contactId}`;
 }
 
+/**
+ * Kiểm tra xem conversation có phải là DM với contact không.
+ * DM conversation từ API: createBy là người tạo (có thể là current user),
+ * nên cần kiểm tra thêm qua name hoặc dùng contact id trong prefix.
+ * Hiện tại dùng prefix "contact:" được tạo locally để đối chiếu.
+ */
 function isContactConversation(conversation: ConversationListItem, contactId: string) {
-  return conversation.type === 1 && conversation.createBy === contactId;
+  return conversation.type === 1 && conversation.id === `contact:${contactId}`;
 }
 
-function mergeConversations(
-  baseConversations: ConversationListItem[],
-  localConversations: ConversationListItem[],
-) {
-  const localIds = new Set(localConversations.map((conversation) => conversation.id));
-
-  return [
-    ...localConversations,
-    ...baseConversations.filter((conversation) => !localIds.has(conversation.id)),
-  ].sort((left, right) => {
-    const leftTime = left.lastActivityAt ? new Date(left.lastActivityAt).getTime() : 0;
-    const rightTime = right.lastActivityAt ? new Date(right.lastActivityAt).getTime() : 0;
-
-    return rightTime - leftTime;
-  });
-}
 
 function contactToDraftConversation(contact: ContactUserResponse): ConversationListItem {
   const lastActivityAt =
@@ -81,24 +75,6 @@ function contactToDraftConversation(contact: ContactUserResponse): ConversationL
     role: 3,
     isMuted: false,
     unreadCount: 0,
-  };
-}
-
-function createContactConversation(
-  draftConversation: ConversationListItem,
-  firstMessageText: string,
-): ConversationListItem | undefined {
-  if (!draftConversation.createBy) return undefined;
-
-  const now = new Date().toISOString();
-
-  return {
-    ...draftConversation,
-    id: getContactConversationId(draftConversation.createBy),
-    createdAt: now,
-    updatedAt: now,
-    lastActivityAt: now,
-    lastMessageText: firstMessageText,
   };
 }
 
@@ -132,7 +108,7 @@ export default function ChatPageClient({
   const [sidebarActiveTab, setSidebarActiveTab] = useState<"all" | "friends">("all");
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>(undefined);
   const [activeDraftContact, setActiveDraftContact] = useState<ContactUserResponse | null>(null);
-  const [localConversations, setLocalConversations] = useState<ConversationListItem[]>([]);
+
 
   const authState = useMemo<AuthState>(() => {
     if (!hasHydrated) return "hydrating";
@@ -191,10 +167,18 @@ export default function ChatPageClient({
 
   const contacts = contactList ?? chatContacts.contacts;
 
-  const conversations = useMemo(
-    () => mergeConversations(conversationList ?? [], localConversations),
-    [conversationList, localConversations],
-  );
+  const {
+    conversations: apiConversations,
+    pagination: conversationsPagination,
+    prependConversation,
+    isLoading: isConversationsLoading,
+    loadMore: loadMoreConversations,
+  } = useConversations({ enabled: authState === "authenticated" });
+
+  // Dùng apiConversations sau khi đã load. Khi đang load, fallback về prop (SSR data).
+  const conversations = isConversationsLoading && apiConversations.length === 0
+    ? (conversationList ?? [])
+    : apiConversations;
 
   const activeDraftConversation = useMemo(
     () => activeDraftContact ? contactToDraftConversation(activeDraftContact) : undefined,
@@ -258,7 +242,7 @@ export default function ChatPageClient({
   );
 
   const handleCreateConversation = useCallback(
-    (conversation: ConversationListItem, firstMessageText: string) => {
+    async (conversation: ConversationListItem, firstMessageText: string) => {
       if (!conversation.id.startsWith(DRAFT_CONTACT_CONVERSATION_PREFIX)) return undefined;
 
       const contactId = conversation.createBy;
@@ -274,19 +258,65 @@ export default function ChatPageClient({
         return existingConversation;
       }
 
-      const createdConversation = createContactConversation(conversation, firstMessageText);
-      if (!createdConversation) return undefined;
+      try {
+        const { conversation: newConv, isNew } = await conversationService.createDM(toHexId(contactId));
+        const listItem = mapCreatedConversationToListItem(newConv);
 
-      setLocalConversations((currentConversations) => [
-        createdConversation,
-        ...currentConversations.filter((item) => item.id !== createdConversation.id),
-      ]);
-      setActiveDraftContact(null);
-      setActiveConversationId(createdConversation.id);
+        // Dù đã tồn tại (200) hay mới tạo (201), đều prepend để đảm bảo xuất hiện đầu list
+        prependConversation(listItem);
 
-      return createdConversation;
+        setActiveDraftContact(null);
+        setActiveConversationId(listItem.id);
+
+        return listItem;
+      } catch (error) {
+        console.error("Failed to create DM conversation:", error);
+        return undefined;
+      }
     },
-    [conversations],
+    [conversations, prependConversation],
+  );
+
+  const handleSearchMembersForGroup = useCallback(
+    async (q: string): Promise<SearchUser[]> => {
+      try {
+        if (q.trim() === "") {
+          // q rỗng → trả danh sách bạn bè
+          const result = await userService.getContacts({ limit: 50 });
+          return result.data;
+        } else {
+          // q không rỗng → search user
+          const result = await userService.searchUsers({ q: q.trim(), limit: 20 });
+          return result.data;
+        }
+      } catch {
+        return [];
+      }
+    },
+    [],
+  );
+
+  const handleCreateGroup = useCallback(
+    async (payload: { name: string; type: 2 | 3; avatar_url?: string; description?: string; member_user_ids: string[] }) => {
+      try {
+        const newGroup = await conversationService.createGroup({
+          name: payload.name,
+          type: payload.type,
+          avatar_url: payload.avatar_url,
+          description: payload.description,
+          member_user_ids: payload.member_user_ids.map(toHexId),
+        });
+
+        const listItem = mapCreatedConversationToListItem(newGroup);
+        prependConversation(listItem);
+        setActiveDraftContact(null);
+        setActiveConversationId(listItem.id);
+        closePanel();
+      } catch (error) {
+        console.error("Failed to create group:", error);
+      }
+    },
+    [prependConversation, closePanel],
   );
 
   if (authState === "hydrating") return <ChatSkeleton />;
@@ -315,6 +345,8 @@ export default function ChatPageClient({
               activeConversationId={activeConversationId}
               onSelectConversation={handleSelectConversation}
               onSelectContact={handleSelectContact}
+              onLoadMoreConversations={loadMoreConversations}
+              hasMoreConversations={conversationsPagination?.hasNext}
             />
 
             <div className="min-h-0 flex-1 overflow-hidden">
@@ -345,6 +377,8 @@ export default function ChatPageClient({
           onAcceptContactRequest={chatContacts.acceptContactRequest}
           onSearchUsers={chatContacts.searchUsers}
           onSendContactRequest={chatContacts.sendContactRequest}
+          onCreateConversation={handleCreateGroup}
+          onSearchMembers={handleSearchMembersForGroup}
         />
 
         <div

@@ -18,4 +18,13 @@ export const API_ENDPOINTS = {
     incomingRequests: "/contacts/requests/incoming",
     acceptRequest: "/contacts/requests/accept",
   },
+  conversations: {
+    list: "/conversations",
+    direct: "/conversations/direct",
+    group: "/conversations/group",
+    member: (id: string, userId: string) => `/conversations/${id}/members/${userId}`,
+  },
+  messages: {
+    send: (id: string) => `/conversations/${id}/messages`,
+  },
 } as const;

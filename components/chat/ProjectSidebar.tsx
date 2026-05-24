@@ -19,9 +19,11 @@ interface ProjectSidebarProps {
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
   isContactsLoading?: boolean;
-  contactsError?: string | null;
+  contactsError?: any;
   activeTab?: SidebarFilter;
   onActiveTabChange?: (tab: SidebarFilter) => void;
+  onLoadMoreConversations?: () => void;
+  hasMoreConversations?: boolean;
 }
 
 export default function ProjectSidebar({
@@ -37,6 +39,8 @@ export default function ProjectSidebar({
   onSelectContact,
   activeTab: activeTabProp,
   onActiveTabChange,
+  onLoadMoreConversations,
+  hasMoreConversations,
 }: ProjectSidebarProps) {
   const isMobile = useIsMobile();
   const isHiddenOnMobile = isMobile && !isMobileOpen;
@@ -288,6 +292,8 @@ export default function ProjectSidebar({
             onSelectContact={onSelectContact}
             isContactsLoading={isContactsLoading}
             contactsError={contactsError}
+            onLoadMoreConversations={onLoadMoreConversations}
+            hasMoreConversations={hasMoreConversations}
           />
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useDeferredValue, useMemo, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BackIcon,
   SearchIcon,
@@ -9,7 +9,7 @@ import {
   UsersIcon,
   CheckIcon,
 } from "@/components/chat/icons";
-import { ContactUserResponse, MOCK_CONTACT_USERS } from "@/components/chat/contact-data";
+import type { SearchUser } from "@/types/user";
 
 interface CreateConversationPayload {
   name: string;
@@ -22,14 +22,14 @@ interface CreateConversationPayload {
 interface ThemeSettingsContentProps {
   onBack?: () => void;
   initialType?: 2 | 3;
-  contacts?: ContactUserResponse[];
+  onSearchMembers?: (q: string) => Promise<SearchUser[]>;
   onCreateConversation?: (payload: CreateConversationPayload) => void;
 }
 
 export default function ThemeSettingsContent({
   onBack,
   initialType = 2,
-  contacts = MOCK_CONTACT_USERS,
+  onSearchMembers,
   onCreateConversation,
 }: ThemeSettingsContentProps) {
   const [activeTab, setActiveTab] = useState<"info" | "members">("info");
@@ -39,18 +39,49 @@ export default function ThemeSettingsContent({
   const [avatarUrl, setAvatarUrl] = useState<string>("");
   const [memberIds, setMemberIds] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const deferredSearchQuery = useDeferredValue(searchQuery);
-  const normalizedSearchQuery = useMemo(
-    () => deferredSearchQuery.trim().toLowerCase(),
-    [deferredSearchQuery],
-  );
+  const [memberResults, setMemberResults] = useState<SearchUser[]>([]);
+  const [isMemberSearching, setIsMemberSearching] = useState(false);
+  const [memberSearchError, setMemberSearchError] = useState<string | null>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestRef = useRef(0);
 
-  const filteredUsers = useMemo(
-    () => contacts.filter((user) => user.username.toLowerCase().includes(normalizedSearchQuery)),
-    [contacts, normalizedSearchQuery],
-  );
+  // Khi mở tab members lần đầu hoặc query thay đổi, gọi onSearchMembers
+  useEffect(() => {
+    if (!onSearchMembers) return;
 
-  const selectedMemberIds = useMemo(() => new Set(memberIds), [memberIds]);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    const requestId = ++latestRef.current;
+    const delay = searchQuery.trim() === "" ? 0 : 300;
+
+    debounceRef.current = setTimeout(async () => {
+      setIsMemberSearching(true);
+      setMemberSearchError(null);
+      try {
+        const results = await onSearchMembers(searchQuery.trim());
+        if (latestRef.current === requestId) {
+          setMemberResults(results);
+        }
+      } catch {
+        if (latestRef.current === requestId) {
+          setMemberSearchError("Không thể tải danh sách người dùng");
+          setMemberResults([]);
+        }
+      } finally {
+        if (latestRef.current === requestId) {
+          setIsMemberSearching(false);
+        }
+      }
+    }, delay);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [searchQuery, onSearchMembers]);
+
+  const filteredUsers = memberResults;
+
+  const selectedMemberIds = new Set(memberIds);
   const canSave = name.trim().length > 0 && memberIds.length > 0;
 
   const toggleMember = useCallback((id: string) => {
@@ -249,7 +280,21 @@ export default function ThemeSettingsContent({
           </div>
 
           <div className="flex flex-col gap-1 mt-2 pb-4">
-            {filteredUsers.length > 0 ? (
+            {isMemberSearching ? (
+              <div className="flex flex-col gap-1">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 p-2 rounded-xl animate-pulse">
+                    <div className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] flex-shrink-0" />
+                    <div className="flex flex-col gap-1.5 flex-1">
+                      <div className="h-3 w-24 rounded bg-[rgb(var(--backgroundColor-state-enabled)/.4)]" />
+                      <div className="h-2.5 w-36 rounded bg-[rgb(var(--backgroundColor-state-enabled)/.25)]" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : memberSearchError ? (
+              <div className="text-center text-sm text-secondary py-4">{memberSearchError}</div>
+            ) : filteredUsers.length > 0 ? (
               filteredUsers.map((user) => {
                 const isSelected = selectedMemberIds.has(user.id);
                 return (
@@ -286,7 +331,7 @@ export default function ThemeSettingsContent({
               })
             ) : (
               <div className="text-center text-sm text-secondary py-4">
-                Không tìm thấy người dùng nào
+                {searchQuery.trim() ? "Không tìm thấy người dùng" : "Không có bạn bè nào"}
               </div>
             )}
           </div>

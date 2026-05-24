@@ -22,6 +22,8 @@ interface PanelProps {
   onAcceptContactRequest?: (senderUserId: string) => Promise<void> | void;
   onSearchUsers?: (query: string) => Promise<SearchUser[]> | SearchUser[];
   onSendContactRequest?: (targetUserId: string) => Promise<ContactRequestStatusResponse | undefined> | ContactRequestStatusResponse | undefined;
+  onCreateConversation?: (payload: { name: string; type: 2 | 3; avatar_url?: string; description?: string; member_user_ids: string[] }) => void;
+  onSearchMembers?: (q: string) => Promise<SearchUser[]>;
 }
 
 export default function Panel({
@@ -39,6 +41,8 @@ export default function Panel({
   onAcceptContactRequest,
   onSearchUsers,
   onSendContactRequest,
+  onCreateConversation,
+  onSearchMembers,
 }: PanelProps) {
   const [activeView, setActiveView] = useState<"list" | "details" | "friends">("list");
   const [initialThemeType, setInitialThemeType] = useState<2 | 3>(2);
@@ -112,7 +116,8 @@ export default function Panel({
                   key={initialThemeType}
                   onBack={() => setActiveView("list")}
                   initialType={initialThemeType}
-                  contacts={contacts}
+                  onSearchMembers={onSearchMembers}
+                  onCreateConversation={onCreateConversation}
                 />
               </div>
 

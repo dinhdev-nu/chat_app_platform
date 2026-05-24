@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import ProjectItem from "./ProjectItem";
 import ContactItem from "./ContactItem";
 import { ConversationListItem } from "./conversation-data";
@@ -15,6 +15,8 @@ type Props = {
     onSelectContact?: (contact: ContactUserResponse) => void;
     isContactsLoading?: boolean;
     contactsError?: string | null;
+    onLoadMoreConversations?: () => void;
+    hasMoreConversations?: boolean;
 };
 
 function SidebarList({
@@ -26,7 +28,26 @@ function SidebarList({
     onSelectContact,
     isContactsLoading = false,
     contactsError,
+    onLoadMoreConversations,
+    hasMoreConversations,
 }: Props) {
+    const observer = useRef<IntersectionObserver | null>(null);
+
+    const lastConversationElementRef = useCallback(
+        (node: HTMLElement | null) => {
+            if (observer.current) observer.current.disconnect();
+
+            observer.current = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting && hasMoreConversations && onLoadMoreConversations) {
+                    onLoadMoreConversations();
+                }
+            });
+
+            if (node) observer.current.observe(node);
+        },
+        [hasMoreConversations, onLoadMoreConversations],
+    );
+
     return (
         <div className="relative w-full overflow-hidden">
             <div
@@ -50,14 +71,18 @@ function SidebarList({
                 >
                     <ul>
                         {conversations.length > 0 ? (
-                            conversations.map((conversation) => (
-                                <ProjectItem
-                                    key={conversation.id}
-                                    conversation={conversation}
-                                    isActive={conversation.id === activeConversationId}
-                                    onSelect={onSelectConversation}
-                                />
-                            ))
+                            conversations.map((conversation, index) => {
+                                const isLast = index === conversations.length - 1;
+                                return (
+                                    <div key={conversation.id} ref={isLast ? lastConversationElementRef : null}>
+                                        <ProjectItem
+                                            conversation={conversation}
+                                            isActive={conversation.id === activeConversationId}
+                                            onSelect={onSelectConversation}
+                                        />
+                                    </div>
+                                );
+                            })
                         ) : (
                             <li className="px-3 py-8 text-center text-sm text-secondary">
                                 Chưa có hội thoại
