@@ -17,6 +17,7 @@ import { useConversations } from "@/hooks/use-conversations";
 import { conversationService } from "@/services/conversationService";
 import { toHexId, mapCreatedConversationToListItem } from "@/types/conversation";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
+import type { ChatMessage } from "@/components/chat/chat-message-types";
 import type { ContactUserResponse, SearchUser } from "@/types/user";
 import { userService } from "@/services/userService";
 
@@ -37,10 +38,6 @@ function hasValidStoredSession(
   if (!accessToken || !expiresAt) return false;
   const expiresAtTime = Date.parse(expiresAt);
   return Number.isFinite(expiresAtTime) && expiresAtTime > Date.now();
-}
-
-function getContactConversationId(contactId: string) {
-  return `contact:${contactId}`;
 }
 
 function getDraftContactConversationId(contactId: string) {
@@ -100,6 +97,7 @@ export default function ChatPageClient({
   const router = useRouter();
   const accessToken = useAuthStore((state) => state.accessToken);
   const expiresAt = useAuthStore((state) => state.expiresAt);
+  const currentUser = useAuthStore((state) => state.user);
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const refreshProfile = useAuthStore((state) => state.refreshProfile);
   const clearSession = useAuthStore((state) => state.clearSession);
@@ -171,14 +169,19 @@ export default function ChatPageClient({
     conversations: apiConversations,
     pagination: conversationsPagination,
     prependConversation,
+    updateConversation,
     isLoading: isConversationsLoading,
     loadMore: loadMoreConversations,
   } = useConversations({ enabled: authState === "authenticated" });
 
   // Dùng apiConversations sau khi đã load. Khi đang load, fallback về prop (SSR data).
-  const conversations = isConversationsLoading && apiConversations.length === 0
-    ? (conversationList ?? [])
-    : apiConversations;
+  const conversations = useMemo(
+    () =>
+      isConversationsLoading && apiConversations.length === 0
+        ? (conversationList ?? [])
+        : apiConversations,
+    [apiConversations, conversationList, isConversationsLoading],
+  );
 
   const activeDraftConversation = useMemo(
     () => activeDraftContact ? contactToDraftConversation(activeDraftContact) : undefined,
@@ -221,7 +224,10 @@ export default function ChatPageClient({
   const handleSelectConversation = useCallback((conversation: ConversationListItem) => {
     setActiveDraftContact(null);
     setActiveConversationId(conversation.id);
-  }, []);
+    if (conversation.unreadCount > 0) {
+      updateConversation({ ...conversation, unreadCount: 0 });
+    }
+  }, [updateConversation]);
 
   const handleSelectContact = useCallback(
     (contact: ContactUserResponse) => {
@@ -242,7 +248,7 @@ export default function ChatPageClient({
   );
 
   const handleCreateConversation = useCallback(
-    async (conversation: ConversationListItem, firstMessageText: string) => {
+    async (conversation: ConversationListItem) => {
       if (!conversation.id.startsWith(DRAFT_CONTACT_CONVERSATION_PREFIX)) return undefined;
 
       const contactId = conversation.createBy;
@@ -259,7 +265,7 @@ export default function ChatPageClient({
       }
 
       try {
-        const { conversation: newConv, isNew } = await conversationService.createDM(toHexId(contactId));
+        const { conversation: newConv } = await conversationService.createDM(toHexId(contactId));
         const listItem = mapCreatedConversationToListItem(newConv);
 
         // Dù đã tồn tại (200) hay mới tạo (201), đều prepend để đảm bảo xuất hiện đầu list
@@ -319,6 +325,24 @@ export default function ChatPageClient({
     [prependConversation, closePanel],
   );
 
+  const handleConversationMessageUpdate = useCallback(
+    (conversation: ConversationListItem, message: ChatMessage) => {
+      const previewText =
+        message.text || message.attachments?.[0]?.fileName || conversation.lastMessageText;
+      const activityAt = message.timestamp;
+
+      prependConversation({
+        ...conversation,
+        lastMessageId: message.id,
+        lastMessageText: previewText,
+        lastActivityAt: activityAt,
+        updatedAt: activityAt,
+        unreadCount: conversation.id === activeConversationId ? 0 : conversation.unreadCount,
+      });
+    },
+    [activeConversationId, prependConversation],
+  );
+
   if (authState === "hydrating") return <ChatSkeleton />;
 
   if (authState !== "authenticated") return null;
@@ -352,9 +376,12 @@ export default function ChatPageClient({
             <div className="min-h-0 flex-1 overflow-hidden">
               <ChatMain
                 activeConv={activeConv}
+                currentUser={currentUser}
+                isDraftConversation={activeDraftConversation?.id === activeConversationId}
                 isProjectSidebarOpen={isProjectSidebarOpen}
                 onToggleProjects={toggleProjectSidebar}
                 onCreateConversation={handleCreateConversation}
+                onConversationMessageUpdate={handleConversationMessageUpdate}
               />
             </div>
           </div>

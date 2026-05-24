@@ -1,6 +1,7 @@
+import type { Variants } from "framer-motion";
 import type { ChatMessage } from "./chat-message-types";
 
-export const msgVariants = {
+export const msgVariants: Variants = {
   hidden: { opacity: 0, y: 10, scale: 0.97 },
   visible: {
     opacity: 1,

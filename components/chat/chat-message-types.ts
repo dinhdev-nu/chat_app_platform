@@ -6,8 +6,17 @@ export interface ChatMessageReaction {
   reactedByMe?: boolean;
 }
 
+export interface ChatMessageAttachment {
+  id: string;
+  fileName: string;
+  fileUrl: string;
+  mimeType: string;
+  fileSizeBytes: number;
+}
+
 export interface ChatMessage {
   id: string;
+  conversationId?: string;
   text: string;
   senderId: string;
   senderName?: string;
@@ -15,7 +24,10 @@ export interface ChatMessage {
   timestamp: string;
   editedAt?: string;
   reactions?: ChatMessageReaction[];
+  attachments?: ChatMessageAttachment[];
+  messageType?: number;
   type?: ChatMessageType;
   isSystem?: boolean;
   isOwn?: boolean;
+  seq?: number;
 }

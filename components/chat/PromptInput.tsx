@@ -25,10 +25,11 @@ function getSuggestionPrompts(currentUserName?: string) {
 
 interface PromptInputProps {
   conv?: ConversationListItem;
-  onSend?: (text: string) => void;
+  isSending?: boolean;
+  onSend?: (text: string) => void | Promise<void>;
 }
 
-export default function PromptInput({ conv, onSend }: PromptInputProps) {
+export default function PromptInput({ conv, isSending = false, onSend }: PromptInputProps) {
   const currentUserName = useAuthStore((state) => state.user?.name);
   const suggestionPrompts = useMemo(
     () => getSuggestionPrompts(currentUserName),
@@ -106,6 +107,7 @@ export default function PromptInput({ conv, onSend }: PromptInputProps) {
                   sendLabel={conv ? "Gửi tin nhắn" : undefined}
                   suggestedText={suggestedTextRequest?.text}
                   suggestedTextKey={suggestedTextRequest?.key}
+                  isSending={isSending}
                   onSend={onSend}
                 />
               </div>

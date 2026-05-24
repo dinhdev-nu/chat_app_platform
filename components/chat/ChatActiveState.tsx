@@ -19,9 +19,18 @@ interface ChatActiveStateProps {
   messages: ChatMessage[];
   currentUserId?: string;
   typingUsers?: ChatTypingUser[];
-  onSend?: (text: string) => void;
-  onEditMessage?: (messageId: string, text: string) => void;
-  onReactMessage?: (messageId: string, emoji: string) => void;
+  isLoadingMessages?: boolean;
+  isLoadingMoreMessages?: boolean;
+  hasMoreMessages?: boolean;
+  messagesError?: string | null;
+  actionError?: string | null;
+  isSending?: boolean;
+  onRetryLoad?: () => void;
+  onLoadMoreMessages?: () => void;
+  onSend?: (text: string) => void | Promise<void>;
+  onEditMessage?: (messageId: string, text: string) => void | Promise<void>;
+  onDeleteMessage?: (messageId: string) => void | Promise<void>;
+  onReactMessage?: (messageId: string, emoji: string) => void | Promise<void>;
 }
 
 function getFallbackTypingUsers(messages: ChatMessage[], currentUserId?: string): ChatTypingUser[] {
@@ -164,8 +173,17 @@ export default function ChatActiveState({
   messages,
   currentUserId,
   typingUsers,
+  isLoadingMessages = false,
+  isLoadingMoreMessages = false,
+  hasMoreMessages = false,
+  messagesError,
+  actionError,
+  isSending = false,
+  onRetryLoad,
+  onLoadMoreMessages,
   onSend,
   onEditMessage,
+  onDeleteMessage,
   onReactMessage,
 }: ChatActiveStateProps) {
   const shouldReduceMotion = useReducedMotion() ?? false;
@@ -192,7 +210,58 @@ export default function ChatActiveState({
 
       <div className="message-scrollbar min-h-0 overflow-x-hidden overflow-y-scroll overscroll-contain px-4 py-3">
         <div className="flex min-h-full flex-col justify-end">
-          <ChatDateSeparator label="Hôm nay" />
+          {messagesError && messages.length === 0 ? (
+            <div className="flex min-h-[220px] flex-col items-center justify-center gap-3 text-center">
+              <p className="max-w-sm text-sm text-[rgb(var(--textColor-secondary))]" role="alert">
+                {messagesError}
+              </p>
+              {onRetryLoad ? (
+                <button
+                  type="button"
+                  className="rounded-full border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring"
+                  style={{
+                    borderColor: "rgb(var(--borderColor-secondary) / 0.15)",
+                    color: "rgb(var(--textColor-primary))",
+                  }}
+                  onClick={onRetryLoad}
+                >
+                  Tải lại
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
+          {isLoadingMessages && messages.length === 0 ? (
+            <div
+              role="status"
+              className="flex min-h-[220px] items-center justify-center text-sm text-[rgb(var(--textColor-secondary))]"
+            >
+              Đang tải tin nhắn...
+            </div>
+          ) : null}
+
+          {messages.length > 0 ? (
+            <>
+              {hasMoreMessages || isLoadingMoreMessages ? (
+                <div className="mb-3 flex justify-center">
+                  <button
+                    type="button"
+                    className="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring disabled:cursor-not-allowed disabled:opacity-50"
+                    style={{
+                      borderColor: "rgb(var(--borderColor-secondary) / 0.15)",
+                      color: "rgb(var(--textColor-primary))",
+                    }}
+                    disabled={isLoadingMoreMessages}
+                    onClick={onLoadMoreMessages}
+                  >
+                    {isLoadingMoreMessages ? "Đang tải..." : "Tải tin cũ hơn"}
+                  </button>
+                </div>
+              ) : null}
+
+              <ChatDateSeparator label="Hôm nay" />
+            </>
+          ) : null}
 
           <AnimatePresence initial={false}>
             {messages.map((msg, i) =>
@@ -206,7 +275,9 @@ export default function ChatActiveState({
                   nextMsg={messages[i + 1]}
                   currentUserId={currentUserId}
                   reduceMotion={shouldReduceMotion}
+                  canManageMessages={conv.role === 1 || conv.role === 2}
                   onEditMessage={onEditMessage}
+                  onDeleteMessage={onDeleteMessage}
                   onReactMessage={onReactMessage}
                 />
               )
@@ -226,15 +297,21 @@ export default function ChatActiveState({
       </div>
 
       <motion.div
-        className="shrink-0 flex justify-center px-4 pb-4 pt-2"
+        className="shrink-0 flex flex-col items-center px-4 pb-4 pt-2"
         initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       >
+        {actionError ? (
+          <p className="mb-2 max-w-[720px] text-center text-xs text-[rgb(var(--textColor-danger))]" role="alert">
+            {actionError}
+          </p>
+        ) : null}
         <ChatInput
           ariaLabel={conv.name ? `Nhắn tin tới ${conv.name}` : "Nhắn tin"}
           placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}...`}
           sendLabel="Gửi tin nhắn"
+          isSending={isSending}
           onSend={onSend}
         />
       </motion.div>

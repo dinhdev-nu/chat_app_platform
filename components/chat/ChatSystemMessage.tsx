@@ -14,7 +14,7 @@ interface ChatSystemMessageProps {
 export default function ChatSystemMessage({ msg, reduceMotion }: ChatSystemMessageProps) {
   return (
     <motion.div
-      variants={msgVariants as any}
+      variants={msgVariants}
       initial={reduceMotion ? false : "hidden"}
       animate="visible"
       className="my-3 flex justify-center px-3"

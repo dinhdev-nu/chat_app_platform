@@ -20,7 +20,7 @@ export interface CreateGroupRequest {
   member_user_ids: string[];
 }
 
-export interface ListConversationsParams extends CursorPaginationParams {}
+export type ListConversationsParams = CursorPaginationParams;
 
 // ─── Response types ───────────────────────────────────────────────────────────
 

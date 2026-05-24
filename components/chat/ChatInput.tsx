@@ -30,7 +30,8 @@ interface ChatInputProps {
   sendLabel?: string;
   suggestedText?: string;
   suggestedTextKey?: number;
-  onSend?: (text: string) => void;
+  isSending?: boolean;
+  onSend?: (text: string) => void | Promise<void>;
 }
 
 function focusEditorEnd(editor: HTMLElement) {
@@ -50,6 +51,7 @@ export default function ChatInput({
   sendLabel = "Tạo",
   suggestedText,
   suggestedTextKey,
+  isSending = false,
   onSend,
 }: ChatInputProps) {
   const paletteButtonRef = useRef<HTMLButtonElement>(null);
@@ -68,7 +70,7 @@ export default function ChatInput({
   };
 
   const trimmedText = inputText.trim();
-  const canSend = Boolean(onSend && trimmedText);
+  const canSend = Boolean(onSend && trimmedText && !isSending);
 
   useEffect(() => {
     if (suggestedTextKey === undefined || suggestedText === undefined) return;
@@ -92,7 +94,7 @@ export default function ChatInput({
 
   const handleSend = () => {
     if (!canSend) return;
-    onSend?.(trimmedText);
+    void onSend?.(trimmedText);
     setInputText("");
     setEditorResetKey((key) => key + 1);
   };
@@ -267,6 +269,7 @@ export default function ChatInput({
                   aria-disabled={!canSend}
                   aria-label={sendLabel}
                   disabled={!canSend}
+                  data-loading={isSending ? "" : undefined}
                   onClick={handleSend}
                 >
                   <ArrowUpIcon />

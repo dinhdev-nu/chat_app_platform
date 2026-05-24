@@ -25,6 +25,10 @@ export const API_ENDPOINTS = {
     member: (id: string, userId: string) => `/conversations/${id}/members/${userId}`,
   },
   messages: {
-    send: (id: string) => `/conversations/${id}/messages`,
+    list: (conversationId: string) => `/conversations/${conversationId}/messages`,
+    send: (conversationId: string) => `/conversations/${conversationId}/messages`,
+    read: (conversationId: string) => `/conversations/${conversationId}/read`,
+    detail: (messageId: string) => `/messages/${messageId}`,
+    reactions: (messageId: string) => `/messages/${messageId}/reactions`,
   },
 } as const;
