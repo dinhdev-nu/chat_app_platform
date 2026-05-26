@@ -2,11 +2,27 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Check, MoreHorizontal, Pencil, SmilePlus, X } from "lucide-react";
+import { Check, MoreHorizontal, Paperclip, Pencil, SmilePlus, X } from "lucide-react";
 
 import { MessageActionButton, MessageMoreMenu, MessageReactionPicker } from "./ChatMessageActions";
 import type { ChatMessage } from "./chat-message-types";
 import { formatTime, isGroupedWithMessage, msgVariants } from "./chat-message-utils";
+
+const EDIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+function isWithinEditWindow(timestamp: string) {
+  const createdAt = Date.parse(timestamp);
+
+  return Number.isFinite(createdAt) && Date.now() - createdAt <= EDIT_WINDOW_MS;
+}
+
+function formatFileSize(bytes: number) {
+  if (!Number.isFinite(bytes) || bytes <= 0) return "";
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
 interface ChatMessageBubbleProps {
   msg: ChatMessage;
@@ -14,8 +30,10 @@ interface ChatMessageBubbleProps {
   nextMsg?: ChatMessage;
   currentUserId?: string;
   reduceMotion?: boolean;
-  onEditMessage?: (messageId: string, text: string) => void;
-  onReactMessage?: (messageId: string, emoji: string) => void;
+  canManageMessages?: boolean;
+  onEditMessage?: (messageId: string, text: string) => void | Promise<void>;
+  onDeleteMessage?: (messageId: string) => void | Promise<void>;
+  onReactMessage?: (messageId: string, emoji: string) => void | Promise<void>;
 }
 
 export default function ChatMessageBubble({
@@ -24,7 +42,9 @@ export default function ChatMessageBubble({
   nextMsg,
   currentUserId,
   reduceMotion,
+  canManageMessages = false,
   onEditMessage,
+  onDeleteMessage,
   onReactMessage,
 }: ChatMessageBubbleProps) {
   const isOwn = msg.isOwn ?? msg.senderId === currentUserId;
@@ -38,10 +58,12 @@ export default function ChatMessageBubble({
   const [draftText, setDraftText] = useState(msg.text);
   const hasOpenFloatingMenu = isReactionPickerOpen || isMoreMenuOpen;
   const isActionBarVisible = isActionBarOpen || hasOpenFloatingMenu;
-
-  useEffect(() => {
-    if (!isEditing) setDraftText(msg.text);
-  }, [isEditing, msg.text]);
+  const canEditMessage =
+    isOwn &&
+    (msg.messageType === undefined || msg.messageType === 1) &&
+    isWithinEditWindow(msg.timestamp) &&
+    !msg.id.startsWith("local_");
+  const canDeleteMessage = !msg.id.startsWith("local_") && (isOwn || canManageMessages);
 
   useEffect(() => {
     if (!isActionBarVisible) return;
@@ -91,7 +113,7 @@ export default function ChatMessageBubble({
     };
 
   const handleReact = (emoji: string) => {
-    onReactMessage?.(msg.id, emoji);
+    void onReactMessage?.(msg.id, emoji);
     setIsActionBarOpen(false);
     setIsReactionPickerOpen(false);
   };
@@ -99,10 +121,17 @@ export default function ChatMessageBubble({
   const handleCopy = () => {
     setIsActionBarOpen(false);
     setIsMoreMenuOpen(false);
-    void navigator.clipboard?.writeText(msg.text);
+    const attachmentText = msg.attachments
+      ?.map((attachment) => `${attachment.fileName}: ${attachment.fileUrl}`)
+      .join("\n");
+    const copyText = [msg.text, attachmentText].filter(Boolean).join("\n");
+
+    void navigator.clipboard?.writeText(copyText);
   };
 
   const startEdit = () => {
+    if (!canEditMessage) return;
+
     setIsActionBarOpen(false);
     setIsMoreMenuOpen(false);
     setIsReactionPickerOpen(false);
@@ -125,13 +154,22 @@ export default function ChatMessageBubble({
     const nextText = draftText.trim();
     if (!nextText) return;
 
-    onEditMessage?.(msg.id, nextText);
+    void onEditMessage?.(msg.id, nextText);
     setIsEditing(false);
+  };
+
+  const handleDelete = () => {
+    if (!canDeleteMessage) return;
+
+    setIsActionBarOpen(false);
+    setIsMoreMenuOpen(false);
+    setIsReactionPickerOpen(false);
+    void onDeleteMessage?.(msg.id);
   };
 
   return (
     <motion.div
-      variants={msgVariants as any}
+      variants={msgVariants}
       initial={reduceMotion ? false : "hidden"}
       animate="visible"
       className={`flex items-end gap-2 ${isOwn ? "flex-row-reverse" : "flex-row"}`}
@@ -223,11 +261,35 @@ export default function ChatMessageBubble({
             </div>
           ) : (
             <div
-              className="rounded-2xl px-3 py-2 font-sans text-[14px] leading-[1.5] break-words"
+              className="flex max-w-full flex-col gap-2 rounded-2xl px-3 py-2 font-sans text-[14px] leading-[1.5] break-words"
               style={bubbleStyle}
               onClick={showActionBar}
             >
-              {msg.text}
+              {msg.text ? <p className="whitespace-pre-wrap">{msg.text}</p> : null}
+              {msg.attachments?.length ? (
+                <div className="flex max-w-full flex-col gap-1.5">
+                  {msg.attachments.map((attachment) => (
+                    <a
+                      key={attachment.id}
+                      href={attachment.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex min-w-0 items-center gap-2 rounded-xl border px-2.5 py-2 text-[12px] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring"
+                      style={{
+                        borderColor: "rgb(var(--borderColor-secondary) / 0.12)",
+                        color: "rgb(var(--textColor-primary))",
+                      }}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <Paperclip size={14} strokeWidth={1.7} aria-hidden="true" className="shrink-0" />
+                      <span className="min-w-0 flex-1 truncate">{attachment.fileName}</span>
+                      <span className="shrink-0 text-[10px]" style={{ color: "rgb(var(--textColor-secondary))" }}>
+                        {formatFileSize(attachment.fileSizeBytes)}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              ) : null}
             </div>
           )}
 
@@ -242,7 +304,15 @@ export default function ChatMessageBubble({
               }}
             >
               {isReactionPickerOpen ? <MessageReactionPicker isOwn={isOwn} onReact={handleReact} /> : null}
-              {isMoreMenuOpen ? <MessageMoreMenu isOwn={isOwn} onCopy={handleCopy} onEdit={startEdit} /> : null}
+              {isMoreMenuOpen ? (
+                <MessageMoreMenu
+                  isOwn={isOwn}
+                  canDelete={canDeleteMessage}
+                  onCopy={handleCopy}
+                  onEdit={canEditMessage ? startEdit : undefined}
+                  onDelete={canDeleteMessage ? handleDelete : undefined}
+                />
+              ) : null}
 
               <MessageActionButton
                 label="Thả cảm xúc"
@@ -254,7 +324,7 @@ export default function ChatMessageBubble({
                 <SmilePlus size={16} strokeWidth={1.7} />
               </MessageActionButton>
 
-              {isOwn ? (
+              {canEditMessage ? (
                 <MessageActionButton label="Chỉnh sửa" onClick={startEdit}>
                   <Pencil size={16} strokeWidth={1.7} />
                 </MessageActionButton>

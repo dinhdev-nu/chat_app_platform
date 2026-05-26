@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Copy, Pencil } from "lucide-react";
+import { Copy, Pencil, Trash2 } from "lucide-react";
 
 const MESSAGE_REACTION_OPTIONS = ["👍", "❤️", "😂", "😮", "😢", "👏"];
 const messageActionButtonClass =
@@ -67,12 +67,16 @@ export function MessageReactionPicker({
 
 export function MessageMoreMenu({
   isOwn,
+  canDelete,
   onCopy,
   onEdit,
+  onDelete,
 }: {
   isOwn: boolean;
+  canDelete: boolean;
   onCopy: () => void;
-  onEdit: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }) {
   return (
     <div
@@ -96,7 +100,7 @@ export function MessageMoreMenu({
           <Copy size={15} strokeWidth={1.7} aria-hidden="true" />
           Sao chép
         </button>
-        {isOwn ? (
+        {isOwn && onEdit ? (
           <button
             type="button"
             className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring"
@@ -105,6 +109,17 @@ export function MessageMoreMenu({
           >
             <Pencil size={15} strokeWidth={1.7} aria-hidden="true" />
             Chỉnh sửa
+          </button>
+        ) : null}
+        {canDelete && onDelete ? (
+          <button
+            type="button"
+            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2 text-left text-[13px] hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring"
+            style={{ color: "rgb(var(--textColor-primary))" }}
+            onClick={onDelete}
+          >
+            <Trash2 size={15} strokeWidth={1.7} aria-hidden="true" />
+            Xóa
           </button>
         ) : null}
       </div>

@@ -9,22 +9,26 @@ import { UserIcon } from "./icons";
 
 interface ContactItemProps {
     contact: ContactUserResponse;
+    onSelect?: (contact: ContactUserResponse) => void;
 }
 
-function ContactItem({ contact }: ContactItemProps) {
+function ContactItem({ contact, onSelect }: ContactItemProps) {
     const initials = contact.username.trim().slice(0, 2).toUpperCase() || "FR";
     const lastSeenLabel = formatContactLastSeen(contact.lastSeenAt);
 
     return (
-        <li
-            className="
-        flex items-center justify-between gap-3 p-2 rounded-xl
-        transition-colors duration-200 ease-out
-        text-body-sm
-        border border-transparent opacity-100 active:scale-[0.985]
-        hover:bg-[rgb(var(--backgroundColor-state-hover)/0.5)]
-      "
-        >
+        <li>
+            <button
+                type="button"
+                className={`
+                    flex w-full items-center justify-between gap-3 p-2 rounded-xl
+                    transition-colors duration-200 ease-out
+                    text-body-sm text-left
+                    border border-transparent opacity-100 active:scale-[0.985]
+                    hover:bg-[rgb(var(--backgroundColor-state-hover)/0.5)]
+                `}
+                onClick={() => onSelect?.(contact)}
+            >
             <div
                 className={`
           shrink-0 w-10 h-10 min-w-[2.5rem] rounded-xl
@@ -68,6 +72,7 @@ function ContactItem({ contact }: ContactItemProps) {
                     </span>
                 </div>
             </div>
+            </button>
         </li>
     );
 }

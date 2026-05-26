@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
-interface UpdateUserRequest {
-  name: string;
-  avatarUrl?: string;
-  bio?: string;
-}
+import { getApiErrorMessage } from "@/services/http";
+import { useAuthStore } from "@/stores/authStore";
+import type { UpdateUserRequest } from "@/types/user";
 
 interface UpdateProfileModalProps {
   open: boolean;
@@ -38,23 +37,34 @@ export default function UpdateProfileModal({
   onSave,
   onLogout,
 }: UpdateProfileModalProps) {
+  const router = useRouter();
+  const authUser = useAuthStore((state) => state.user);
+  const updateProfile = useAuthStore((state) => state.updateProfile);
+  const logout = useAuthStore((state) => state.logout);
+  const isUpdatingProfile = useAuthStore((state) => state.isUpdatingProfile);
+  const isStoreLoggingOut = useAuthStore((state) => state.isLoggingOut);
+  const initialName = initialData?.name ?? authUser?.name ?? authUser?.email ?? "";
+  const initialAvatarUrl = initialData?.avatarUrl ?? authUser?.avatarUrl ?? "";
+  const initialBio = initialData?.bio ?? authUser?.bio ?? "";
   const [shouldRender, setShouldRender] = useState(open);
   const [isAnimatingOut, setIsAnimatingOut] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [name, setName] = useState(initialData?.name ?? "");
-  const [avatarUrl, setAvatarUrl] = useState(initialData?.avatarUrl ?? "");
-  const [bio, setBio] = useState(initialData?.bio ?? "");
+  const [name, setName] = useState(initialName);
+  const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
+  const [bio, setBio] = useState(initialBio);
   const [avatarError, setAvatarError] = useState(false);
+  const [modalError, setModalError] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
-      setName(initialData?.name ?? "");
-      setAvatarUrl(initialData?.avatarUrl ?? "");
-      setBio(initialData?.bio ?? "");
+      setName(initialName);
+      setAvatarUrl(initialAvatarUrl);
+      setBio(initialBio);
       setAvatarError(false);
+      setModalError(null);
     }
-  }, [open, initialData]);
+  }, [open, initialName, initialAvatarUrl, initialBio]);
 
   useEffect(() => {
     if (open) {
@@ -67,8 +77,8 @@ export default function UpdateProfileModal({
 
   useEffect(() => {
     if (!open) return;
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onOpenChange(false);
+    const handler = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onOpenChange(false);
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
@@ -82,30 +92,56 @@ export default function UpdateProfileModal({
   };
 
   const handleSave = async () => {
-    if (isSaving || !name.trim()) return;
+    if (isSaving || isUpdatingProfile || !name.trim()) return;
+
     setIsSaving(true);
+    setModalError(null);
+
     try {
-      await onSave?.({
+      const payload: UpdateUserRequest = {
         name: name.trim(),
         ...(avatarUrl.trim() ? { avatarUrl: avatarUrl.trim() } : {}),
         ...(bio.trim() ? { bio: bio.trim() } : {}),
-      });
+      };
+
+      if (onSave) {
+        await onSave(payload);
+      } else {
+        await updateProfile(payload);
+      }
+
       onOpenChange(false);
+    } catch (error) {
+      setModalError(getApiErrorMessage(error));
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleLogout = async () => {
-    if (isLoggingOut || !onLogout) return;
+    if (isLoggingOut || isStoreLoggingOut) return;
+
     setIsLoggingOut(true);
+    setModalError(null);
+
     try {
-      await onLogout();
+      if (onLogout) {
+        await onLogout();
+      } else {
+        await logout();
+        router.replace("/login");
+      }
+
+      onOpenChange(false);
+    } catch (error) {
+      setModalError(getApiErrorMessage(error));
     } finally {
       setIsLoggingOut(false);
     }
   };
 
+  const isSavingProfile = isSaving || isUpdatingProfile;
+  const isLogoutPending = isLoggingOut || isStoreLoggingOut;
   const avatarFallback = name.trim().charAt(0).toUpperCase() || "U";
   const showAvatar = avatarUrl.trim() && !avatarError;
 
@@ -173,8 +209,8 @@ export default function UpdateProfileModal({
                     type="text"
                     placeholder="Tên hiển thị..."
                     value={name}
-                    maxLength={255}
-                    onChange={(e) => setName(e.target.value)}
+                    maxLength={50}
+                    onChange={(event) => setName(event.target.value)}
                     name="profileName"
                     autoComplete="name"
                     className="flex-1 modal-input-underline text-sm font-medium text-primary py-2"
@@ -189,9 +225,9 @@ export default function UpdateProfileModal({
                   type="url"
                   placeholder="URL ảnh đại diện (tùy chọn)"
                   value={avatarUrl}
-                  maxLength={255}
-                  onChange={(e) => {
-                    setAvatarUrl(e.target.value);
+                  maxLength={512}
+                  onChange={(event) => {
+                    setAvatarUrl(event.target.value);
                     setAvatarError(false);
                   }}
                   name="profileAvatarUrl"
@@ -203,7 +239,7 @@ export default function UpdateProfileModal({
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <h3 className="text-xs text-secondary font-medium">Giới thiệu bản thân</h3>
-                  <p className="text-xs text-secondary">{bio.length}/500</p>
+                  <p className="text-xs text-secondary">{bio.length}/300</p>
                 </div>
                 <label htmlFor="profile-bio" className="sr-only">
                   Giới thiệu bản thân
@@ -213,20 +249,26 @@ export default function UpdateProfileModal({
                   rows={2}
                   placeholder="Thêm mô tả về bạn..."
                   value={bio}
-                  maxLength={500}
-                  onChange={(e) => setBio(e.target.value)}
+                  maxLength={300}
+                  onChange={(event) => setBio(event.target.value)}
                   name="profileBio"
                   autoComplete="off"
                   className="w-full text-sm text-primary modal-textarea rounded-xl p-3 resize-none"
                 />
               </div>
+
+              {modalError ? (
+                <p className="text-xs text-[rgb(var(--textColor-danger))]" role="alert">
+                  {modalError}
+                </p>
+              ) : null}
             </div>
 
             <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
                 onClick={handleSave}
-                disabled={isSaving || !name.trim()}
+                disabled={isSavingProfile || !name.trim()}
                 className="flex items-center justify-center gap-2 rounded-lg bg-clip-border
                   focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2
                   border border-white/[.13] bg-state-enabled text-primary shadow-sm
@@ -234,7 +276,7 @@ export default function UpdateProfileModal({
                   disabled:opacity-50 disabled:cursor-not-allowed
                   backdrop-blur-glass text-subtitle-md px-3 h-8 w-full"
               >
-                {isSaving ? (
+                {isSavingProfile ? (
                   <>
                     <svg
                       width="14"
@@ -256,11 +298,11 @@ export default function UpdateProfileModal({
                   <span className="font-medium text-sm">Lưu thay đổi</span>
                 )}
               </button>
-              {onLogout ? (
+              {authUser || onLogout ? (
                 <button
                   type="button"
                   onClick={handleLogout}
-                  disabled={isSaving || isLoggingOut}
+                  disabled={isSavingProfile || isLogoutPending}
                   className="flex h-8 w-full items-center justify-center gap-2 rounded-lg bg-transparent
                     px-3 text-subtitle-md text-[rgb(var(--textColor-danger))]
                     border border-[rgb(var(--borderColor-error)/.35)]
@@ -270,7 +312,7 @@ export default function UpdateProfileModal({
                     focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2"
                 >
                   <LogOut size={15} aria-hidden="true" />
-                  <span className="font-medium text-sm">{isLoggingOut ? "Đang đăng xuất..." : "Đăng xuất"}</span>
+                  <span className="font-medium text-sm">{isLogoutPending ? "Đang đăng xuất..." : "Đăng xuất"}</span>
                 </button>
               ) : null}
               <div className="h-2" />

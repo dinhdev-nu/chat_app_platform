@@ -3,21 +3,27 @@
 import React, { useState, useEffect } from "react";
 import { SunIcon, MoonIcon } from "./icons";
 
+function getInitialIsDark() {
+  if (typeof document === "undefined") return true;
+
+  return document.documentElement.classList.contains("dark");
+}
+
 export default function DisplayToggle() {
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(getInitialIsDark);
 
   useEffect(() => {
     const saved = localStorage.getItem("chat-theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const dark = saved === "dark" || (!saved && prefersDark);
-    setIsDark(dark);
+    const dark = saved !== "light";
     document.documentElement.classList.toggle("dark", dark);
+    document.documentElement.style.colorScheme = dark ? "dark" : "light";
   }, []);
 
   const toggle = () => {
     const next = !isDark;
     setIsDark(next);
     document.documentElement.classList.toggle("dark", next);
+    document.documentElement.style.colorScheme = next ? "dark" : "light";
     localStorage.setItem("chat-theme", next ? "dark" : "light");
   };
 
@@ -26,6 +32,7 @@ export default function DisplayToggle() {
       <button
         type="button"
         tabIndex={0}
+        suppressHydrationWarning
         aria-label={isDark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
         onClick={toggle}
         className="

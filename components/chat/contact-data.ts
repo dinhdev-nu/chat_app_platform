@@ -1,27 +1,8 @@
-export interface ContactUserResponse {
-  id: string;
-  username: string;
-  avatarUrl?: string | null;
-  bio?: string | null;
-  lastSeenAt?: string | null;
-  createdAt?: string;
-};
+import type { ContactUserResponse, SearchUser } from "@/types/user";
+import { ContactStatus } from "@/types/user";
 
-export enum ContactStatus {
-  Pending = 1,  // Chờ xác nhận
-  Accepted = 2, // Đã kết bạn
-  Blocked = 3,  // Đã chặn
-}
-
-export interface SearchUser {
-  id: string;
-  username: string;
-  avatarUrl?: string | null;
-  bio?: string | null;
-  lastSeenAt?: string | null;
-  outgoingStatus?: ContactStatus;
-  incomingStatus?: ContactStatus;
-}
+export type { ContactUserResponse, SearchUser };
+export { ContactStatus };
 
 export const MOCK_CONTACT_USERS: ContactUserResponse[] = [
   {

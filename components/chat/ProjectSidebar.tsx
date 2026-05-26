@@ -15,10 +15,15 @@ interface ProjectSidebarProps {
   onOpenPanel?: () => void;
   activeConversationId?: string;
   onSelectConversation?: (conv: ConversationListItem) => void;
+  onSelectContact?: (contact: ContactUserResponse) => void;
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
+  isContactsLoading?: boolean;
+  contactsError?: any;
   activeTab?: SidebarFilter;
   onActiveTabChange?: (tab: SidebarFilter) => void;
+  onLoadMoreConversations?: () => void;
+  hasMoreConversations?: boolean;
 }
 
 export default function ProjectSidebar({
@@ -27,10 +32,15 @@ export default function ProjectSidebar({
   onOpenPanel,
   conversations = MOCK_CONVERSATIONS,
   contacts = MOCK_CONTACT_USERS,
+  isContactsLoading = false,
+  contactsError,
   activeConversationId,
   onSelectConversation,
+  onSelectContact,
   activeTab: activeTabProp,
   onActiveTabChange,
+  onLoadMoreConversations,
+  hasMoreConversations,
 }: ProjectSidebarProps) {
   const isMobile = useIsMobile();
   const isHiddenOnMobile = isMobile && !isMobileOpen;
@@ -279,6 +289,11 @@ export default function ProjectSidebar({
             contacts={visibleContacts}
             activeConversationId={activeConversationId}
             onSelectConversation={onSelectConversation}
+            onSelectContact={onSelectContact}
+            isContactsLoading={isContactsLoading}
+            contactsError={contactsError}
+            onLoadMoreConversations={onLoadMoreConversations}
+            hasMoreConversations={hasMoreConversations}
           />
         </div>
       </div>
