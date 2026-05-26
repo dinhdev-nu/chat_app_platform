@@ -58,12 +58,14 @@ export default function ChatMessageBubble({
   const [draftText, setDraftText] = useState(msg.text);
   const hasOpenFloatingMenu = isReactionPickerOpen || isMoreMenuOpen;
   const isActionBarVisible = isActionBarOpen || hasOpenFloatingMenu;
+  const isDeleted = Boolean(msg.isDeleted);
   const canEditMessage =
+    !isDeleted &&
     isOwn &&
     (msg.messageType === undefined || msg.messageType === 1) &&
     isWithinEditWindow(msg.timestamp) &&
     !msg.id.startsWith("local_");
-  const canDeleteMessage = !msg.id.startsWith("local_") && (isOwn || canManageMessages);
+  const canDeleteMessage = !isDeleted && !msg.id.startsWith("local_") && (isOwn || canManageMessages);
 
   useEffect(() => {
     if (!isActionBarVisible) return;
@@ -113,6 +115,8 @@ export default function ChatMessageBubble({
     };
 
   const handleReact = (emoji: string) => {
+    if (isDeleted) return;
+
     void onReactMessage?.(msg.id, emoji);
     setIsActionBarOpen(false);
     setIsReactionPickerOpen(false);
@@ -140,7 +144,7 @@ export default function ChatMessageBubble({
   };
 
   const showActionBar = () => {
-    if (isEditing) return;
+    if (isEditing || isDeleted) return;
 
     setIsActionBarOpen(true);
   };
@@ -266,7 +270,7 @@ export default function ChatMessageBubble({
               onClick={showActionBar}
             >
               {msg.text ? <p className="whitespace-pre-wrap">{msg.text}</p> : null}
-              {msg.attachments?.length ? (
+              {!isDeleted && msg.attachments?.length ? (
                 <div className="flex max-w-full flex-col gap-1.5">
                   {msg.attachments.map((attachment) => (
                     <a
@@ -293,7 +297,7 @@ export default function ChatMessageBubble({
             </div>
           )}
 
-          {!isEditing ? (
+          {!isEditing && !isDeleted ? (
             <div
               className={`absolute bottom-full z-10 mb-1 flex translate-y-0 items-center gap-0.5 rounded-full border px-1 py-0.5 shadow-lg backdrop-blur-glass transition-opacity sm:top-1/2 sm:bottom-auto sm:mb-0 sm:-translate-y-1/2 ${isActionBarVisible ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 sm:pointer-events-auto"
                 } ${isOwn ? "right-0 sm:right-full sm:mr-1" : "left-0 sm:left-full sm:ml-1"
@@ -343,7 +347,7 @@ export default function ChatMessageBubble({
           ) : null}
         </div>
 
-        {msg.reactions?.length ? (
+        {!isDeleted && msg.reactions?.length ? (
           <div className={`mt-1 flex flex-wrap gap-1 px-1 ${isOwn ? "justify-end" : "justify-start"}`}>
             {msg.reactions.map((reaction) => (
               <button

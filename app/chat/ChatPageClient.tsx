@@ -14,8 +14,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "./chat.css";
 import { useConversations } from "@/hooks/use-conversations";
+import { useChatRealtime } from "@/hooks/use-chat-realtime";
 import { conversationService } from "@/services/conversationService";
 import { toHexId, mapCreatedConversationToListItem } from "@/types/conversation";
+import { normalizeRealtimeId } from "@/stores/chatStore";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
 import type { ChatMessage } from "@/components/chat/chat-message-types";
 import type { ContactUserResponse, SearchUser } from "@/types/user";
@@ -113,6 +115,24 @@ export default function ChatPageClient({
     if (!hasValidStoredSession(accessToken, expiresAt)) return "unauthenticated";
     return "authenticated";
   }, [hasHydrated, accessToken, expiresAt]);
+
+  const handleCurrentUserRemovedFromConversation = useCallback(
+    (conversationId: string) => {
+      if (normalizeRealtimeId(conversationId) !== normalizeRealtimeId(activeConversationId)) return;
+
+      setActiveDraftContact(null);
+      setActiveConversationId(undefined);
+    },
+    [activeConversationId],
+  );
+
+  useChatRealtime({
+    accessToken,
+    activeConversationId,
+    currentUserId: currentUser?.id,
+    enabled: authState === "authenticated",
+    onCurrentUserRemovedFromConversation: handleCurrentUserRemovedFromConversation,
+  });
 
   useEffect(() => {
     if (authState !== "unauthenticated") return;

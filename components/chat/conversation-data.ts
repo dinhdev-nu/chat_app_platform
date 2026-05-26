@@ -16,6 +16,8 @@ export interface ConversationListItem {
   isMuted: boolean;
   unreadCount: number;
   lastMessageText?: string;
+  memberOnlineCount?: number;
+  isOnline?: boolean;
 }
 
 export const CONVERSATION_TYPE_LABELS: Record<ConversationType, string> = {

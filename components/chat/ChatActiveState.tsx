@@ -28,6 +28,7 @@ interface ChatActiveStateProps {
   onRetryLoad?: () => void;
   onLoadMoreMessages?: () => void;
   onSend?: (text: string) => void | Promise<void>;
+  onTyping?: () => void;
   onEditMessage?: (messageId: string, text: string) => void | Promise<void>;
   onDeleteMessage?: (messageId: string) => void | Promise<void>;
   onReactMessage?: (messageId: string, emoji: string) => void | Promise<void>;
@@ -182,6 +183,7 @@ export default function ChatActiveState({
   onRetryLoad,
   onLoadMoreMessages,
   onSend,
+  onTyping,
   onEditMessage,
   onDeleteMessage,
   onReactMessage,
@@ -313,6 +315,7 @@ export default function ChatActiveState({
           sendLabel="Gửi tin nhắn"
           isSending={isSending}
           onSend={onSend}
+          onTyping={onTyping}
         />
       </motion.div>
     </div>

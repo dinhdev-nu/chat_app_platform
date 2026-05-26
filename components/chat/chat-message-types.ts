@@ -29,5 +29,7 @@ export interface ChatMessage {
   type?: ChatMessageType;
   isSystem?: boolean;
   isOwn?: boolean;
+  isDeleted?: boolean;
+  deletedAt?: string;
   seq?: number;
 }

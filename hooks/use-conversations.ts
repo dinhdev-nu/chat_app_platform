@@ -1,9 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 
 import { getApiErrorMessage } from "@/services/http";
 import { conversationService } from "@/services/conversationService";
+import { selectConversationList, useChatStore } from "@/stores/chatStore";
 import type { PaginationMeta } from "@/types/api";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
 
@@ -21,7 +23,11 @@ interface UseConversationsOptions {
 }
 
 export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: UseConversationsOptions = {}) {
-  const [conversations, setConversations] = useState<ConversationListItem[]>([]);
+  const conversations = useChatStore(useShallow(selectConversationList));
+  const setStoreConversations = useChatStore((state) => state.setConversations);
+  const upsertConversation = useChatStore((state) => state.upsertConversation);
+  const patchConversation = useChatStore((state) => state.patchConversation);
+  const removeStoreConversation = useChatStore((state) => state.removeConversation);
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +51,7 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
 
         if (!isMountedRef.current) return;
 
-        setConversations((current) =>
-          append ? [...current, ...result.data] : result.data,
-        );
+        setStoreConversations(result.data, { append });
         setPagination(result.pagination);
       } catch (err) {
         if (!isMountedRef.current) return;
@@ -56,7 +60,7 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
         if (isMountedRef.current && !silent) setIsLoading(false);
       }
     },
-    [enabled, limit],
+    [enabled, limit, setStoreConversations],
   );
 
   // Auto-load khi mount
@@ -81,27 +85,22 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
    * Nếu đã tồn tại (cùng id), di chuyển lên đầu thay vì thêm mới.
    */
   const prependConversation = useCallback((conversation: ConversationListItem) => {
-    setConversations((current) => {
-      const filtered = current.filter((item) => item.id !== conversation.id);
-      return [conversation, ...filtered];
-    });
-  }, []);
+    upsertConversation(conversation, { moveToTop: true });
+  }, [upsertConversation]);
 
   /**
    * Cập nhật một conversation trong danh sách (ví dụ sau khi gửi tin nhắn).
    */
   const updateConversation = useCallback((updatedConv: ConversationListItem) => {
-    setConversations((current) =>
-      current.map((item) => (item.id === updatedConv.id ? updatedConv : item)),
-    );
-  }, []);
+    upsertConversation(updatedConv);
+  }, [upsertConversation]);
 
   /**
    * Xóa một conversation khỏi danh sách (ví dụ sau khi rời nhóm).
    */
   const removeConversation = useCallback((conversationId: string) => {
-    setConversations((current) => current.filter((item) => item.id !== conversationId));
-  }, []);
+    removeStoreConversation(conversationId);
+  }, [removeStoreConversation]);
 
   return {
     conversations: enabled ? conversations : [],
@@ -112,6 +111,7 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
     loadMore,
     prependConversation,
     updateConversation,
+    patchConversation,
     removeConversation,
   };
 }

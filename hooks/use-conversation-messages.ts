@@ -1,13 +1,26 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useShallow } from "zustand/react/shallow";
 
-import type { ChatMessage } from "@/components/chat/chat-message-types";
+import type { ChatTypingUser } from "@/components/chat/ChatActiveState";
+import { useActiveConversationRealtime } from "@/hooks/use-active-conversation-realtime";
 import { getApiErrorMessage } from "@/services/http";
 import { messageService } from "@/services/messageService";
+import {
+  normalizeRealtimeId,
+  selectMessagesForConversation,
+  selectTypingUsersForConversation,
+  useChatStore,
+} from "@/stores/chatStore";
 import type { PaginationMeta } from "@/types/api";
 import type { AuthUser } from "@/types/user";
-import { MESSAGE_TYPE, mapMessageResponseToChatMessage } from "@/types/message";
+import {
+  MESSAGE_TYPE,
+  mapMessageResponseToChatMessage,
+} from "@/types/message";
+import type { MessageResponse } from "@/types/message";
+import type { WsReactionToggleEvent } from "@/types/ws";
 
 const DEFAULT_PAGE_LIMIT = 20;
 
@@ -28,99 +41,49 @@ interface UseConversationMessagesOptions {
   limit?: number;
 }
 
-function mergeMessages(nextMessages: ChatMessage[], currentMessages: ChatMessage[]) {
-  const seenIds = new Set<string>();
-  const merged: ChatMessage[] = [];
+function isSameUser(left?: string | null, right?: string | null) {
+  const normalizedLeft = normalizeRealtimeId(left);
+  const normalizedRight = normalizeRealtimeId(right);
 
-  for (const message of [...nextMessages, ...currentMessages]) {
-    if (seenIds.has(message.id)) continue;
-
-    seenIds.add(message.id);
-    merged.push(message);
-  }
-
-  return merged;
+  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
 }
 
-function replaceOrAppendMessage(messages: ChatMessage[], targetId: string, nextMessage: ChatMessage) {
-  let didReplace = false;
-  const nextMessages = messages.map((message) => {
-    if (message.id !== targetId) return message;
+function createOptimisticTextMessage(
+  conversationId: string,
+  text: string,
+  currentUser?: AuthUser | null,
+): MessageResponse {
+  const now = new Date().toISOString();
 
-    didReplace = true;
-    return nextMessage;
-  });
-
-  return didReplace ? nextMessages : [...nextMessages, nextMessage];
-}
-
-function createOptimisticTextMessage(text: string, currentUser?: AuthUser | null): ChatMessage {
   return {
     id: `local_${Date.now()}_${Math.random().toString(36).slice(2)}`,
-    text,
-    senderId: currentUser?.id ?? "current-user",
-    senderName: currentUser?.name,
-    senderAvatar: currentUser?.avatarUrl,
-    timestamp: new Date().toISOString(),
-    isOwn: true,
-    messageType: MESSAGE_TYPE.text,
+    conversation_id: conversationId,
+    sender_id: currentUser?.id ?? "current-user",
+    type: MESSAGE_TYPE.text,
+    content: text,
+    content_encrypted: false,
+    seq: Date.now(),
+    is_edited: false,
+    is_deleted: false,
+    created_at: now,
+    updated_at: now,
+    sender_name: currentUser?.name ?? "",
+    sender_avatar_url: currentUser?.avatarUrl,
+    attachments: [],
+    reactions: [],
   };
 }
 
-function setOwnReactionState(
-  messages: ChatMessage[],
-  messageId: string,
+function getOptimisticReactionAction(
+  message: MessageResponse | undefined,
+  currentUserId: string | undefined,
   emoji: string,
-  shouldReact: boolean,
-) {
-  return messages.map((message) => {
-    if (message.id !== messageId) return message;
+): WsReactionToggleEvent["action"] {
+  const alreadyReacted = message?.reactions?.some(
+    (reaction) => reaction.emoji === emoji && isSameUser(reaction.user_id, currentUserId),
+  );
 
-    const reactions = message.reactions ?? [];
-    const existingReaction = reactions.find((reaction) => reaction.emoji === emoji);
-
-    if (shouldReact) {
-      if (!existingReaction) {
-        return {
-          ...message,
-          reactions: [...reactions, { emoji, count: 1, reactedByMe: true }],
-        };
-      }
-
-      if (existingReaction.reactedByMe) return message;
-
-      return {
-        ...message,
-        reactions: reactions.map((reaction) =>
-          reaction.emoji === emoji
-            ? { ...reaction, count: reaction.count + 1, reactedByMe: true }
-            : reaction,
-        ),
-      };
-    }
-
-    if (!existingReaction || !existingReaction.reactedByMe) return message;
-
-    const nextCount = existingReaction.count - 1;
-
-    return {
-      ...message,
-      reactions: reactions
-        .map((reaction) =>
-          reaction.emoji === emoji
-            ? { ...reaction, count: nextCount, reactedByMe: false }
-            : reaction,
-        )
-        .filter((reaction) => reaction.count > 0),
-    };
-  });
-}
-
-function toggleOwnReaction(messages: ChatMessage[], messageId: string, emoji: string) {
-  const message = messages.find((item) => item.id === messageId);
-  const existingReaction = message?.reactions?.find((reaction) => reaction.emoji === emoji);
-
-  return setOwnReactionState(messages, messageId, emoji, !existingReaction?.reactedByMe);
+  return alreadyReacted ? "removed" : "added";
 }
 
 export function useConversationMessages({
@@ -129,7 +92,23 @@ export function useConversationMessages({
   enabled = true,
   limit = DEFAULT_PAGE_LIMIT,
 }: UseConversationMessagesOptions = {}) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const rawMessages = useChatStore(
+    useShallow((state) => selectMessagesForConversation(state, conversationId)),
+  );
+  const typingUsers = useChatStore(
+    useShallow((state) =>
+      selectTypingUsersForConversation(state, conversationId, currentUser?.id),
+    ),
+  );
+  const setStoreMessages = useChatStore((state) => state.setMessages);
+  const upsertStoreMessage = useChatStore((state) => state.upsertMessage);
+  const replaceStoreMessage = useChatStore((state) => state.replaceMessage);
+  const patchStoreMessage = useChatStore((state) => state.patchMessage);
+  const removeStoreMessage = useChatStore((state) => state.removeMessage);
+  const getStoreMessage = useChatStore((state) => state.getMessage);
+  const applyReactionToggle = useChatStore((state) => state.applyReactionToggle);
+  const currentUserId = currentUser?.id;
+
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -138,17 +117,32 @@ export function useConversationMessages({
   const [actionError, setActionError] = useState<string | null>(null);
   const isMountedRef = useRef(true);
   const latestRequestIdRef = useRef(0);
-  const messagesRef = useRef<ChatMessage[]>([]);
-  const lastReadMarkerRef = useRef<string | null>(null);
+  const rawMessagesRef = useRef<MessageResponse[]>([]);
 
   const mappingOptions = useMemo(
     () => ({
-      currentUserId: currentUser?.id,
+      currentUserId,
       currentUserName: currentUser?.name,
       currentUserAvatarUrl: currentUser?.avatarUrl,
     }),
-    [currentUser?.avatarUrl, currentUser?.id, currentUser?.name],
+    [currentUser?.avatarUrl, currentUser?.name, currentUserId],
   );
+
+  const messages = useMemo(
+    () => rawMessages.map((message) => mapMessageResponseToChatMessage(message, mappingOptions)),
+    [mappingOptions, rawMessages],
+  );
+
+  const latestReadMessageId = useMemo(() => {
+    const latestMessage = rawMessages.at(-1);
+    return latestMessage?.id ?? null;
+  }, [rawMessages]);
+
+  const sendTyping = useActiveConversationRealtime({
+    conversationId,
+    enabled: enabled && Boolean(conversationId),
+    latestReadMessageId,
+  });
 
   useEffect(() => {
     isMountedRef.current = true;
@@ -158,8 +152,8 @@ export function useConversationMessages({
   }, []);
 
   useEffect(() => {
-    messagesRef.current = messages;
-  }, [messages]);
+    rawMessagesRef.current = rawMessages;
+  }, [rawMessages]);
 
   const loadMessages = useCallback(
     async ({ cursor, append = false, silent = false }: LoadPageOptions = {}) => {
@@ -175,15 +169,11 @@ export function useConversationMessages({
 
       try {
         const result = await messageService.listMessages(conversationId, { cursor, limit });
-        const mappedMessages = result.data
-          .map((message) => mapMessageResponseToChatMessage(message, mappingOptions))
-          .reverse();
+        const orderedMessages = result.data.slice().reverse();
 
         if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
 
-        setMessages((currentMessages) =>
-          append ? mergeMessages(mappedMessages, currentMessages) : mappedMessages,
-        );
+        setStoreMessages(conversationId, orderedMessages, { append });
         setPagination(result.pagination);
       } catch (err) {
         if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
@@ -195,38 +185,30 @@ export function useConversationMessages({
         }
       }
     },
-    [conversationId, enabled, limit, mappingOptions],
+    [conversationId, enabled, limit, setStoreMessages],
   );
 
   useEffect(() => {
     latestRequestIdRef.current += 1;
-    lastReadMarkerRef.current = null;
 
     if (!enabled || !conversationId) {
-      setMessages([]);
-      setPagination(null);
-      setError(null);
-      setActionError(null);
-      setIsLoading(false);
-      setIsLoadingMore(false);
-      return;
+      const timeoutId = window.setTimeout(() => {
+        setPagination(null);
+        setError(null);
+        setActionError(null);
+        setIsLoading(false);
+        setIsLoadingMore(false);
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
 
-    void loadMessages();
+    const timeoutId = window.setTimeout(() => {
+      void loadMessages();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [conversationId, enabled, loadMessages]);
-
-  useEffect(() => {
-    if (!enabled || !conversationId || messages.length === 0) return;
-
-    const latestMessage = messages[messages.length - 1];
-    if (!latestMessage || latestMessage.id.startsWith("local_")) return;
-
-    const readMarker = `${conversationId}:${latestMessage.id}`;
-    if (lastReadMarkerRef.current === readMarker) return;
-
-    lastReadMarkerRef.current = readMarker;
-    void messageService.markAsRead(conversationId, latestMessage.id).catch(() => undefined);
-  }, [conversationId, enabled, messages]);
 
   const loadMore = useCallback(async () => {
     if (!pagination?.hasNext || !pagination.nextCursor || isLoadingMore) return;
@@ -241,31 +223,32 @@ export function useConversationMessages({
 
       if (!trimmedText || !targetConversationId) return undefined;
 
-      const optimisticMessage = createOptimisticTextMessage(trimmedText, currentUser);
+      const optimisticMessage = createOptimisticTextMessage(
+        targetConversationId,
+        trimmedText,
+        currentUser,
+      );
 
       setIsSending(true);
       setActionError(null);
-      setMessages((currentMessages) => [...currentMessages, optimisticMessage]);
+      upsertStoreMessage(targetConversationId, optimisticMessage);
 
       try {
         const response = await messageService.sendMessage(targetConversationId, {
           type: MESSAGE_TYPE.text,
           content: trimmedText,
         });
-        const sentMessage = mapMessageResponseToChatMessage(response, mappingOptions);
 
-        if (!isMountedRef.current) return sentMessage;
+        if (!isMountedRef.current) {
+          return mapMessageResponseToChatMessage(response, mappingOptions);
+        }
 
-        setMessages((currentMessages) =>
-          replaceOrAppendMessage(currentMessages, optimisticMessage.id, sentMessage),
-        );
+        replaceStoreMessage(targetConversationId, optimisticMessage.id, response);
 
-        return sentMessage;
+        return mapMessageResponseToChatMessage(response, mappingOptions);
       } catch (err) {
         if (isMountedRef.current) {
-          setMessages((currentMessages) =>
-            currentMessages.filter((message) => message.id !== optimisticMessage.id),
-          );
+          removeStoreMessage(targetConversationId, optimisticMessage.id);
           setActionError(getApiErrorMessage(err));
         }
 
@@ -274,93 +257,126 @@ export function useConversationMessages({
         if (isMountedRef.current) setIsSending(false);
       }
     },
-    [conversationId, currentUser, mappingOptions],
+    [
+      conversationId,
+      currentUser,
+      mappingOptions,
+      removeStoreMessage,
+      replaceStoreMessage,
+      upsertStoreMessage,
+    ],
   );
 
   const editMessage = useCallback(
     async (messageId: string, text: string) => {
       const trimmedText = text.trim();
-      if (!trimmedText) return undefined;
+      if (!trimmedText || !conversationId) return undefined;
 
-      const snapshot = messagesRef.current;
+      const snapshot = rawMessagesRef.current;
+      const editedAt = new Date().toISOString();
+
       setActionError(null);
-      setMessages((currentMessages) =>
-        currentMessages.map((message) =>
-          message.id === messageId
-            ? { ...message, text: trimmedText, editedAt: new Date().toISOString() }
-            : message,
-        ),
-      );
+      patchStoreMessage(conversationId, messageId, {
+        content: trimmedText,
+        is_edited: true,
+        updated_at: editedAt,
+      });
 
       try {
         const response = await messageService.editMessage(messageId, trimmedText);
-        const editedMessage = mapMessageResponseToChatMessage(response, mappingOptions);
 
         if (isMountedRef.current) {
-          setMessages((currentMessages) =>
-            replaceOrAppendMessage(currentMessages, messageId, editedMessage),
-          );
+          replaceStoreMessage(conversationId, messageId, response);
         }
 
-        return editedMessage;
+        return mapMessageResponseToChatMessage(response, mappingOptions);
       } catch (err) {
         if (isMountedRef.current) {
-          setMessages(snapshot);
+          setStoreMessages(conversationId, snapshot);
           setActionError(getApiErrorMessage(err));
         }
 
         throw err;
       }
     },
-    [mappingOptions],
+    [conversationId, mappingOptions, patchStoreMessage, replaceStoreMessage, setStoreMessages],
   );
 
-  const deleteMessage = useCallback(async (messageId: string) => {
-    const snapshot = messagesRef.current;
+  const deleteMessage = useCallback(
+    async (messageId: string) => {
+      if (!conversationId) return;
 
-    setActionError(null);
-    setMessages((currentMessages) =>
-      currentMessages.filter((message) => message.id !== messageId),
-    );
+      const snapshot = rawMessagesRef.current;
 
-    try {
-      await messageService.deleteMessage(messageId);
-    } catch (err) {
-      if (isMountedRef.current) {
-        setMessages(snapshot);
-        setActionError(getApiErrorMessage(err));
+      setActionError(null);
+      removeStoreMessage(conversationId, messageId);
+
+      try {
+        await messageService.deleteMessage(messageId);
+      } catch (err) {
+        if (isMountedRef.current) {
+          setStoreMessages(conversationId, snapshot);
+          setActionError(getApiErrorMessage(err));
+        }
+
+        throw err;
       }
+    },
+    [conversationId, removeStoreMessage, setStoreMessages],
+  );
 
-      throw err;
-    }
-  }, []);
+  const toggleReaction = useCallback(
+    async (messageId: string, emoji: string) => {
+      if (!conversationId || !currentUserId) return;
 
-  const toggleReaction = useCallback(async (messageId: string, emoji: string) => {
-    const snapshot = messagesRef.current;
+      const snapshot = rawMessagesRef.current;
+      const currentMessage = getStoreMessage(conversationId, messageId);
+      const optimisticAction = getOptimisticReactionAction(currentMessage, currentUserId, emoji);
 
-    setActionError(null);
-    setMessages((currentMessages) => toggleOwnReaction(currentMessages, messageId, emoji));
+      setActionError(null);
+      applyReactionToggle({
+        event: "reaction.toggle",
+        conv_id: conversationId,
+        msg_id: messageId,
+        user_id: currentUserId,
+        emoji,
+        action: optimisticAction,
+      });
 
-    try {
-      const response = await messageService.toggleReaction(messageId, emoji);
+      try {
+        const response = await messageService.toggleReaction(messageId, emoji);
 
-      if (isMountedRef.current) {
-        setMessages((currentMessages) =>
-          setOwnReactionState(currentMessages, messageId, emoji, response.action === "added"),
-        );
+        if (isMountedRef.current) {
+          applyReactionToggle({
+            event: "reaction.toggle",
+            conv_id: conversationId,
+            msg_id: messageId,
+            user_id: currentUserId,
+            emoji,
+            action: response.action,
+          });
+        }
+      } catch (err) {
+        if (isMountedRef.current) {
+          setStoreMessages(conversationId, snapshot);
+          setActionError(getApiErrorMessage(err));
+        }
+
+        throw err;
       }
-    } catch (err) {
-      if (isMountedRef.current) {
-        setMessages(snapshot);
-        setActionError(getApiErrorMessage(err));
-      }
-
-      throw err;
-    }
-  }, []);
+    },
+    [
+      applyReactionToggle,
+      conversationId,
+      currentUserId,
+      getStoreMessage,
+      setStoreMessages,
+    ],
+  );
 
   return {
-    messages,
+    messages: enabled ? messages : [],
+    typingUsers: enabled ? (typingUsers as ChatTypingUser[]) : [],
     pagination,
     isLoading,
     isLoadingMore,
@@ -373,6 +389,7 @@ export function useConversationMessages({
     editMessage,
     deleteMessage,
     toggleReaction,
+    sendTyping,
     clearActionError: () => setActionError(null),
   };
 }

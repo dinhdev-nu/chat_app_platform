@@ -55,6 +55,8 @@ export interface ConversationListItemResponse {
   role: ConversationRole;
   is_muted: boolean;
   unread_count: number;
+  member_online_count?: number;
+  is_online?: boolean;
 }
 
 // ─── Mappers ─────────────────────────────────────────────────────────────────
@@ -81,6 +83,8 @@ export function mapConversationResponseToListItem(
     role: raw.role,
     isMuted: raw.is_muted,
     unreadCount: raw.unread_count,
+    memberOnlineCount: raw.member_online_count,
+    isOnline: raw.is_online,
   };
 }
 

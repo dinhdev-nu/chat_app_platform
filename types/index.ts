@@ -19,3 +19,19 @@ export type {
 } from "./user";
 export { ContactStatus } from "./user";
 export type { SendOtpRequest, SendOtpResponse, VerifyOtpRequest, LoginResponse } from "./auth";
+export type {
+  WsConversationCreatedEvent,
+  WsInboundEnvelope,
+  WsInboundType,
+  WsMemberAddedEvent,
+  WsMemberRemovedEvent,
+  WsMessageDeletedEvent,
+  WsMessageEditedEvent,
+  WsMessageNewEvent,
+  WsMessageReadEvent,
+  WsOutboundEvent,
+  WsPresenceEvent,
+  WsReactionToggleEvent,
+  WsTypingEvent,
+  WsUserSummary,
+} from "./ws";

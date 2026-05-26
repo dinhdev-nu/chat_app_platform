@@ -55,6 +55,8 @@ export default function ChatMain({
     editMessage,
     deleteMessage,
     toggleReaction,
+    sendTyping,
+    typingUsers,
   } = useConversationMessages({
     conversationId: activeConv?.id,
     currentUser,
@@ -204,7 +206,7 @@ export default function ChatMain({
               conv={activeConv}
               messages={messages}
               currentUserId={currentUser?.id}
-              typingUsers={[]}
+              typingUsers={typingUsers}
               isLoadingMessages={isLoading}
               isLoadingMoreMessages={isLoadingMore}
               hasMoreMessages={Boolean(pagination?.hasNext)}
@@ -214,6 +216,7 @@ export default function ChatMain({
               onRetryLoad={() => void loadMessages()}
               onLoadMoreMessages={() => void loadMore()}
               onSend={handleSend}
+              onTyping={sendTyping}
               onEditMessage={handleEditMessage}
               onDeleteMessage={handleDeleteMessage}
               onReactMessage={handleReactMessage}
