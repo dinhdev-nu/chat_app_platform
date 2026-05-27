@@ -1,3 +1,9 @@
+import {
+  formatVietnamDate,
+  formatVietnamTime,
+  getVietnamDayDiffFromNow,
+} from "./chat-time-utils";
+
 export type ConversationType = 1 | 2 | 3;
 export type ConversationRole = 1 | 2 | 3;
 
@@ -16,8 +22,8 @@ export interface ConversationListItem {
   isMuted: boolean;
   unreadCount: number;
   lastMessageText?: string;
-  memberOnlineCount?: number;
-  isOnline?: boolean;
+  memberOnlineCount: number;
+  isOnline: boolean;
 }
 
 export const CONVERSATION_TYPE_LABELS: Record<ConversationType, string> = {
@@ -47,6 +53,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 3,
     isMuted: false,
     unreadCount: 4,
+    memberOnlineCount: 1,
+    isOnline: true,
     lastMessageText: "Mình vừa đẩy bản wireframe mới lên rồi, bạn xem giúp nhé.",
   },
   {
@@ -62,6 +70,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 2,
     isMuted: false,
     unreadCount: 12,
+    memberOnlineCount: 3,
+    isOnline: true,
     lastMessageText: "Hôm nay chốt lại copy cho màn onboarding nhé.",
   },
   {
@@ -77,6 +87,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 2,
     isMuted: true,
     unreadCount: 0,
+    memberOnlineCount: 0,
+    isOnline: false,
     lastMessageText: "Docs đã cập nhật token color mới ở branch main.",
   },
   {
@@ -93,6 +105,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 3,
     isMuted: false,
     unreadCount: 1,
+    memberOnlineCount: 0,
+    isOnline: false,
     lastMessageText: "Nếu ổn thì mai mình export sang API contract luôn.",
   },
   {
@@ -108,6 +122,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 3,
     isMuted: false,
     unreadCount: 0,
+    memberOnlineCount: 2,
+    isOnline: true,
     lastMessageText: "Migration conversations xong rồi, chỉ còn seed mock data.",
   },
   {
@@ -123,6 +139,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 1,
     isMuted: true,
     unreadCount: 0,
+    memberOnlineCount: 0,
+    isOnline: false,
     lastMessageText: "Release note v0.12 đã sẵn sàng review.",
   },
   {
@@ -138,6 +156,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 3,
     isMuted: false,
     unreadCount: 8,
+    memberOnlineCount: 1,
+    isOnline: true,
     lastMessageText: "Tớ vừa test trên mobile, layout vẫn ổn.",
   },
   {
@@ -153,6 +173,8 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
     role: 3,
     isMuted: false,
     unreadCount: 2,
+    memberOnlineCount: 4,
+    isOnline: true,
     lastMessageText: "Số liệu tuần này tăng đều, giữ lịch đăng như cũ nhé.",
   },
 ];
@@ -168,29 +190,16 @@ export function getConversationRoleLabel(role: ConversationRole) {
 export function formatConversationActivity(value?: string) {
   if (!value) return "Mới đây";
 
-  const activityDate = new Date(value);
-  if (Number.isNaN(activityDate.getTime())) return value;
-
-  const now = new Date();
-  const diffInDays = Math.floor(
-    (Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) -
-      Date.UTC(activityDate.getFullYear(), activityDate.getMonth(), activityDate.getDate())) /
-      86400000,
-  );
+  const diffInDays = getVietnamDayDiffFromNow(value);
+  if (diffInDays === null) return value;
 
   if (diffInDays <= 0) {
-    return activityDate.toLocaleTimeString("vi-VN", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    return formatVietnamTime(value);
   }
 
   if (diffInDays === 1) {
     return "Hôm qua";
   }
 
-  return activityDate.toLocaleDateString("vi-VN", {
-    day: "2-digit",
-    month: "2-digit",
-  });
+  return formatVietnamDate(value);
 }

@@ -96,15 +96,8 @@ export interface MessageMappingOptions {
   currentUserAvatarUrl?: string | null;
 }
 
-function normalizeComparableId(id?: string | null) {
-  return id?.replace(/-/g, "").toLowerCase();
-}
-
 function isSameUser(left?: string | null, right?: string | null) {
-  const normalizedLeft = normalizeComparableId(left);
-  const normalizedRight = normalizeComparableId(right);
-
-  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
+  return Boolean(left && right && left === right);
 }
 
 function aggregateReactions(

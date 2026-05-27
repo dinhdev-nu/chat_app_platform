@@ -30,6 +30,7 @@ function ProjectItem({ conversation, isActive = false, onSelect }: ProjectItemPr
   const initials = (conversation.name ?? "").trim().slice(0, 2).toUpperCase() || "CH";
   const typeLabel = getConversationTypeLabel(conversation.type);
   const activityLabel = formatConversationActivity(conversation.lastActivityAt);
+  const onlineLabel = conversation.isOnline ? "Đang online" : "Đang offline";
 
   return (
     <li>
@@ -48,23 +49,34 @@ function ProjectItem({ conversation, isActive = false, onSelect }: ProjectItemPr
         `}
       >
         {/* Avatar */}
-        <div
-          className={`
-            shrink-0 w-10 h-10 min-w-[2.5rem] rounded-xl
-            flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
-            ${isActive ? "bg-[rgb(var(--backgroundColor-state-enabled)/.65)]" : "bg-[rgb(var(--backgroundColor-state-enabled)/.575)]"}
-            border border-[rgb(var(--borderColor-secondary)/.15)]
-          `}
-          style={{
-            backgroundImage: conversation.avatarUrl ? `url(${conversation.avatarUrl})` : undefined,
-            backgroundColor: conversation.avatarUrl ? "transparent" : "rgb(var(--backgroundColor-state-active))",
-          }}
-        >
-          {!conversation.avatarUrl && (
-            <span className="text-[12px] font-semibold text-[rgb(var(--textColor-primary))]">
-              {initials}
-            </span>
-          )}
+        <div className="relative shrink-0">
+          <div
+            className={`
+              w-10 h-10 min-w-[2.5rem] rounded-xl
+              flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
+              ${isActive ? "bg-[rgb(var(--backgroundColor-state-enabled)/.65)]" : "bg-[rgb(var(--backgroundColor-state-enabled)/.575)]"}
+              border border-[rgb(var(--borderColor-secondary)/.15)]
+            `}
+            style={{
+              backgroundImage: conversation.avatarUrl ? `url(${conversation.avatarUrl})` : undefined,
+              backgroundColor: conversation.avatarUrl ? "transparent" : "rgb(var(--backgroundColor-state-active))",
+            }}
+          >
+            {!conversation.avatarUrl && (
+              <span className="text-[12px] font-semibold text-[rgb(var(--textColor-primary))]">
+                {initials}
+              </span>
+            )}
+          </div>
+          <span
+            aria-label={onlineLabel}
+            title={onlineLabel}
+            className={`absolute -bottom-0.5 -right-0.5 block size-3 rounded-full border-2 ${
+              conversation.isOnline
+                ? "bg-emerald-400 border-[rgb(var(--backgroundColor-primary))]"
+                : "bg-[rgb(var(--textColor-disabled))] border-[rgb(var(--backgroundColor-primary))]"
+            }`}
+          />
         </div>
 
         {/* Info */}

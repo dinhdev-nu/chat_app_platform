@@ -108,25 +108,37 @@ class ChatWebSocketService {
   send<TPayload extends object>(type: WsInboundType, payload: TPayload) {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) return false;
 
-    const envelope: WsInboundEnvelope<TPayload> = { type, payload };
-    this.socket.send(JSON.stringify(envelope));
+    try {
+      const envelope: WsInboundEnvelope<TPayload> = { type, payload };
+      this.socket.send(JSON.stringify(envelope));
 
-    return true;
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   sendTyping(convId: string) {
+    if (!convId) return false;
+
     return this.send<WsConversationPayload>("typing", { conv_id: convId });
   }
 
   sendViewing(convId: string) {
+    if (!convId) return false;
+
     return this.send<WsConversationPayload>("viewing", { conv_id: convId });
   }
 
   sendLeft(convId: string) {
+    if (!convId) return false;
+
     return this.send<WsConversationPayload>("left", { conv_id: convId });
   }
 
   sendRead(convId: string, lastReadMessageId: string) {
+    if (!convId || !lastReadMessageId) return false;
+
     return this.send<WsReadPayload>("read", {
       conv_id: convId,
       last_read_msg_id: lastReadMessageId,

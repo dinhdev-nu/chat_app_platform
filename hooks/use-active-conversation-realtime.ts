@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 
-import { messageService } from "@/services/messageService";
+import { markConversationRead } from "@/services/readReceiptService";
 import { wsService } from "@/services/wsService";
 
 interface UseActiveConversationRealtimeOptions {
@@ -40,18 +40,20 @@ export function useActiveConversationRealtime({
     const readMarker = `${conversationId}:${latestReadMessageId}`;
     if (lastReadMarkerRef.current === readMarker) return;
 
+    let cancelled = false;
     const timeoutId = window.setTimeout(() => {
-      lastReadMarkerRef.current = readMarker;
-
-      const sent = wsService.sendRead(conversationId, latestReadMessageId);
-      if (!sent) {
-        void messageService
-          .markAsRead(conversationId, latestReadMessageId)
-          .catch(() => undefined);
-      }
+      void markConversationRead(conversationId, latestReadMessageId)
+        .then((didMarkRead) => {
+          if (!didMarkRead) return;
+          if (!cancelled) lastReadMarkerRef.current = readMarker;
+        })
+        .catch(() => undefined);
     }, readDebounceMs);
 
-    return () => window.clearTimeout(timeoutId);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
   }, [conversationId, enabled, latestReadMessageId, readDebounceMs]);
 
   return useCallback(() => {
@@ -60,7 +62,7 @@ export function useActiveConversationRealtime({
     const now = Date.now();
     if (now - lastTypingAtRef.current < typingThrottleMs) return;
 
-    lastTypingAtRef.current = now;
-    wsService.sendTyping(conversationId);
+    const sent = wsService.sendTyping(conversationId);
+    if (sent) lastTypingAtRef.current = now;
   }, [conversationId, enabled, typingThrottleMs]);
 }

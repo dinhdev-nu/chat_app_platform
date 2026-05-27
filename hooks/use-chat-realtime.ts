@@ -4,11 +4,9 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { conversationService } from "@/services/conversationService";
 import { messageService } from "@/services/messageService";
+import { markConversationRead } from "@/services/readReceiptService";
 import { wsService } from "@/services/wsService";
-import {
-  normalizeRealtimeId,
-  useChatStore,
-} from "@/stores/chatStore";
+import { useChatStore } from "@/stores/chatStore";
 import { useWsStore } from "@/stores/wsStore";
 import type { WsOutboundEvent } from "@/types/ws";
 
@@ -18,6 +16,7 @@ interface UseChatRealtimeOptions {
   currentUserId?: string | null;
   enabled?: boolean;
   onCurrentUserRemovedFromConversation?: (conversationId: string) => void;
+  onPresenceChange?: (userId: string, isOnline: boolean) => void;
 }
 
 const SYNC_DEBOUNCE_MS = 250;
@@ -29,10 +28,12 @@ export function useChatRealtime({
   currentUserId,
   enabled = true,
   onCurrentUserRemovedFromConversation,
+  onPresenceChange,
 }: UseChatRealtimeOptions) {
   const activeConversationIdRef = useRef(activeConversationId);
   const currentUserIdRef = useRef(currentUserId);
   const removedCallbackRef = useRef(onCurrentUserRemovedFromConversation);
+  const presenceCallbackRef = useRef(onPresenceChange);
   const typingCleanupTimersRef = useRef<Record<string, number>>({});
   const messageSyncTimersRef = useRef<Record<string, number>>({});
   const conversationSyncTimerRef = useRef<number | null>(null);
@@ -54,6 +55,10 @@ export function useChatRealtime({
   useEffect(() => {
     removedCallbackRef.current = onCurrentUserRemovedFromConversation;
   }, [onCurrentUserRemovedFromConversation]);
+
+  useEffect(() => {
+    presenceCallbackRef.current = onPresenceChange;
+  }, [onPresenceChange]);
 
   const syncConversations = useCallback(async () => {
     const result = await conversationService.listConversations({ limit: DEFAULT_SYNC_LIMIT });
@@ -84,7 +89,7 @@ export function useChatRealtime({
 
   const scheduleMessageSync = useCallback(
     (conversationId: string) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
+      const conversationKey = conversationId;
       if (!conversationKey) return;
 
       const existingTimer = messageSyncTimersRef.current[conversationKey];
@@ -99,7 +104,7 @@ export function useChatRealtime({
   );
 
   const scheduleTypingCleanup = useCallback((conversationId: string, userId: string) => {
-    const timerKey = `${normalizeRealtimeId(conversationId)}:${normalizeRealtimeId(userId)}`;
+    const timerKey = `${conversationId}:${userId}`;
     const existingTimer = typingCleanupTimersRef.current[timerKey];
     if (existingTimer) window.clearTimeout(existingTimer);
 
@@ -119,12 +124,12 @@ export function useChatRealtime({
     wsService.sendViewing(activeConversation);
 
     const thread =
-      useChatStore.getState().messageThreadsByConvId[normalizeRealtimeId(activeConversation)];
+      useChatStore.getState().messageThreadsByConvId[activeConversation];
     const latestMessageId = thread?.ids.at(-1);
     const latestMessage = latestMessageId ? thread?.byId[latestMessageId] : undefined;
 
     if (latestMessage && !latestMessage.id.startsWith("local_")) {
-      wsService.sendRead(activeConversation, latestMessage.id);
+      void markConversationRead(activeConversation, latestMessage.id);
     }
   }, [syncConversations, syncMessages]);
 
@@ -142,10 +147,11 @@ export function useChatRealtime({
 
         case "presence":
           store.applyPresence(event);
+          presenceCallbackRef.current?.(event.user_id, event.is_online);
           break;
 
         case "message.new": {
-          const conversationKey = normalizeRealtimeId(event.conv_id);
+          const conversationKey = event.conv_id;
           const hasConversation = Boolean(store.conversationsById[conversationKey]);
 
           store.applyIncomingMessage(event, {

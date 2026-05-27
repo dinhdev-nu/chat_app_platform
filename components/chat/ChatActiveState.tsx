@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { Fragment, useEffect, useMemo, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import type { ConversationListItem } from "./conversation-data";
@@ -10,7 +10,11 @@ import ChatDateSeparator from "./ChatDateSeparator";
 import ChatMessageBubble from "./ChatMessageBubble";
 import ChatSystemMessage from "./ChatSystemMessage";
 import type { ChatMessage } from "./chat-message-types";
-import { isSystemMessage } from "./chat-message-utils";
+import {
+  formatMessageDateLabel,
+  isSameMessageDate,
+  isSystemMessage,
+} from "./chat-message-utils";
 
 export type { ChatMessage, ChatMessageReaction } from "./chat-message-types";
 
@@ -242,48 +246,52 @@ export default function ChatActiveState({
             </div>
           ) : null}
 
-          {messages.length > 0 ? (
-            <>
-              {hasMoreMessages || isLoadingMoreMessages ? (
-                <div className="mb-3 flex justify-center">
-                  <button
-                    type="button"
-                    className="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring disabled:cursor-not-allowed disabled:opacity-50"
-                    style={{
-                      borderColor: "rgb(var(--borderColor-secondary) / 0.15)",
-                      color: "rgb(var(--textColor-primary))",
-                    }}
-                    disabled={isLoadingMoreMessages}
-                    onClick={onLoadMoreMessages}
-                  >
-                    {isLoadingMoreMessages ? "Đang tải..." : "Tải tin cũ hơn"}
-                  </button>
-                </div>
-              ) : null}
-
-              <ChatDateSeparator label="Hôm nay" />
-            </>
+          {messages.length > 0 && (hasMoreMessages || isLoadingMoreMessages) ? (
+            <div className="mb-3 flex justify-center">
+              <button
+                type="button"
+                className="rounded-full border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring disabled:cursor-not-allowed disabled:opacity-50"
+                style={{
+                  borderColor: "rgb(var(--borderColor-secondary) / 0.15)",
+                  color: "rgb(var(--textColor-primary))",
+                }}
+                disabled={isLoadingMoreMessages}
+                onClick={onLoadMoreMessages}
+              >
+                {isLoadingMoreMessages ? "Đang tải..." : "Tải tin cũ hơn"}
+              </button>
+            </div>
           ) : null}
 
           <AnimatePresence initial={false}>
-            {messages.map((msg, i) =>
-              isSystemMessage(msg) ? (
-                <ChatSystemMessage key={msg.id} msg={msg} reduceMotion={shouldReduceMotion} />
-              ) : (
-                <ChatMessageBubble
-                  key={msg.id}
-                  msg={msg}
-                  prevMsg={messages[i - 1]}
-                  nextMsg={messages[i + 1]}
-                  currentUserId={currentUserId}
-                  reduceMotion={shouldReduceMotion}
-                  canManageMessages={conv.role === 1 || conv.role === 2}
-                  onEditMessage={onEditMessage}
-                  onDeleteMessage={onDeleteMessage}
-                  onReactMessage={onReactMessage}
-                />
-              )
-            )}
+            {messages.map((msg, i) => {
+              const previousMessage = messages[i - 1];
+              const shouldShowDateSeparator =
+                !previousMessage || !isSameMessageDate(msg.timestamp, previousMessage.timestamp);
+
+              return (
+                <Fragment key={msg.id}>
+                  {shouldShowDateSeparator ? (
+                    <ChatDateSeparator label={formatMessageDateLabel(msg.timestamp)} />
+                  ) : null}
+                  {isSystemMessage(msg) ? (
+                    <ChatSystemMessage msg={msg} reduceMotion={shouldReduceMotion} />
+                  ) : (
+                    <ChatMessageBubble
+                      msg={msg}
+                      prevMsg={previousMessage}
+                      nextMsg={messages[i + 1]}
+                      currentUserId={currentUserId}
+                      reduceMotion={shouldReduceMotion}
+                      canManageMessages={conv.role === 1 || conv.role === 2}
+                      onEditMessage={onEditMessage}
+                      onDeleteMessage={onDeleteMessage}
+                      onReactMessage={onReactMessage}
+                    />
+                  )}
+                </Fragment>
+              );
+            })}
 
             {visibleTypingUsers.length ? (
               <TypingIndicator

@@ -8,7 +8,6 @@ import { useActiveConversationRealtime } from "@/hooks/use-active-conversation-r
 import { getApiErrorMessage } from "@/services/http";
 import { messageService } from "@/services/messageService";
 import {
-  normalizeRealtimeId,
   selectMessagesForConversation,
   selectTypingUsersForConversation,
   useChatStore,
@@ -42,10 +41,7 @@ interface UseConversationMessagesOptions {
 }
 
 function isSameUser(left?: string | null, right?: string | null) {
-  const normalizedLeft = normalizeRealtimeId(left);
-  const normalizedRight = normalizeRealtimeId(right);
-
-  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
+  return Boolean(left && right && left === right);
 }
 
 function createOptimisticTextMessage(
@@ -106,6 +102,8 @@ export function useConversationMessages({
   const patchStoreMessage = useChatStore((state) => state.patchMessage);
   const removeStoreMessage = useChatStore((state) => state.removeMessage);
   const getStoreMessage = useChatStore((state) => state.getMessage);
+  const applyMessageEdited = useChatStore((state) => state.applyMessageEdited);
+  const applyMessageDeleted = useChatStore((state) => state.applyMessageDeleted);
   const applyReactionToggle = useChatStore((state) => state.applyReactionToggle);
   const currentUserId = currentUser?.id;
 
@@ -286,7 +284,14 @@ export function useConversationMessages({
         const response = await messageService.editMessage(messageId, trimmedText);
 
         if (isMountedRef.current) {
-          replaceStoreMessage(conversationId, messageId, response);
+          applyMessageEdited({
+            event: "message.edited",
+            conv_id: conversationId,
+            msg_id: messageId,
+            content: response.content ?? trimmedText,
+            edited_at: response.updated_at,
+            message: response,
+          });
         }
 
         return mapMessageResponseToChatMessage(response, mappingOptions);
@@ -299,7 +304,7 @@ export function useConversationMessages({
         throw err;
       }
     },
-    [conversationId, mappingOptions, patchStoreMessage, replaceStoreMessage, setStoreMessages],
+    [applyMessageEdited, conversationId, mappingOptions, patchStoreMessage, setStoreMessages],
   );
 
   const deleteMessage = useCallback(
@@ -313,6 +318,16 @@ export function useConversationMessages({
 
       try {
         await messageService.deleteMessage(messageId);
+
+        if (isMountedRef.current) {
+          applyMessageDeleted({
+            event: "message.deleted",
+            conv_id: conversationId,
+            msg_id: messageId,
+            is_deleted: true,
+            deleted_at: new Date().toISOString(),
+          });
+        }
       } catch (err) {
         if (isMountedRef.current) {
           setStoreMessages(conversationId, snapshot);
@@ -322,7 +337,7 @@ export function useConversationMessages({
         throw err;
       }
     },
-    [conversationId, removeStoreMessage, setStoreMessages],
+    [applyMessageDeleted, conversationId, removeStoreMessage, setStoreMessages],
   );
 
   const toggleReaction = useCallback(

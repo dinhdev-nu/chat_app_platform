@@ -31,6 +31,13 @@ function HeaderActionButton({
 
 export default function ChatConversationHeader({ conv }: { conv: ConversationListItem }) {
   const typeLabel = conv.type === 1 ? "Tin nhắn trực tiếp" : conv.type === 2 ? "Nhóm" : "Kênh";
+  const isConversationOnline = conv.type === 1 ? conv.isOnline : conv.isOnline || conv.memberOnlineCount > 0;
+  const presenceLabel =
+    conv.type === 1
+      ? isConversationOnline
+        ? "Đang online"
+        : "Đang offline"
+      : `${typeLabel} · ${conv.memberOnlineCount} online`;
 
   return (
     <div
@@ -60,12 +67,13 @@ export default function ChatConversationHeader({ conv }: { conv: ConversationLis
           </div>
         )}
 
-        {conv.type === 1 && (
-          <span
-            className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2"
-            style={{ background: "rgb(var(--colors-emerald-300))", borderColor: "transparent" }}
-          />
-        )}
+        <span
+          aria-label={presenceLabel}
+          title={presenceLabel}
+          className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-[rgb(var(--backgroundColor-primary))] ${
+            isConversationOnline ? "bg-emerald-400" : "bg-[rgb(var(--textColor-disabled))]"
+          }`}
+        />
       </div>
 
       <div className="flex flex-col min-w-0">
@@ -73,7 +81,7 @@ export default function ChatConversationHeader({ conv }: { conv: ConversationLis
           {conv.name ?? "Người dùng"}
         </span>
         <span className="text-[11px]" style={{ color: "rgb(var(--textColor-secondary))", opacity: 0.8 }}>
-          {typeLabel}
+          {presenceLabel}
         </span>
       </div>
 

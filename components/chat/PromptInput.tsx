@@ -27,9 +27,10 @@ interface PromptInputProps {
   conv?: ConversationListItem;
   isSending?: boolean;
   onSend?: (text: string) => void | Promise<void>;
+  onTyping?: () => void;
 }
 
-export default function PromptInput({ conv, isSending = false, onSend }: PromptInputProps) {
+export default function PromptInput({ conv, isSending = false, onSend, onTyping }: PromptInputProps) {
   const currentUserName = useAuthStore((state) => state.user?.name);
   const suggestionPrompts = useMemo(
     () => getSuggestionPrompts(currentUserName),
@@ -109,6 +110,7 @@ export default function PromptInput({ conv, isSending = false, onSend }: PromptI
                   suggestedTextKey={suggestedTextRequest?.key}
                   isSending={isSending}
                   onSend={onSend}
+                  onTyping={onTyping}
                 />
               </div>
             </div>

@@ -56,6 +56,7 @@ export interface ChatState {
   usersById: Record<string, ChatUserSummary>;
   typingByConvId: Record<string, Record<string, number>>;
   presenceByUserId: Record<string, boolean>;
+  presenceByConvId: Record<string, Record<string, boolean>>;
   readReceiptsByConvId: Record<string, Record<string, ReadReceipt>>;
   setConversations: (conversations: ConversationListItem[], options?: { append?: boolean }) => void;
   upsertConversation: (
@@ -92,15 +93,8 @@ export interface ChatState {
   reset: () => void;
 }
 
-export function normalizeRealtimeId(id?: string | null) {
-  return (id ?? "").replace(/-/g, "").toLowerCase();
-}
-
 function isSameId(left?: string | null, right?: string | null) {
-  const normalizedLeft = normalizeRealtimeId(left);
-  const normalizedRight = normalizeRealtimeId(right);
-
-  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
+  return Boolean(left && right && left === right);
 }
 
 function getConversationSortTime(conversation?: ConversationListItem) {
@@ -161,7 +155,7 @@ function upsertUser(
 ) {
   if (!user?.id) return usersById;
 
-  const userKey = normalizeRealtimeId(user.id);
+  const userKey = user.id;
   if (!userKey) return usersById;
 
   const existing = usersById[userKey];
@@ -213,6 +207,7 @@ const initialState = {
   usersById: {},
   typingByConvId: {},
   presenceByUserId: {},
+  presenceByConvId: {},
   readReceiptsByConvId: {},
 } satisfies Pick<
   ChatState,
@@ -223,6 +218,7 @@ const initialState = {
   | "usersById"
   | "typingByConvId"
   | "presenceByUserId"
+  | "presenceByConvId"
   | "readReceiptsByConvId"
 >;
 
@@ -235,7 +231,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       const nextIds = options.append ? [...state.conversationIds] : [];
 
       for (const conversation of conversations) {
-        const conversationKey = normalizeRealtimeId(conversation.id);
+        const conversationKey = conversation.id;
         if (!conversationKey) continue;
 
         nextById[conversationKey] = mergeConversation(nextById[conversationKey], conversation);
@@ -250,7 +246,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   upsertConversation: (conversation, options = {}) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversation.id);
+      const conversationKey = conversation.id;
       if (!conversationKey) return state;
 
       const conversationsById = {
@@ -271,7 +267,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   patchConversation: (conversationId, patch) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
+      const conversationKey = conversationId;
       const current = state.conversationsById[conversationKey];
       if (!current) return state;
 
@@ -291,12 +287,13 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   removeConversation: (conversationId) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
+      const conversationKey = conversationId;
       if (!state.conversationsById[conversationKey]) return state;
 
       const conversationsById = { ...state.conversationsById };
       const messageThreadsByConvId = { ...state.messageThreadsByConvId };
       const typingByConvId = { ...state.typingByConvId };
+      const presenceByConvId = { ...state.presenceByConvId };
       const readReceiptsByConvId = { ...state.readReceiptsByConvId };
       const messageIdToConvId = { ...state.messageIdToConvId };
       const removedThread = messageThreadsByConvId[conversationKey];
@@ -304,6 +301,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       delete conversationsById[conversationKey];
       delete messageThreadsByConvId[conversationKey];
       delete typingByConvId[conversationKey];
+      delete presenceByConvId[conversationKey];
       delete readReceiptsByConvId[conversationKey];
 
       for (const messageId of removedThread?.ids ?? []) {
@@ -316,13 +314,14 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         messageThreadsByConvId,
         messageIdToConvId,
         typingByConvId,
+        presenceByConvId,
         readReceiptsByConvId,
       };
     }),
 
   setMessages: (conversationId, messages, options = {}) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
+      const conversationKey = conversationId;
       if (!conversationKey) return state;
 
       const currentThread = options.append
@@ -334,7 +333,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       let usersById = state.usersById;
 
       for (const message of messages) {
-        const messageKey = normalizeRealtimeId(message.id);
+        const messageKey = message.id;
         if (!messageKey) continue;
 
         byId[messageKey] = message;
@@ -360,8 +359,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   upsertMessage: (conversationId, message) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
-      const messageKey = normalizeRealtimeId(message.id);
+      const conversationKey = conversationId;
+      const messageKey = message.id;
       if (!conversationKey || !messageKey) return state;
 
       const currentThread = state.messageThreadsByConvId[conversationKey] ?? createEmptyThread();
@@ -391,9 +390,9 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   replaceMessage: (conversationId, targetMessageId, message) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
-      const targetKey = normalizeRealtimeId(targetMessageId);
-      const messageKey = normalizeRealtimeId(message.id);
+      const conversationKey = conversationId;
+      const targetKey = targetMessageId;
+      const messageKey = message.id;
       if (!conversationKey || !targetKey || !messageKey) return state;
 
       const currentThread = state.messageThreadsByConvId[conversationKey] ?? createEmptyThread();
@@ -431,8 +430,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     let didPatch = false;
 
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
-      const messageKey = normalizeRealtimeId(messageId);
+      const conversationKey = conversationId;
+      const messageKey = messageId;
       const currentThread = state.messageThreadsByConvId[conversationKey];
       const currentMessage = currentThread?.byId[messageKey];
 
@@ -463,8 +462,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   removeMessage: (conversationId, messageId) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(conversationId);
-      const messageKey = normalizeRealtimeId(messageId);
+      const conversationKey = conversationId;
+      const messageKey = messageId;
       const currentThread = state.messageThreadsByConvId[conversationKey];
       if (!currentThread?.byId[messageKey]) return state;
 
@@ -487,16 +486,16 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     }),
 
   getMessage: (conversationId, messageId) => {
-    const conversationKey = normalizeRealtimeId(conversationId);
-    const messageKey = normalizeRealtimeId(messageId);
+    const conversationKey = conversationId;
+    const messageKey = messageId;
 
     return get().messageThreadsByConvId[conversationKey]?.byId[messageKey];
   },
 
   applyTyping: (event) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(event.conv_id);
-      const userKey = normalizeRealtimeId(event.user_id);
+      const conversationKey = event.conv_id;
+      const userKey = event.user_id;
       if (!conversationKey || !userKey) return state;
 
       return {
@@ -541,36 +540,60 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   applyPresence: (event) =>
     set((state) => {
-      const userKey = normalizeRealtimeId(event.user_id);
+      const userKey = event.user_id;
       if (!userKey) return state;
 
       const presenceByUserId = {
         ...state.presenceByUserId,
         [userKey]: event.is_online,
       };
-      const conversationKey = normalizeRealtimeId(event.conv_id);
+      const conversationKey = event.conv_id;
 
       if (!conversationKey || !state.conversationsById[conversationKey]) {
         return { presenceByUserId };
       }
 
+      const conversation = state.conversationsById[conversationKey];
+      const currentConvPresence = state.presenceByConvId[conversationKey] ?? {};
+      const previousUserPresence = currentConvPresence[userKey];
+      const presenceByConvId = {
+        ...state.presenceByConvId,
+        [conversationKey]: {
+          ...currentConvPresence,
+          [userKey]: event.is_online,
+        },
+      };
+      let memberOnlineCount = conversation.memberOnlineCount;
+
+      if (conversation.type === 1) {
+        memberOnlineCount = event.is_online ? 1 : 0;
+      } else if (previousUserPresence !== event.is_online) {
+        memberOnlineCount = Math.max(
+          0,
+          conversation.memberOnlineCount + (event.is_online ? 1 : -1),
+        );
+      }
+
+      const isOnline =
+        conversation.type === 1 ? event.is_online : memberOnlineCount > 0;
       const conversationsById = {
         ...state.conversationsById,
         [conversationKey]: {
-          ...state.conversationsById[conversationKey],
-          isOnline: event.is_online,
+          ...conversation,
+          memberOnlineCount,
+          isOnline,
         },
       };
 
-      return { presenceByUserId, conversationsById };
+      return { presenceByUserId, presenceByConvId, conversationsById };
     }),
 
   applyIncomingMessage: (event, options = {}) => {
     let didInsert = false;
 
     set((state) => {
-      const conversationKey = normalizeRealtimeId(event.conv_id);
-      const messageKey = normalizeRealtimeId(event.message.id);
+      const conversationKey = event.conv_id;
+      const messageKey = event.message.id;
       if (!conversationKey || !messageKey) return state;
 
       const currentThread = state.messageThreadsByConvId[conversationKey] ?? createEmptyThread();
@@ -636,8 +659,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 
   applyMessageRead: (event, currentUserId) =>
     set((state) => {
-      const conversationKey = normalizeRealtimeId(event.conv_id);
-      const userKey = normalizeRealtimeId(event.user_id);
+      const conversationKey = event.conv_id;
+      const userKey = event.user_id;
       if (!conversationKey || !userKey) return state;
 
       const readReceiptsByConvId = {
@@ -684,13 +707,13 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     }
 
     const currentMessage = get().getMessage(event.conv_id, nextMessage?.id ?? event.msg_id);
-    const conversationKey = normalizeRealtimeId(event.conv_id);
+    const conversationKey = event.conv_id;
     const conversation = get().conversationsById[conversationKey];
 
-    if (currentMessage && conversation?.lastMessageId && isSameId(conversation.lastMessageId, event.msg_id)) {
+    if (conversation) {
       get().patchConversation(event.conv_id, {
-        lastMessageText: getMessagePreview(currentMessage),
-        updatedAt: currentMessage.updated_at,
+        lastMessageText: currentMessage ? getMessagePreview(currentMessage) : event.content,
+        updatedAt: currentMessage?.updated_at ?? event.edited_at,
       });
     }
 
@@ -704,10 +727,10 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       updated_at: event.deleted_at,
     });
 
-    const conversationKey = normalizeRealtimeId(event.conv_id);
+    const conversationKey = event.conv_id;
     const conversation = get().conversationsById[conversationKey];
 
-    if (didPatch && conversation?.lastMessageId && isSameId(conversation.lastMessageId, event.msg_id)) {
+    if (conversation) {
       get().patchConversation(event.conv_id, {
         lastMessageText: "Tin nhắn đã bị xóa",
         updatedAt: event.deleted_at,
@@ -721,8 +744,8 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     let didPatch = false;
 
     set((state) => {
-      const conversationKey = normalizeRealtimeId(event.conv_id);
-      const messageKey = normalizeRealtimeId(event.msg_id);
+      const conversationKey = event.conv_id;
+      const messageKey = event.msg_id;
       const currentThread = state.messageThreadsByConvId[conversationKey];
       const currentMessage = currentThread?.byId[messageKey];
 
@@ -832,7 +855,7 @@ export function selectConversationList(state: ChatState) {
 }
 
 export function selectMessagesForConversation(state: ChatState, conversationId?: string) {
-  const conversationKey = normalizeRealtimeId(conversationId);
+  const conversationKey = conversationId;
   if (!conversationKey) return [];
 
   const thread = state.messageThreadsByConvId[conversationKey];
@@ -846,10 +869,10 @@ export function selectTypingUsersForConversation(
   conversationId?: string,
   currentUserId?: string | null,
 ) {
-  const conversationKey = normalizeRealtimeId(conversationId);
+  const conversationKey = conversationId;
   if (!conversationKey) return [];
 
-  const currentUserKey = normalizeRealtimeId(currentUserId);
+  const currentUserKey = currentUserId;
   const typingUsers = state.typingByConvId[conversationKey] ?? {};
   const now = Date.now();
 
