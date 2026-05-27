@@ -64,15 +64,15 @@ const AuthHero: FC<AuthHeroProps> = ({
       >
         <h1 className="text-[clamp(2.2rem,4vw,3rem)] font-display leading-[0.92] tracking-tight text-white mb-4">
           <motion.span variants={lineVariants} className="block whitespace-nowrap">
-            Think fast,
+            Nhanh,
           </motion.span>
           <motion.span variants={lineVariants} className="block whitespace-nowrap">
-            build faster
+            an toàn hơn
           </motion.span>
         </h1>
 
         <motion.p variants={lineVariants} className="text-base text-white/70 mb-8">
-          Brainstorm in Claude, build in Cowork
+          Bắt đầu cuộc trò chuyện của bạn ngay hôm nay
         </motion.p>
 
         {/* AuthCard has its own entrance animation */}

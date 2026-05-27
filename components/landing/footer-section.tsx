@@ -4,28 +4,28 @@ import { ArrowUpRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 const footerLinks = {
-  Product: [
-    { name: "Agent capabilities", href: "#features" },
-    { name: "How it works", href: "#how-it-works" },
-    { name: "Pricing", href: "#pricing" },
-    { name: "Integrations", href: "#integrations" },
+  "Sản phẩm": [
+    { name: "Tính năng", href: "#features" },
+    { name: "Quy trình", href: "#how-it-works" },
+    { name: "Bảng giá", href: "#pricing" },
+    { name: "Tích hợp", href: "#integrations" },
   ],
-  Developers: [
-    { name: "Documentation", href: "#developers" },
-    { name: "Agent SDK", href: "#" },
-    { name: "API Reference", href: "#developers" },
-    { name: "Status", href: "#" },
+  "Phát triển": [
+    { name: "Tài liệu", href: "#developers" },
+    { name: "Mã nguồn", href: "#" },
+    { name: "API", href: "#developers" },
+    { name: "Trạng thái", href: "#" },
   ],
-  Company: [
-    { name: "About", href: "#" },
+  "Công ty": [
+    { name: "Về chúng tôi", href: "#" },
     { name: "Blog", href: "#" },
-    { name: "Careers", href: "#", badge: "Hiring" },
-    { name: "Contact", href: "#" },
+    { name: "Tuyển dụng", href: "#", badge: "Đang tuyển" },
+    { name: "Liên hệ", href: "#" },
   ],
-  Legal: [
-    { name: "Privacy", href: "#" },
-    { name: "Terms", href: "#" },
-    { name: "Security", href: "#security" },
+  "Pháp lý": [
+    { name: "Quyền riêng tư", href: "#" },
+    { name: "Điều khoản", href: "#" },
+    { name: "Bảo mật", href: "#security" },
   ],
 };
 
@@ -115,12 +115,12 @@ export function FooterSection() {
             {/* Brand Column */}
             <div className="col-span-2">
               <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <span className="text-2xl font-display text-white">COMPUTE</span>
-                <span className="text-xs text-white/40 font-mono">TM</span>
+                <span className="text-2xl font-display text-white">CHAT</span>
+                <span className="text-xs text-white/40 font-mono">APP</span>
               </a>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
-                Autonomous AI agents for distributed computing. Delegate complex tasks to intelligent workers.
+                Nền tảng giao tiếp hiện đại dành cho đội nhóm. Kết nối và chia sẻ thông tin dễ dàng mọi lúc mọi nơi.
               </p>
 
               {/* Social Links */}
@@ -167,13 +167,13 @@ export function FooterSection() {
         {/* Bottom Bar */}
         <div className="py-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/30">
-            &copy; 2025 COMPUTE. All rights reserved.
+            &copy; 2025 CHAT APP. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 text-sm text-white/30">
             <span className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-[#eca8d6]" />
-              All agents operational
+              Hệ thống hoạt động tốt
             </span>
           </div>
         </div>
