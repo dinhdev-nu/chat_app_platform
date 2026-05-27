@@ -3,7 +3,7 @@
 import React from "react";
 import {
     ContactUserResponse,
-    formatContactLastSeen,
+    formatContactPresence,
 } from "./contact-data";
 import { UserIcon } from "./icons";
 
@@ -14,7 +14,7 @@ interface ContactItemProps {
 
 function ContactItem({ contact, onSelect }: ContactItemProps) {
     const initials = contact.username.trim().slice(0, 2).toUpperCase() || "FR";
-    const lastSeenLabel = formatContactLastSeen(contact.lastSeenAt);
+    const presenceLabel = formatContactPresence(contact);
 
     return (
         <li>
@@ -29,23 +29,31 @@ function ContactItem({ contact, onSelect }: ContactItemProps) {
                 `}
                 onClick={() => onSelect?.(contact)}
             >
-            <div
-                className={`
-          shrink-0 w-10 h-10 min-w-[2.5rem] rounded-xl
-          flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
-          bg-[rgb(var(--backgroundColor-state-enabled)/.575)]
-          border border-[rgb(var(--borderColor-secondary)/.15)]
-        `}
-                style={{
-                    backgroundImage: contact.avatarUrl ? `url(${contact.avatarUrl})` : undefined,
-                    backgroundColor: contact.avatarUrl ? "transparent" : "rgb(var(--backgroundColor-state-active))",
-                }}
-            >
-                {!contact.avatarUrl && (
-                    <span className="text-[12px] font-semibold text-[rgb(var(--textColor-primary))]">
-                        {initials}
-                    </span>
-                )}
+            <div className="relative shrink-0">
+                <div
+                    className={`
+            w-10 h-10 min-w-[2.5rem] rounded-xl
+            flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
+            bg-[rgb(var(--backgroundColor-state-enabled)/.575)]
+            border border-[rgb(var(--borderColor-secondary)/.15)]
+          `}
+                    style={{
+                        backgroundImage: contact.avatarUrl ? `url(${contact.avatarUrl})` : undefined,
+                        backgroundColor: contact.avatarUrl ? "transparent" : "rgb(var(--backgroundColor-state-active))",
+                    }}
+                >
+                    {!contact.avatarUrl && (
+                        <span className="text-[12px] font-semibold text-[rgb(var(--textColor-primary))]">
+                            {initials}
+                        </span>
+                    )}
+                </div>
+                <span
+                    aria-label={presenceLabel}
+                    title={presenceLabel}
+                    className={`absolute -bottom-0.5 -right-0.5 block size-3 rounded-full border-2 border-[rgb(var(--backgroundColor-primary))] ${contact.isOnline ? "bg-emerald-400" : "bg-[rgb(var(--textColor-disabled))]"
+                        }`}
+                />
             </div>
 
             <div className="flex flex-1 flex-col justify-center min-w-0">
@@ -54,7 +62,7 @@ function ContactItem({ contact, onSelect }: ContactItemProps) {
                         {contact.username}
                     </p>
                     <div className="flex shrink-0 items-center gap-2 text-[11px] text-secondary">
-                        <span>{lastSeenLabel}</span>
+                        <span>{presenceLabel}</span>
                     </div>
                 </div>
 

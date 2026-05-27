@@ -55,6 +55,8 @@ export default function ChatMain({
     editMessage,
     deleteMessage,
     toggleReaction,
+    sendTyping,
+    typingUsers,
   } = useConversationMessages({
     conversationId: activeConv?.id,
     currentUser,
@@ -115,16 +117,12 @@ export default function ChatMain({
   const handleEditMessage = useCallback(
     async (messageId: string, text: string) => {
       try {
-        const editedMessage = await editMessage(messageId, text);
-
-        if (activeConv && editedMessage && activeConv.lastMessageId === messageId) {
-          onConversationMessageUpdate?.(activeConv, editedMessage);
-        }
+        await editMessage(messageId, text);
       } catch (error) {
         console.error("Failed to edit message:", error);
       }
     },
-    [activeConv, editMessage, onConversationMessageUpdate],
+    [editMessage],
   );
 
   const handleDeleteMessage = useCallback(
@@ -152,7 +150,7 @@ export default function ChatMain({
   let stateKey: "empty" | "new" | "active";
   if (!activeConv) {
     stateKey = "empty";
-  } else if (messages.length === 0 && !isLoading && !error) {
+  } else if (messages.length === 0 && typingUsers.length === 0 && !isLoading && !error) {
     stateKey = "new";
   } else {
     stateKey = "active";
@@ -187,7 +185,12 @@ export default function ChatMain({
             animate="animate"
             exit="exit"
           >
-            <PromptInput conv={activeConv} isSending={isSending} onSend={handleSend} />
+            <PromptInput
+              conv={activeConv}
+              isSending={isSending}
+              onSend={handleSend}
+              onTyping={sendTyping}
+            />
           </motion.div>
         )}
 
@@ -204,7 +207,7 @@ export default function ChatMain({
               conv={activeConv}
               messages={messages}
               currentUserId={currentUser?.id}
-              typingUsers={[]}
+              typingUsers={typingUsers}
               isLoadingMessages={isLoading}
               isLoadingMoreMessages={isLoadingMore}
               hasMoreMessages={Boolean(pagination?.hasNext)}
@@ -214,6 +217,7 @@ export default function ChatMain({
               onRetryLoad={() => void loadMessages()}
               onLoadMoreMessages={() => void loadMore()}
               onSend={handleSend}
+              onTyping={sendTyping}
               onEditMessage={handleEditMessage}
               onDeleteMessage={handleDeleteMessage}
               onReactMessage={handleReactMessage}

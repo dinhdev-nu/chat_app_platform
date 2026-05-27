@@ -25,13 +25,13 @@ export interface ContactUserResponse {
   avatarUrl?: string | null;
   bio?: string | null;
   lastSeenAt?: string | null;
+  isOnline?: boolean | null;
   createdAt?: string;
+  outgoingStatus?: ContactStatus | null;
+  incomingStatus?: ContactStatus | null;
 }
 
-export interface SearchUser extends ContactUserResponse {
-  outgoingStatus?: ContactStatus;
-  incomingStatus?: ContactStatus;
-}
+export type SearchUser = ContactUserResponse;
 
 export interface CursorPaginationParams {
   cursor?: string;

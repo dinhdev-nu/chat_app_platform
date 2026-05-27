@@ -5,39 +5,36 @@ import { useEffect, useRef, useState } from "react";
 const steps = [
   {
     number: "01",
-    title: "Define",
-    subtitle: "your agent",
-    description: "Describe what your agent should do. Set its capabilities, constraints, and goals in natural language or code.",
-    code: `const researcher = new Agent({
-  role: 'Research Analyst',
-  capabilities: ['web', 'docs', 'api'],
-  memory: true,
-  autonomy: 'full'
+    title: "Đăng ký",
+    subtitle: "tạo tài khoản",
+    description: "Đăng ký nhanh chóng chỉ với vài thao tác cơ bản để bắt đầu trải nghiệm trò chuyện.",
+    code: `const user = new User({
+  role: 'Member',
+  status: 'online',
+  preferences: ['notifications', 'dark-mode']
 })`,
   },
   {
     number: "02",
-    title: "Assign",
-    subtitle: "the task",
-    description: "Give your agent a mission. It breaks down complex tasks into steps and executes them autonomously.",
-    code: `await researcher.execute({
-  task: 'Analyze competitor pricing',
-  sources: ['public-data', 'news'],
-  output: 'structured-report',
-  deadline: '2h'
+    title: "Kết nối",
+    subtitle: "thêm bạn bè",
+    description: "Tìm kiếm và kết nối với đồng nghiệp hoặc bạn bè để bắt đầu cuộc trò chuyện.",
+    code: `await user.connect({
+  to: 'team-group',
+  message: 'Hello everyone!',
+  attach: 'report.pdf'
 })`,
   },
   {
     number: "03",
-    title: "Monitor",
-    subtitle: "& scale",
-    description: "Track progress in real-time. Spin up more agents as needed. Pay only for compute used.",
-    code: `optimus.dashboard({
-  agents: [researcher],
-  metrics: ['tasks', 'latency', 'cost'],
-  alerts: true
-})
-// 847 tasks completed today`,
+    title: "Trò chuyện",
+    subtitle: "& chia sẻ",
+    description: "Nhắn tin, gọi video và chia sẻ tệp tin một cách dễ dàng, nhanh chóng và mượt mà nhất.",
+    code: `app.metrics({
+  activeUsers: '10M+',
+  messagesToday: '5B+',
+  uptime: '99.99%'
+})`,
   },
 ];
 
@@ -81,15 +78,15 @@ export function HowItWorksSection() {
             <div className={`transition-all duration-1000 ${isVisible ? "translate-x-0 opacity-100" : "-translate-x-12 opacity-0"}`}>
               <span className="inline-flex items-center gap-3 text-sm font-mono text-white/40 mb-8">
                 <span className="w-12 h-px bg-white/20" />
-                Process
+                Quy trình
               </span>
             </div>
 
             <h2 className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.85] transition-all duration-1000 delay-100 ${isVisible ? "translate-y-0 opacity-100" : "translate-y-16 opacity-0"
               }`}>
-              <span className="block">Define.</span>
-              <span className="block text-white/30">Deploy.</span>
-              <span className="block text-white/10">Scale.</span>
+              <span className="block">Đăng ký.</span>
+              <span className="block text-white/30">Kết nối.</span>
+              <span className="block text-white/10">Trò chuyện.</span>
             </h2>
           </div>
 

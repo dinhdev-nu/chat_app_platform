@@ -5,32 +5,32 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const testimonials = [
   {
-    quote: "Our agents handle 80% of our customer support tickets autonomously. The ROI was immediate.",
+    quote: "Nền tảng giúp nhóm chúng tôi kết nối hiệu quả, tiết kiệm thời gian và tăng năng suất công việc rõ rệt.",
     author: "Sarah Chen",
     role: "CTO",
     company: "Meridian Labs",
-    metric: { value: "80%", label: "Ticket resolution" },
+    metric: { value: "80%", label: "Tăng hiệu suất" },
   },
   {
-    quote: "We deployed research agents that work 24/7. They surface insights we'd never find manually.",
+    quote: "Tính năng gọi video mượt mà, giúp các cuộc họp từ xa trở nên chân thực hơn bao giờ hết.",
     author: "Marcus Webb",
     role: "Head of Research",
     company: "Flux Systems",
-    metric: { value: "10x", label: "Research output" },
+    metric: { value: "100%", label: "Chất lượng gọi" },
   },
   {
-    quote: "The multi-agent orchestration is incredible. Complex workflows that took weeks now run in hours.",
+    quote: "Quản lý nhóm rất tuyệt vời, việc chia sẻ tài liệu dung lượng lớn cực kỳ dễ dàng và nhanh chóng.",
     author: "Elena Rodriguez",
     role: "VP Engineering",
     company: "Beacon AI",
-    metric: { value: "40x", label: "Faster workflows" },
+    metric: { value: "Siêu tốc", label: "Tốc độ tải" },
   },
   {
-    quote: "Security was our biggest concern. The sandboxing and audit trails gave us full confidence.",
+    quote: "Bảo mật luôn là ưu tiên, và nền tảng này cho chúng tôi sự an tâm tuyệt đối về quyền riêng tư.",
     author: "James Liu",
     role: "CISO",
     company: "Prism Analytics",
-    metric: { value: "0", label: "Security incidents" },
+    metric: { value: "0", label: "Sự cố bảo mật" },
   },
 ];
 
@@ -94,12 +94,12 @@ export function TestimonialsSection() {
           <div>
             <span className="inline-flex items-center gap-3 text-sm font-mono text-background/40 mb-4">
               <span className="w-12 h-px bg-background/20" />
-              Testimonials
+              Khách hàng
             </span>
             <h2 className={`text-4xl lg:text-5xl font-display transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}>
-              Trusted by teams
-              <span className="text-background/40"> worldwide.</span>
+              Được tin dùng bởi
+              <span className="text-background/40"> hàng triệu người.</span>
             </h2>
           </div>
 
@@ -189,7 +189,7 @@ export function TestimonialsSection() {
             {/* Company list */}
             <div className="mt-4 pt-6 border-t border-background/10">
               <span className="text-xs font-mono text-background/30 uppercase tracking-widest block mb-4">
-                Featured companies
+                Các công ty tiêu biểu
               </span>
               <div className="flex flex-wrap gap-3">
                 {testimonials.map((t, idx) => (

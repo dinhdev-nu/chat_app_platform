@@ -54,7 +54,7 @@ export const conversationService = {
    * POST /api/v1/conversations/direct
    * Tạo hoặc lấy lại DM conversation với một user khác.
    * Idempotent: trả 200 nếu đã tồn tại, 201 nếu mới tạo.
-   * @param targetUserId - hex 32 ký tự, KHÔNG có dấu gạch ngang
+   * @param targetUserId - id from API/contact payload
    */
   async createDM(targetUserId: string): Promise<{ conversation: ConversationResponse; isNew: boolean }> {
     try {
@@ -76,7 +76,7 @@ export const conversationService = {
   /**
    * POST /api/v1/conversations/group
    * Tạo group (type=2) hoặc channel (type=3).
-   * @param payload.member_user_ids - mảng hex 32 ký tự, KHÔNG bao gồm creator
+   * @param payload.member_user_ids - ids from API/contact/search payloads, excluding creator
    */
   async createGroup(payload: CreateGroupRequest): Promise<ConversationResponse> {
     try {

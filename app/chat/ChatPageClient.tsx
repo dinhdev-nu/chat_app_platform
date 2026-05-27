@@ -14,8 +14,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import "./chat.css";
 import { useConversations } from "@/hooks/use-conversations";
+import { useChatRealtime } from "@/hooks/use-chat-realtime";
 import { conversationService } from "@/services/conversationService";
-import { toHexId, mapCreatedConversationToListItem } from "@/types/conversation";
+import { markConversationRead } from "@/services/readReceiptService";
+import { mapCreatedConversationToListItem } from "@/types/conversation";
 import type { ConversationListItem } from "@/components/chat/conversation-data";
 import type { ChatMessage } from "@/components/chat/chat-message-types";
 import type { ContactUserResponse, SearchUser } from "@/types/user";
@@ -72,6 +74,8 @@ function contactToDraftConversation(contact: ContactUserResponse): ConversationL
     role: 3,
     isMuted: false,
     unreadCount: 0,
+    memberOnlineCount: contact.isOnline ? 1 : 0,
+    isOnline: Boolean(contact.isOnline),
   };
 }
 
@@ -114,6 +118,16 @@ export default function ChatPageClient({
     return "authenticated";
   }, [hasHydrated, accessToken, expiresAt]);
 
+  const handleCurrentUserRemovedFromConversation = useCallback(
+    (conversationId: string) => {
+      if (conversationId !== activeConversationId) return;
+
+      setActiveDraftContact(null);
+      setActiveConversationId(undefined);
+    },
+    [activeConversationId],
+  );
+
   useEffect(() => {
     if (authState !== "unauthenticated") return;
     clearSession();
@@ -146,6 +160,15 @@ export default function ChatPageClient({
 
   const chatContacts = useChatContacts({ enabled: authState === "authenticated" });
 
+  useChatRealtime({
+    accessToken,
+    activeConversationId,
+    currentUserId: currentUser?.id,
+    enabled: authState === "authenticated",
+    onCurrentUserRemovedFromConversation: handleCurrentUserRemovedFromConversation,
+    onPresenceChange: chatContacts.applyContactPresence,
+  });
+
   const {
     hasRequestedIncomingRequests,
     isLoadingIncoming,
@@ -163,7 +186,7 @@ export default function ChatPageClient({
     void loadIncomingRequests();
   }, [shouldLoadIncoming, loadIncomingRequests]);
 
-  const contacts = contactList ?? chatContacts.contacts;
+  const contacts = chatContacts.contacts.length > 0 ? chatContacts.contacts : (contactList ?? []);
 
   const {
     conversations: apiConversations,
@@ -225,6 +248,7 @@ export default function ChatPageClient({
     setActiveDraftContact(null);
     setActiveConversationId(conversation.id);
     if (conversation.unreadCount > 0) {
+      void markConversationRead(conversation.id, conversation.lastMessageId);
       updateConversation({ ...conversation, unreadCount: 0 });
     }
   }, [updateConversation]);
@@ -265,7 +289,7 @@ export default function ChatPageClient({
       }
 
       try {
-        const { conversation: newConv } = await conversationService.createDM(toHexId(contactId));
+        const { conversation: newConv } = await conversationService.createDM(contactId);
         const listItem = mapCreatedConversationToListItem(newConv);
 
         // Dù đã tồn tại (200) hay mới tạo (201), đều prepend để đảm bảo xuất hiện đầu list
@@ -310,7 +334,7 @@ export default function ChatPageClient({
           type: payload.type,
           avatar_url: payload.avatar_url,
           description: payload.description,
-          member_user_ids: payload.member_user_ids.map(toHexId),
+          member_user_ids: payload.member_user_ids,
         });
 
         const listItem = mapCreatedConversationToListItem(newGroup);

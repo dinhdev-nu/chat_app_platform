@@ -96,15 +96,8 @@ export interface MessageMappingOptions {
   currentUserAvatarUrl?: string | null;
 }
 
-function normalizeComparableId(id?: string | null) {
-  return id?.replace(/-/g, "").toLowerCase();
-}
-
 function isSameUser(left?: string | null, right?: string | null) {
-  const normalizedLeft = normalizeComparableId(left);
-  const normalizedRight = normalizeComparableId(right);
-
-  return Boolean(normalizedLeft && normalizedRight && normalizedLeft === normalizedRight);
+  return Boolean(left && right && left === right);
 }
 
 function aggregateReactions(
@@ -129,6 +122,7 @@ function aggregateReactions(
 }
 
 function getFallbackContent(message: MessageResponse) {
+  if (message.is_deleted) return "Tin nhắn đã bị xóa";
   if (message.content) return message.content;
   if (message.content_encrypted) return "Tin nhan da duoc ma hoa";
   if (message.attachments?.length) return "";
@@ -163,6 +157,8 @@ export function mapMessageResponseToChatMessage(
     type: message.type === MESSAGE_TYPE.system ? "system" : "user",
     isSystem: message.type === MESSAGE_TYPE.system,
     isOwn,
+    isDeleted: message.is_deleted,
+    deletedAt: message.deleted_at,
     seq: message.seq,
   };
 }

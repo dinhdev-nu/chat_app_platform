@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 
-const words = ["automate", "delegate", "execute", "scale"];
+const words = ["trò chuyện", "làm việc", "chia sẻ", "gắn kết"];
 
 function BlurWord({ word, trigger }: { word: string; trigger: number }) {
   const letters = word.split("");
@@ -96,7 +96,7 @@ function BlurWord({ word, trigger }: { word: string; trigger: number }) {
               transition: "color 0.4s ease",
             }}
           >
-            {char}
+            {char === " " ? "\u00A0" : char}
           </span>
         );
       })}
@@ -173,19 +173,19 @@ export function HeroSection() {
           >
             <span className="inline-flex items-center gap-3 text-sm font-mono text-white/60">
               <span className="w-8 h-px bg-white/30" />
-              Autonomous AI agents for distributed computing
+              Nền tảng giao tiếp hiện đại dành cho mọi người
             </span>
           </div>
 
           {/* Main headline */}
           <div className="mb-12">
             <h1
-              className={`text-left text-[clamp(2rem,6vw,7rem)] font-display leading-[0.92] tracking-tight text-white transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+              className={`text-left text-[clamp(1.75rem,5vw,5.5rem)] font-display leading-[1.1] tracking-tight text-white transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
             >
-              <span className="block whitespace-nowrap">Distributed compute,</span>
+              <span className="block whitespace-nowrap">Kết nối mọi người,</span>
               <span className="block whitespace-nowrap">
-                agents that{" "}
+                để cùng nhau{" "}
                 <span className="relative inline-block">
                   <BlurWord word={words[wordIndex]} trigger={wordIndex} />
                 </span>
@@ -202,9 +202,9 @@ export function HeroSection() {
       >
         <div className="max-w-[1400px] mx-auto flex items-start gap-10 lg:gap-20">
           {[
-            { value: "3500+", label: "autonomous agents active" },
-            { value: "99.7%", label: "distributed uptime" },
-            { value: "<50ms", label: "execution latency" },
+            { value: "10M+", label: "người dùng tích cực" },
+            { value: "99.9%", label: "thời gian hoạt động" },
+            { value: "<10ms", label: "độ trễ tin nhắn" },
           ].map((stat) => (
             <div key={stat.label} className="flex flex-col gap-2">
               <span className="text-3xl lg:text-4xl font-display text-white">{stat.value}</span>

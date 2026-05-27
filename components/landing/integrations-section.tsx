@@ -106,20 +106,20 @@ export function IntegrationsSection() {
         <span className={`inline-flex items-center gap-4 text-sm font-mono text-muted-foreground mb-8 transition-all duration-700 justify-center ${isVisible ? "opacity-100" : "opacity-0"
           }`}>
           <span className="w-12 h-px bg-foreground/20" />
-          Integrations
+          Tích hợp
           <span className="w-12 h-px bg-foreground/20" />
         </span>
 
         <h2 className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9] transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}>
-          Connect
+          Kết nối
           <br />
-          <span className="text-muted-foreground">everything.</span>
+          <span className="text-muted-foreground">mọi thứ.</span>
         </h2>
 
         <p className={`mt-8 text-xl text-muted-foreground leading-relaxed max-w-lg mx-auto transition-all duration-1000 delay-100 ${isVisible ? "opacity-100" : "opacity-0"
           }`}>
-          Your agents connect to 100+ tools and services. They read, write, and act autonomously across your entire stack.
+          Nền tảng của chúng tôi kết nối với hơn 100+ công cụ và dịch vụ. Giúp đội nhóm của bạn làm việc hiệu quả ngay trên một ứng dụng duy nhất.
         </p>
       </div>
 
@@ -201,9 +201,9 @@ export function IntegrationsSection() {
           }`}>
           <div className="flex flex-wrap gap-12">
             {[
-              { value: "100+", label: "Integrations" },
-              { value: "OAuth", label: "Auth built-in" },
-              { value: "Webhooks", label: "Real-time sync" },
+              { value: "100+", label: "Công cụ tích hợp" },
+              { value: "OAuth", label: "Xác thực bảo mật" },
+              { value: "Webhooks", label: "Đồng bộ thời gian thực" },
             ].map((stat) => (
               <div key={stat.label} className="flex items-baseline gap-3">
                 <span className="text-3xl font-display">{stat.value}</span>
@@ -213,7 +213,7 @@ export function IntegrationsSection() {
           </div>
 
           <a href="#" className="group inline-flex items-center gap-2 text-sm font-mono text-muted-foreground hover:text-foreground transition-colors">
-            View all integrations
+            Xem tất cả tiện ích tích hợp
             <span className="group-hover:translate-x-1 transition-transform">&rarr;</span>
           </a>
         </div>

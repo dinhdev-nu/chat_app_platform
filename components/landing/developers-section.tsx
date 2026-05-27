@@ -4,20 +4,20 @@ import { useState, useEffect, useRef } from "react";
 
 const features = [
   {
-    title: "TypeScript native",
-    description: "Full type safety for agent configs and responses."
+    title: "Giao diện thân thiện",
+    description: "Dễ dàng làm quen và sử dụng ngay lập tức."
   },
   {
-    title: "Streaming results",
-    description: "Watch your agents think and act in real-time."
+    title: "Tin nhắn tức thời",
+    description: "Tốc độ gửi nhận tin nhắn siêu tốc và mượt mà."
   },
   {
-    title: "Multi-model support",
-    description: "OpenAI, Anthropic, Mistral, or bring your own."
+    title: "Đa nền tảng",
+    description: "Hỗ trợ Windows, macOS, Web, iOS và Android."
   },
   {
-    title: "Local debugging",
-    description: "Test agents locally before deploying to cloud."
+    title: "Tùy chỉnh linh hoạt",
+    description: "Thay đổi màu sắc, chủ đề theo phong cách riêng."
   },
 ];
 
@@ -66,12 +66,12 @@ export function DevelopersSection() {
         >
           <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
             <span className="w-8 h-px bg-foreground/30" />
-            Developer SDK
+            Tùy biến đa dạng
           </span>
           <h2 className="text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9]">
-            Code your agents.
+            Cá nhân hóa
             <br />
-            <span className="text-muted-foreground">Or let them code.</span>
+            <span className="text-muted-foreground">theo cách của riêng bạn.</span>
           </h2>
         </div>
 
@@ -81,8 +81,7 @@ export function DevelopersSection() {
             }`}
         >
           <p className="text-xl text-muted-foreground mb-12 leading-relaxed max-w-md">
-            A powerful SDK for building, deploying, and orchestrating AI agents.
-            Define behaviors in code or natural language.
+            Nền tảng chat linh hoạt với nhiều tùy chọn cá nhân hóa. Giao diện trực quan, tính năng mạnh mẽ và dễ sử dụng cho mọi người.
           </p>
           <div className="grid grid-cols-2 gap-6">
             {features.map((feature, index) => (

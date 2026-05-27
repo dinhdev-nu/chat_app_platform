@@ -1,5 +1,10 @@
 import type { Variants } from "framer-motion";
 import type { ChatMessage } from "./chat-message-types";
+import {
+  formatVietnamRelativeDate,
+  formatVietnamTime,
+  isSameVietnamDate,
+} from "./chat-time-utils";
 
 export const msgVariants: Variants = {
   hidden: { opacity: 0, y: 10, scale: 0.97 },
@@ -14,10 +19,15 @@ export const msgVariants: Variants = {
 const MESSAGE_GROUP_WINDOW_MS = 5 * 60 * 1000;
 
 export function formatTime(iso: string) {
-  return new Date(iso).toLocaleTimeString("vi-VN", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  return formatVietnamTime(iso);
+}
+
+export function formatMessageDateLabel(iso: string) {
+  return formatVietnamRelativeDate(iso);
+}
+
+export function isSameMessageDate(left?: string | null, right?: string | null) {
+  return isSameVietnamDate(left, right);
 }
 
 export function isSystemMessage(msg: ChatMessage) {

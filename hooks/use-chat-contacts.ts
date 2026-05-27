@@ -36,7 +36,10 @@ function toContactUser(user: SearchUser): ContactUserResponse {
     avatarUrl: user.avatarUrl,
     bio: user.bio,
     lastSeenAt: user.lastSeenAt,
+    isOnline: user.isOnline,
     createdAt: user.createdAt,
+    outgoingStatus: user.outgoingStatus,
+    incomingStatus: user.incomingStatus,
   };
 }
 
@@ -54,6 +57,26 @@ function applyAcceptedStatus(user: SearchUser, userId: string): SearchUser {
     outgoingStatus: ContactStatus.Accepted,
     incomingStatus: ContactStatus.Accepted,
   };
+}
+
+function applyPresenceToUsers<TUser extends ContactUserResponse>(
+  users: TUser[],
+  userId: string,
+  isOnline: boolean,
+) {
+  let changed = false;
+
+  const nextUsers = users.map((user) => {
+    if (user.id !== userId || user.isOnline === isOnline) return user;
+
+    changed = true;
+    return {
+      ...user,
+      isOnline,
+    };
+  });
+
+  return changed ? nextUsers : users;
 }
 
 export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: UseChatContactsOptions = {}) {
@@ -263,6 +286,12 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
     await loadIncomingRequests({ cursor: incomingPagination.nextCursor, append: true });
   }, [incomingPagination, loadIncomingRequests]);
 
+  const applyContactPresence = useCallback((userId: string, isOnline: boolean) => {
+    setContacts((currentContacts) => applyPresenceToUsers(currentContacts, userId, isOnline));
+    setIncomingRequests((currentRequests) => applyPresenceToUsers(currentRequests, userId, isOnline));
+    setSearchResults((currentResults) => applyPresenceToUsers(currentResults, userId, isOnline));
+  }, []);
+
   return {
     contacts: enabled ? contacts : [],
     incomingRequests: enabled ? incomingRequests : [],
@@ -283,6 +312,7 @@ export function useChatContacts({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: 
     loadIncomingRequests,
     loadMoreContacts,
     loadMoreIncomingRequests,
+    applyContactPresence,
     searchUsers,
     sendContactRequest,
   };

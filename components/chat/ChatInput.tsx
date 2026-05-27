@@ -32,6 +32,7 @@ interface ChatInputProps {
   suggestedTextKey?: number;
   isSending?: boolean;
   onSend?: (text: string) => void | Promise<void>;
+  onTyping?: () => void;
 }
 
 function focusEditorEnd(editor: HTMLElement) {
@@ -53,6 +54,7 @@ export default function ChatInput({
   suggestedTextKey,
   isSending = false,
   onSend,
+  onTyping,
 }: ChatInputProps) {
   const paletteButtonRef = useRef<HTMLButtonElement>(null);
   const editorRef = useRef<HTMLDivElement>(null);
@@ -89,7 +91,10 @@ export default function ChatInput({
   }, [suggestedText, suggestedTextKey]);
 
   const handleEditorInput = (event: FormEvent<HTMLDivElement>) => {
-    setInputText(event.currentTarget.textContent ?? "");
+    const nextText = event.currentTarget.textContent ?? "";
+
+    setInputText(nextText);
+    if (nextText.trim()) onTyping?.();
   };
 
   const handleSend = () => {

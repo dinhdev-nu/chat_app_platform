@@ -7,22 +7,22 @@ const metrics = [
     value: 12847392,
     suffix: "",
     prefix: "",
-    label: "Tasks completed today",
-    sublabel: "by 23,847 active agents",
+    label: "Tin nhắn hôm nay",
+    sublabel: "từ 23,847 người dùng",
   },
   {
     value: 99,
     suffix: ".99%",
     prefix: "",
-    label: "Availability",
-    sublabel: "across all regions",
+    label: "Sẵn sàng",
+    sublabel: "trên toàn hệ thống",
   },
   {
     value: 340,
     suffix: "ms",
     prefix: "<",
-    label: "Average execution",
-    sublabel: "p99 latency",
+    label: "Độ trễ trung bình",
+    sublabel: "tốc độ phản hồi",
   },
 ];
 
@@ -248,7 +248,7 @@ export function MetricsSection() {
             <div className="flex items-center gap-4 mb-6">
               <span className="flex items-center gap-2 px-3 py-1 bg-[#eca8d6]/10 text-[#eca8d6] text-xs font-mono">
                 <span className="w-2 h-2 rounded-full bg-[#eca8d6] animate-pulse" />
-                LIVE
+                TRỰC TIẾP
               </span>
               <span className="text-sm font-mono text-muted-foreground">
                 {time ? `${time.toLocaleTimeString("en-GB")} UTC` : ""}
@@ -257,9 +257,9 @@ export function MetricsSection() {
 
             <h2 className={`text-6xl md:text-7xl lg:text-[140px] font-display tracking-tight leading-[0.95] transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}>
-              Real-time
+              Thống kê
               <br />
-              <span className="text-muted-foreground">agent metrics.</span>
+              <span className="text-muted-foreground">theo thời gian thực.</span>
             </h2>
           </div>
         </div>
@@ -322,11 +322,11 @@ export function MetricsSection() {
         {/* Bottom ticker */}
         <div className={`mt-16 pt-8 border-t border-foreground/10 flex flex-wrap items-center gap-x-12 gap-y-4 text-sm font-mono text-muted-foreground transition-all duration-1000 delay-500 ${isVisible ? "opacity-100" : "opacity-0"
           }`}>
-          <span>OpenAI GPT-4 Turbo</span>
-          <span>Anthropic Claude 3</span>
-          <span>Mistral Large</span>
-          <span>Llama 3</span>
-          <span className="text-foreground">+12 more models</span>
+          <span>iOS</span>
+          <span>Android</span>
+          <span>Web</span>
+          <span>Windows</span>
+          <span className="text-foreground">+ macOS & Linux</span>
         </div>
       </div>
     </section>

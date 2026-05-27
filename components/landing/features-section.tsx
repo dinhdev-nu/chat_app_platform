@@ -5,27 +5,27 @@ import { useEffect, useRef, useState } from "react";
 const features = [
   {
     number: "01",
-    title: "Autonomous Execution",
-    description: "Deploy AI agents that work independently. They analyze, decide, and execute complex multi-step tasks without human intervention.",
-    stats: { value: "99.7%", label: "task completion" },
+    title: "Trò chuyện trực tuyến",
+    description: "Kết nối nhanh chóng với bạn bè và đồng nghiệp qua nền tảng nhắn tin tức thời của chúng tôi, hỗ trợ cả văn bản và đa phương tiện.",
+    stats: { value: "99.9%", label: "tin nhắn gửi đi" },
   },
   {
     number: "02",
-    title: "Distributed Computing",
-    description: "Offload compute-heavy tasks to our global network. Your agents run on optimized infrastructure across 50+ regions worldwide.",
-    stats: { value: "50+", label: "global regions" },
+    title: "Chia sẻ tệp tin",
+    description: "Gửi hình ảnh, video và tài liệu an toàn, nhanh chóng ở bất cứ đâu trên thế giới mà không làm giảm chất lượng.",
+    stats: { value: "50+", label: "định dạng tệp" },
   },
   {
     number: "03",
-    title: "Multi-Agent Orchestration",
-    description: "Coordinate teams of specialized agents. They communicate, delegate, and collaborate to solve complex problems together.",
-    stats: { value: "1000x", label: "parallel execution" },
+    title: "Thảo luận nhóm",
+    description: "Tạo các nhóm trò chuyện để thảo luận, phân chia công việc và làm việc cùng nhau dễ dàng hơn.",
+    stats: { value: "1000+", label: "thành viên/nhóm" },
   },
   {
     number: "04",
-    title: "Secure Sandboxing",
-    description: "Each agent runs in isolated environments. Full audit trails, encrypted execution, and zero data leakage between tasks.",
-    stats: { value: "0", label: "data breaches" },
+    title: "Bảo mật tuyệt đối",
+    description: "Mọi tin nhắn và tệp tin của bạn đều được mã hóa an toàn, đảm bảo sự riêng tư hoàn toàn giữa những người trò chuyện.",
+    stats: { value: "0", label: "rò rỉ dữ liệu" },
   },
 ];
 
@@ -158,21 +158,21 @@ export function FeaturesSection() {
             <div className="lg:col-span-7">
               <span className="inline-flex items-center gap-3 text-sm font-mono text-muted-foreground mb-6">
                 <span className="w-12 h-px bg-foreground/30" />
-                Capabilities
+                Tính năng nổi bật
               </span>
               <h2
                 className={`text-6xl md:text-7xl lg:text-[128px] font-display tracking-tight leading-[0.9] transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                   }`}
               >
-                Intelligent
+                Kết nối
                 <br />
-                <span className="text-muted-foreground">workers.</span>
+                <span className="text-muted-foreground">thông minh.</span>
               </h2>
             </div>
             <div className="lg:col-span-5 lg:pb-4">
               <p className={`text-xl text-muted-foreground leading-relaxed transition-all duration-1000 delay-200 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
                 }`}>
-                Deploy autonomous AI agents that execute complex tasks across distributed infrastructure. No supervision required.
+                Khám phá nền tảng nhắn tin thông minh giúp bạn giữ liên lạc và làm việc hiệu quả với đội nhóm của mình mọi lúc, mọi nơi.
               </p>
             </div>
           </div>

@@ -5,7 +5,7 @@ import type { CursorPaginationParams } from "./user";
 
 /** Body gửi lên POST /api/v1/conversations/direct */
 export interface CreateDMRequest {
-  /** User id hex 32 ký tự, KHÔNG có dấu gạch ngang */
+  /** Target user id from API/contact payload. */
   target_user_id: string;
 }
 
@@ -16,7 +16,7 @@ export interface CreateGroupRequest {
   type: 2 | 3;
   avatar_url?: string;
   description?: string;
-  /** Mảng user id hex 32 ký tự, KHÔNG bao gồm creator */
+  /** Member user ids from API/contact/search payloads, excluding creator. */
   member_user_ids: string[];
 }
 
@@ -55,6 +55,8 @@ export interface ConversationListItemResponse {
   role: ConversationRole;
   is_muted: boolean;
   unread_count: number;
+  member_online_count: number;
+  is_online: boolean;
 }
 
 // ─── Mappers ─────────────────────────────────────────────────────────────────
@@ -81,6 +83,8 @@ export function mapConversationResponseToListItem(
     role: raw.role,
     isMuted: raw.is_muted,
     unreadCount: raw.unread_count,
+    memberOnlineCount: raw.member_online_count,
+    isOnline: raw.is_online,
   };
 }
 
@@ -107,13 +111,7 @@ export function mapCreatedConversationToListItem(
     role,
     isMuted: false,
     unreadCount: 0,
+    memberOnlineCount: 0,
+    isOnline: false,
   };
-}
-
-/**
- * Chuyển UUID có dấu gạch ngang sang hex 32 ký tự (yêu cầu của API body).
- * Ví dụ: "0198f0f0-7a6c-7c1e-9f14-6ec6fd14f0de" → "0198f0f07a6c7c1e9f146ec6fd14f0de"
- */
-export function toHexId(uuid: string): string {
-  return uuid.replace(/-/g, "");
 }

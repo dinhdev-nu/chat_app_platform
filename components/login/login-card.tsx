@@ -148,7 +148,7 @@ export default function AuthCard({
                     className="w-full inline-flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl border border-border/50 bg-secondary/30 text-foreground opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
                   >
                     <img src="/google.svg" alt="" width={20} height={20} className="w-5 h-5" />
-                    Continue with Google
+                    Tiếp tục với Google
                   </button>
                 </motion.div>
 
@@ -159,14 +159,14 @@ export default function AuthCard({
                   animate="visible"
                   className="text-center text-xs text-muted-foreground"
                 >
-                  OR
+                  HOẶC
                 </motion.div>
 
                 <motion.label custom={2} variants={itemVariants} initial="hidden" animate="visible" className="block">
                   <span className="sr-only">Email</span>
                   <input
                     type="email"
-                    placeholder="Enter your email"
+                    placeholder="Nhập email của bạn"
                     required
                     autoComplete="email"
                     spellCheck={false}
@@ -197,7 +197,7 @@ export default function AuthCard({
                     disabled={isEmailSubmitDisabled}
                     aria-disabled={isEmailSubmitDisabled}
                   >
-                    {isSendingOtp ? "Sending code..." : "Continue with email"}
+                    {isSendingOtp ? "Đang gửi mã..." : "Tiếp tục với email"}
                   </button>
                 </motion.div>
 
@@ -208,12 +208,12 @@ export default function AuthCard({
                   animate="visible"
                   className="text-xs text-muted-foreground text-center"
                 >
-                  By continuing, you acknowledge Anthropic&apos;s{" "}
+                  Bằng việc tiếp tục, bạn đồng ý với{" "}
                   <Link
                     href="#"
                     className="underline hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background rounded-sm transition-colors"
                   >
-                    Privacy Policy
+                    Chính sách Bảo mật
                   </Link>
                   .
                 </motion.p>
@@ -244,7 +244,7 @@ export default function AuthCard({
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
-                  <h2 className="text-lg font-medium text-foreground">Enter code</h2>
+                  <h2 className="text-lg font-medium text-foreground">Nhập mã xác nhận</h2>
                 </motion.div>
 
                 <motion.p
@@ -254,9 +254,9 @@ export default function AuthCard({
                   animate="visible"
                   className="text-sm text-muted-foreground leading-snug"
                 >
-                  We sent a 6-digit code to{" "}
+                  Chúng tôi đã gửi mã 6 chữ số đến{" "}
                   <span className="text-foreground font-medium break-all">{normalizedEmail}</span>
-                  {otpExpiryLabel ? <span>. Expires in {otpExpiryLabel}</span> : null}
+                  {otpExpiryLabel ? <span>. Hết hạn sau {otpExpiryLabel}</span> : null}
                 </motion.p>
 
                 <motion.div
@@ -306,10 +306,10 @@ export default function AuthCard({
                           animate={{ rotate: 360 }}
                           transition={{ repeat: Infinity, duration: 0.7, ease: "linear" }}
                         />
-                        Verifying...
+                        Đang xác thực...
                       </span>
                     ) : (
-                      "Verify code"
+                      "Xác nhận mã"
                     )}
                   </button>
                 </motion.div>
@@ -321,14 +321,14 @@ export default function AuthCard({
                   animate="visible"
                   className="text-xs text-muted-foreground text-center"
                 >
-                  Didn&apos;t receive it?{" "}
+                  Chưa nhận được mã?{" "}
                   <button
                     type="button"
                     disabled={isSendingOtp}
                     onClick={handleResendOtp}
                     className="text-foreground underline hover:no-underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                   >
-                    {isSendingOtp ? "Sending..." : "Resend"}
+                    {isSendingOtp ? "Đang gửi..." : "Gửi lại"}
                   </button>
                 </motion.p>
               </form>
