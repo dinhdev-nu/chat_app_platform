@@ -60,7 +60,7 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
   {
     id: "conv_02",
     type: 2,
-    name: "Stitch Product",
+    name: "Stello Product",
     description: "Thảo luận UI/UX, release và QA.",
     createBy: "user_02",
     lastMessageId: "msg_011",

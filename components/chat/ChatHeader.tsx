@@ -22,9 +22,9 @@ export default function ChatHeader() {
         <div className="flex w-full flex-row gap-5 items-center">
           <a href="/" className="select-none cursor-pointer no-underline focus-ring rounded-md">
             <img
-              alt="Tên sản phẩm, Stitch (beta)"
-              className="block dark:invert dark:opacity-90"
-              src="/assets/home/ICA8c3ZnIH.svg"
+              alt="Tên sản phẩm, Stello (beta)"
+              className="block dark:invert dark:opacity-90 h-6"
+              src="/assets/home/stello_beta.svg"
             />
           </a>
         </div>
