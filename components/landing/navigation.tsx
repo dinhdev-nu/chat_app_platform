@@ -48,8 +48,11 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <span className={`font-display tracking-tight transition-all duration-500 ${isScrolled ? "text-xl text-foreground" : "text-2xl text-white"}`}>CHAT</span>
-            <span className={`font-mono transition-all duration-500 ${isScrolled ? "text-[10px] mt-0.5 text-muted-foreground" : "text-xs mt-1 text-white/60"}`}>APP</span>
+            <img
+              src="/assets/home/stello_beta.svg"
+              alt="Stello Logo"
+              className={`transition-all duration-500 h-6 sm:h-7 ${isScrolled ? "dark:invert" : "invert brightness-0"}`}
+            />
           </Link>
 
           {/* Desktop Navigation */}
@@ -74,10 +77,11 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
               Đăng nhập
             </Link>
             <Button
+              asChild
               size="sm"
               className={`rounded-full transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : "bg-white hover:bg-white/90 text-black px-6"}`}
             >
-              Mở Chat
+              <Link href="/chat">Mở Chat</Link>
             </Button>
           </div>
 
@@ -142,10 +146,11 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
               </Button>
             </Link>
             <Button
+              asChild
               className="flex-1 bg-foreground text-background rounded-full h-14 text-base"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              Mở Chat
+              <Link href="/chat">Mở Chat</Link>
             </Button>
           </div>
         </div>

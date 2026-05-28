@@ -8,19 +8,12 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
-  const accessToken = useAuthStore((state) => state.accessToken);
   const error = useAuthStore((state) => state.error);
   const isSendingOtp = useAuthStore((state) => state.isSendingOtp);
   const isVerifyingOtp = useAuthStore((state) => state.isVerifyingOtp);
   const otpExpiresAt = useAuthStore((state) => state.otpExpiresAt);
   const sendOtp = useAuthStore((state) => state.sendOtp);
   const verifyOtp = useAuthStore((state) => state.verifyOtp);
-
-  useEffect(() => {
-    if (accessToken) {
-      router.replace("/chat");
-    }
-  }, [accessToken, router]);
 
   const handleSendOtp = useCallback(
     async (email: string) => {

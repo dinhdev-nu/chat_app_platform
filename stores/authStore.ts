@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import Cookies from "js-cookie";
 
 import { AUTH_STORAGE_KEY } from "@/constants/config";
 import { authService, normalizeEmail } from "@/services/authService";
@@ -82,7 +83,7 @@ export const useAuthStore = create<AuthState>()(
 
       clearSession: () => {
         const deviceId = get().deviceId;
-
+        
         set({
           user: null,
           accessToken: null,
@@ -128,7 +129,7 @@ export const useAuthStore = create<AuthState>()(
             deviceId,
             deviceName: getDeviceName(),
           });
-
+          
           set({
             user: result.user,
             accessToken: result.accessToken,
@@ -216,3 +217,12 @@ export const useAuthStore = create<AuthState>()(
 );
 
 setAccessTokenProvider(() => useAuthStore.getState().accessToken);
+
+// Tự động đồng bộ accessToken vào cookie "token" mỗi khi Zustand thay đổi
+useAuthStore.subscribe((state) => {
+  if (state.accessToken) {
+    Cookies.set("token", state.accessToken, { expires: 30, path: "/", sameSite: "Lax" });
+  } else {
+    Cookies.remove("token", { path: "/" });
+  }
+});
