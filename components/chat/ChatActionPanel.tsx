@@ -2,12 +2,12 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import DesignListContent from "./DesignListContent";
-import ThemeSettingsContent from "./ThemeSettingsContent";
-import ListUserContent from "./ListUserContent";
+import ChatActionMenu from "./ChatActionMenu";
+import CreateConversationForm from "./CreateConversationForm";
+import AddFriendPanel from "./AddFriendPanel";
 import type { ContactRequestStatusResponse, ContactUserResponse, SearchUser } from "@/types/user";
 
-interface PanelProps {
+interface ChatActionPanelProps {
   isOpen?: boolean;
   onClose?: () => void;
   onOpenFriends?: () => void;
@@ -26,11 +26,10 @@ interface PanelProps {
   onSearchMembers?: (q: string) => Promise<SearchUser[]>;
 }
 
-export default function Panel({
+export default function ChatActionPanel({
   isOpen = false,
   onClose,
   onOpenFriends,
-  contacts,
   incomingRequests,
   searchResults,
   isIncomingLoading,
@@ -43,12 +42,12 @@ export default function Panel({
   onSendContactRequest,
   onCreateConversation,
   onSearchMembers,
-}: PanelProps) {
-  const [activeView, setActiveView] = useState<"list" | "details" | "friends">("list");
-  const [initialThemeType, setInitialThemeType] = useState<2 | 3>(2);
+}: ChatActionPanelProps) {
+  const [activeView, setActiveView] = useState<"menu" | "createConversation" | "addFriend">("menu");
+  const [initialConversationType, setInitialConversationType] = useState<2 | 3>(2);
 
   return (
-    <AnimatePresence initial={false} onExitComplete={() => setActiveView("list")}>
+    <AnimatePresence initial={false} onExitComplete={() => setActiveView("menu")}>
       {isOpen ? (
         <motion.div
           key="panel-backdrop"
@@ -83,20 +82,20 @@ export default function Panel({
           >
             <div className="flex flex-col flex-1 min-h-0 relative overflow-hidden">
               <div
-                className={`absolute inset-0 transition-transform duration-300 ease-in-out z-10 flex flex-col ${activeView === "list" ? "translate-x-0" : "-translate-x-full"
+                className={`absolute inset-0 transition-transform duration-300 ease-in-out z-10 flex flex-col ${activeView === "menu" ? "translate-x-0" : "-translate-x-full"
                   }`}
-                aria-hidden={activeView !== "list"}
-                inert={activeView !== "list"}
+                aria-hidden={activeView !== "menu"}
+                inert={activeView !== "menu"}
               >
-                <DesignListContent
+                <ChatActionMenu
                   onClose={onClose}
                   onOpenFriends={onOpenFriends}
                   onOpenAddFriends={() => {
-                    setActiveView("friends");
+                    setActiveView("addFriend");
                   }}
-                  onOpenTheme={(type = 2) => {
-                    setInitialThemeType(type);
-                    setActiveView("details");
+                  onOpenCreateConversation={(type = 2) => {
+                    setInitialConversationType(type);
+                    setActiveView("createConversation");
                   }}
                   incomingRequests={incomingRequests}
                   isIncomingLoading={isIncomingLoading}
@@ -107,29 +106,29 @@ export default function Panel({
               </div>
 
               <div
-                className={`absolute inset-0 transition-transform duration-300 ease-in-out z-10 flex flex-col p-3 overflow-hidden text-primary ${activeView === "details" ? "translate-x-0" : "translate-x-full"
+                className={`absolute inset-0 transition-transform duration-300 ease-in-out z-10 flex flex-col p-3 overflow-hidden text-primary ${activeView === "createConversation" ? "translate-x-0" : "translate-x-full"
                   }`}
-                aria-hidden={activeView !== "details"}
-                inert={activeView !== "details"}
+                aria-hidden={activeView !== "createConversation"}
+                inert={activeView !== "createConversation"}
               >
-                <ThemeSettingsContent
-                  key={initialThemeType}
-                  onBack={() => setActiveView("list")}
-                  initialType={initialThemeType}
+                <CreateConversationForm
+                  key={initialConversationType}
+                  onBack={() => setActiveView("menu")}
+                  initialType={initialConversationType}
                   onSearchMembers={onSearchMembers}
                   onCreateConversation={onCreateConversation}
                 />
               </div>
 
               <div
-                className={`absolute inset-0 transition-transform duration-300 ease-in-out z-10 flex flex-col p-3 overflow-hidden text-primary ${activeView === "friends" ? "translate-x-0" : "translate-x-full"
+                className={`absolute inset-0 transition-transform duration-300 ease-in-out z-10 flex flex-col p-3 overflow-hidden text-primary ${activeView === "addFriend" ? "translate-x-0" : "translate-x-full"
                   }`}
-                aria-hidden={activeView !== "friends"}
-                inert={activeView !== "friends"}
+                aria-hidden={activeView !== "addFriend"}
+                inert={activeView !== "addFriend"}
               >
-                <ListUserContent
-                  isActive={activeView === "friends"}
-                  onBack={() => setActiveView("list")}
+                <AddFriendPanel
+                  isActive={activeView === "addFriend"}
+                  onBack={() => setActiveView("menu")}
                   users={searchResults}
                   isSearching={isSearchingUsers}
                   error={searchError}

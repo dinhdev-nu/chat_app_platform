@@ -1,14 +1,14 @@
 import { ListBulletIcon } from "./icons";
 
-interface MobileProjectSidebarToggleProps {
+interface MobileConversationSidebarToggleProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-export default function MobileProjectSidebarToggle({
+export default function MobileConversationSidebarToggle({
   isOpen,
   onToggle,
-}: MobileProjectSidebarToggleProps) {
+}: MobileConversationSidebarToggleProps) {
   return (
     <button
       type="button"
@@ -23,7 +23,7 @@ export default function MobileProjectSidebarToggle({
       "
       aria-label={isOpen ? "Đóng danh sách hội thoại" : "Mở danh sách hội thoại"}
       aria-expanded={isOpen}
-      aria-controls="recent-projects-panel"
+      aria-controls="conversation-sidebar-panel"
       onClick={onToggle}
     >
       <span className="text-inherit">

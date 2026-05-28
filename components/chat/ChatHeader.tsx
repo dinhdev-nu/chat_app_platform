@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import HeaderActions from "./HeaderActions";
-import ShareProjectModal from "./ShareProjectModal";
+import ProfileModal from "./ProfileModal";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function ChatHeader() {
@@ -35,7 +35,7 @@ export default function ChatHeader() {
           onAccountClick={() => setIsShareOpen(true)}
         />
       </header>
-      <ShareProjectModal open={isShareOpen} onOpenChange={setIsShareOpen} />
+      <ProfileModal open={isShareOpen} onOpenChange={setIsShareOpen} />
     </>
   );
 }

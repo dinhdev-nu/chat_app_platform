@@ -7,7 +7,7 @@ import { BackIcon, CloseIcon, SearchIcon } from "@/components/chat/icons";
 import { ContactStatus } from "@/types/user";
 import type { ContactRequestStatusResponse, SearchUser } from "@/types/user";
 
-interface ListUserContentProps {
+interface AddFriendPanelProps {
   isActive?: boolean;
   onBack?: () => void;
   users?: SearchUser[];
@@ -22,8 +22,8 @@ interface ListUserContentProps {
 interface UserActionProps {
   user: SearchUser;
   isPending: boolean;
-  onSendContactRequest?: ListUserContentProps["onSendContactRequest"];
-  onAcceptContactRequest?: ListUserContentProps["onAcceptContactRequest"];
+  onSendContactRequest?: AddFriendPanelProps["onSendContactRequest"];
+  onAcceptContactRequest?: AddFriendPanelProps["onAcceptContactRequest"];
 }
 
 function runAction(action?: () => Promise<unknown> | unknown) {
@@ -107,7 +107,7 @@ function UserAction({
   );
 }
 
-function ListUserContent({
+function AddFriendPanel({
   isActive = true,
   onBack,
   users = [],
@@ -117,7 +117,7 @@ function ListUserContent({
   onSearchUsers,
   onSendContactRequest,
   onAcceptContactRequest,
-}: ListUserContentProps) {
+}: AddFriendPanelProps) {
   const [searchQuery, setSearchQuery] = useState("");
   const [hasActivatedSearch, setHasActivatedSearch] = useState(false);
   const deferredSearchQuery = useDeferredValue(searchQuery);
@@ -263,4 +263,4 @@ function ListUserContent({
   );
 }
 
-export default React.memo(ListUserContent);
+export default React.memo(AddFriendPanel);

@@ -19,19 +19,19 @@ interface CreateConversationPayload {
   member_user_ids: string[];
 }
 
-interface ThemeSettingsContentProps {
+interface CreateConversationFormProps {
   onBack?: () => void;
   initialType?: 2 | 3;
   onSearchMembers?: (q: string) => Promise<SearchUser[]>;
   onCreateConversation?: (payload: CreateConversationPayload) => void;
 }
 
-export default function ThemeSettingsContent({
+export default function CreateConversationForm({
   onBack,
   initialType = 2,
   onSearchMembers,
   onCreateConversation,
-}: ThemeSettingsContentProps) {
+}: CreateConversationFormProps) {
   const [activeTab, setActiveTab] = useState<"info" | "members">("info");
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");

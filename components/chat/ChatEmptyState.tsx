@@ -32,7 +32,7 @@ const fadeVariants = {
   },
 };
 
-export default function IntegrationsSection() {
+export default function ChatEmptyState() {
   // Chỉ trigger animate sau khi client đã hydrate xong
   // Tránh flash: SSR render visible → JS set opacity:0 → animate
   const [isReady, setIsReady] = useState(false);
@@ -40,8 +40,8 @@ export default function IntegrationsSection() {
 
   return (
     <section
-      id="integrations"
-      aria-labelledby="integrations-heading"
+      id="chat-empty-state"
+      aria-labelledby="chat-empty-heading"
       className="relative w-full h-full flex flex-col overflow-hidden"
     >
       <motion.div
@@ -63,7 +63,7 @@ export default function IntegrationsSection() {
 
           {/* Heading */}
           <motion.h2
-            id="integrations-heading"
+            id="chat-empty-heading"
             variants={fadeUpVariants as any}
             className="text-4xl md:text-5xl lg:text-6xl font-display tracking-tight leading-[1.1] text-primary"
           >

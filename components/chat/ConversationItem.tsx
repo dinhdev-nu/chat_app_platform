@@ -8,7 +8,7 @@ import {
 } from "./conversation-data";
 import { UserIcon, ListBulletIcon, UsersIcon, BellSlashIcon } from "./icons";
 
-interface ProjectItemProps {
+interface ConversationItemProps {
   conversation: ConversationListItem;
   isActive?: boolean;
   onSelect?: (conv: ConversationListItem) => void;
@@ -26,7 +26,7 @@ function TypeIcon({ type }: { type: ConversationListItem["type"] }) {
   return <ListBulletIcon size={14} />;
 }
 
-function ProjectItem({ conversation, isActive = false, onSelect }: ProjectItemProps) {
+function ConversationItem({ conversation, isActive = false, onSelect }: ConversationItemProps) {
   const initials = (conversation.name ?? "").trim().slice(0, 2).toUpperCase() || "CH";
   const typeLabel = getConversationTypeLabel(conversation.type);
   const activityLabel = formatConversationActivity(conversation.lastActivityAt);
@@ -126,4 +126,4 @@ function ProjectItem({ conversation, isActive = false, onSelect }: ProjectItemPr
   );
 }
 
-export default React.memo(ProjectItem);
+export default React.memo(ConversationItem);

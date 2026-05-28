@@ -9,16 +9,16 @@ import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
 import ChatEmptyState from "./ChatEmptyState";
 import ChatActiveState from "./ChatActiveState";
 import type { ChatMessage } from "./chat-message-types";
-import PromptInput from "./PromptInput";
-import MobileProjectSidebarToggle from "./MobileProjectSidebarToggle";
+import ConversationStarter from "./ConversationStarter";
+import MobileConversationSidebarToggle from "./MobileConversationSidebarToggle";
 
 interface ChatMainProps {
   activeConv?: ConversationListItem;
   currentUser?: AuthUser | null;
   isDraftConversation?: boolean;
-  isProjectSidebarOpen?: boolean;
+  isConversationSidebarOpen?: boolean;
   useMessageApi?: boolean;
-  onToggleProjects?: () => void;
+  onToggleConversationSidebar?: () => void;
   onCreateConversation?: (
     conversation: ConversationListItem,
     firstMessageText: string,
@@ -33,9 +33,9 @@ export default function ChatMain({
   activeConv,
   currentUser,
   isDraftConversation = false,
-  isProjectSidebarOpen = false,
+  isConversationSidebarOpen = false,
   useMessageApi = true,
-  onToggleProjects,
+  onToggleConversationSidebar,
   onCreateConversation,
   onConversationMessageUpdate,
 }: ChatMainProps) {
@@ -158,8 +158,11 @@ export default function ChatMain({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col w-full h-full overflow-hidden bg-transparent">
-      {onToggleProjects ? (
-        <MobileProjectSidebarToggle isOpen={isProjectSidebarOpen} onToggle={onToggleProjects} />
+      {onToggleConversationSidebar ? (
+        <MobileConversationSidebarToggle
+          isOpen={isConversationSidebarOpen}
+          onToggle={onToggleConversationSidebar}
+        />
       ) : null}
 
       <AnimatePresence mode="sync" initial={false}>
@@ -185,7 +188,7 @@ export default function ChatMain({
             animate="animate"
             exit="exit"
           >
-            <PromptInput
+            <ConversationStarter
               conv={activeConv}
               isSending={isSending}
               onSend={handleSend}

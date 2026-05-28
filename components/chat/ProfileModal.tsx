@@ -8,7 +8,7 @@ import { getApiErrorMessage } from "@/services/http";
 import { useAuthStore } from "@/stores/authStore";
 import type { UpdateUserRequest } from "@/types/user";
 
-interface UpdateProfileModalProps {
+interface ProfileModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData?: UpdateUserRequest;
@@ -30,13 +30,13 @@ const FOCUS_GUARD: React.CSSProperties = {
   margin: "-1px",
 };
 
-export default function UpdateProfileModal({
+export default function ProfileModal({
   open,
   onOpenChange,
   initialData,
   onSave,
   onLogout,
-}: UpdateProfileModalProps) {
+}: ProfileModalProps) {
   const router = useRouter();
   const authUser = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);

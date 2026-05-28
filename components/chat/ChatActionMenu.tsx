@@ -7,11 +7,11 @@ import {
   PlusIcon,
 } from "./icons";
 
-interface DesignListContentProps {
+interface ChatActionMenuProps {
   onClose?: () => void;
   onOpenFriends?: () => void;
   onOpenAddFriends?: () => void;
-  onOpenTheme?: (type?: 2 | 3) => void;
+  onOpenCreateConversation?: (type?: 2 | 3) => void;
   incomingRequests?: SearchUser[];
   isIncomingLoading?: boolean;
   incomingError?: string | null;
@@ -19,17 +19,17 @@ interface DesignListContentProps {
   onAcceptContactRequest?: (senderUserId: string) => Promise<void> | void;
 }
 
-function DesignListContent({
+function ChatActionMenu({
   onClose,
   onOpenFriends,
   onOpenAddFriends,
-  onOpenTheme,
+  onOpenCreateConversation,
   incomingRequests = [],
   isIncomingLoading = false,
   incomingError,
   pendingContactActionIds = [],
   onAcceptContactRequest,
-}: DesignListContentProps) {
+}: ChatActionMenuProps) {
   const handleAccept = (senderUserId: string) => {
     void Promise.resolve(onAcceptContactRequest?.(senderUserId)).catch(() => undefined);
   };
@@ -66,7 +66,7 @@ function DesignListContent({
         </button>
         <button
           type="button"
-          onClick={() => { onOpenTheme?.(2); }}
+          onClick={() => { onOpenCreateConversation?.(2); }}
           aria-label="Tạo nhóm mới"
           className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
@@ -75,7 +75,7 @@ function DesignListContent({
         </button>
         <button
           type="button"
-          onClick={() => { onOpenTheme?.(3); }}
+          onClick={() => { onOpenCreateConversation?.(3); }}
           aria-label="Tạo kênh mới"
           className="flex items-center gap-3 p-1.5 font-medium text-sm hover-surface rounded-xl transition-colors"
         >
@@ -158,4 +158,4 @@ function DesignListContent({
   );
 }
 
-export default React.memo(DesignListContent);
+export default React.memo(ChatActionMenu);

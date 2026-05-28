@@ -2,7 +2,7 @@
 
 import {
   ChatHeader,
-  ProjectSidebar,
+  ConversationSidebar,
   DotPattern,
   DisplayToggle,
   ChatMain,
@@ -23,7 +23,7 @@ import type { ChatMessage } from "@/components/chat/chat-message-types";
 import type { ContactUserResponse, SearchUser } from "@/types/user";
 import { userService } from "@/services/userService";
 
-const Panel = dynamic(() => import("@/components/chat/Panel"), { ssr: false });
+const ChatActionPanel = dynamic(() => import("@/components/chat/ChatActionPanel"), { ssr: false });
 
 const CONTACT_CONVERSATION_FALLBACK_DATE = "1970-01-01T00:00:00.000Z";
 const DRAFT_CONTACT_CONVERSATION_PREFIX = "draft-contact:";
@@ -105,8 +105,8 @@ export default function ChatPageClient({
   const hasHydrated = useAuthStore((state) => state.hasHydrated);
   const refreshProfile = useAuthStore((state) => state.refreshProfile);
   const clearSession = useAuthStore((state) => state.clearSession);
-  const [isProjectSidebarOpen, setIsProjectSidebarOpen] = useState(false);
-  const [isPanelOpen, setIsPanelOpen] = useState(false);
+  const [isConversationSidebarOpen, setIsConversationSidebarOpen] = useState(false);
+  const [isChatActionPanelOpen, setIsChatActionPanelOpen] = useState(false);
   const [sidebarActiveTab, setSidebarActiveTab] = useState<"all" | "friends">("all");
   const [activeConversationId, setActiveConversationId] = useState<string | undefined>(undefined);
   const [activeDraftContact, setActiveDraftContact] = useState<ContactUserResponse | null>(null);
@@ -177,7 +177,7 @@ export default function ChatPageClient({
 
   const shouldLoadIncoming =
     authState === "authenticated" &&
-    isPanelOpen &&
+    isChatActionPanelOpen &&
     !hasRequestedIncomingRequests &&
     !isLoadingIncoming;
 
@@ -218,26 +218,26 @@ export default function ChatPageClient({
     [activeConversationId, activeDraftConversation, conversations],
   );
 
-  const closeProjectSidebar = useCallback(() => {
-    setIsProjectSidebarOpen(false);
+  const closeConversationSidebar = useCallback(() => {
+    setIsConversationSidebarOpen(false);
   }, []);
 
-  const toggleProjectSidebar = useCallback(() => {
-    setIsProjectSidebarOpen((prev) => !prev);
+  const toggleConversationSidebar = useCallback(() => {
+    setIsConversationSidebarOpen((prev) => !prev);
   }, []);
 
-  const openPanel = useCallback(() => {
-    setIsPanelOpen(true);
+  const openChatActionPanel = useCallback(() => {
+    setIsChatActionPanelOpen(true);
   }, []);
 
-  const closePanel = useCallback(() => {
-    setIsPanelOpen(false);
+  const closeChatActionPanel = useCallback(() => {
+    setIsChatActionPanelOpen(false);
   }, []);
 
   const openFriends = useCallback(() => {
-    setIsProjectSidebarOpen(true);
+    setIsConversationSidebarOpen(true);
     setSidebarActiveTab("friends");
-    setIsPanelOpen(false);
+    setIsChatActionPanelOpen(false);
   }, []);
 
   const handleActiveTabChange = useCallback((tab: "all" | "friends") => {
@@ -341,12 +341,12 @@ export default function ChatPageClient({
         prependConversation(listItem);
         setActiveDraftContact(null);
         setActiveConversationId(listItem.id);
-        closePanel();
+        closeChatActionPanel();
       } catch (error) {
         console.error("Failed to create group:", error);
       }
     },
-    [prependConversation, closePanel],
+    [prependConversation, closeChatActionPanel],
   );
 
   const handleConversationMessageUpdate = useCallback(
@@ -380,10 +380,10 @@ export default function ChatPageClient({
           <ChatHeader />
 
           <div className="relative flex min-h-0 flex-1 overflow-hidden">
-            <ProjectSidebar
-              isMobileOpen={isProjectSidebarOpen}
-              onClose={closeProjectSidebar}
-              onOpenPanel={openPanel}
+            <ConversationSidebar
+              isMobileOpen={isConversationSidebarOpen}
+              onClose={closeConversationSidebar}
+              onOpenActionPanel={openChatActionPanel}
               activeTab={sidebarActiveTab}
               onActiveTabChange={handleActiveTabChange}
               conversations={conversations}
@@ -402,8 +402,8 @@ export default function ChatPageClient({
                 activeConv={activeConv}
                 currentUser={currentUser}
                 isDraftConversation={activeDraftConversation?.id === activeConversationId}
-                isProjectSidebarOpen={isProjectSidebarOpen}
-                onToggleProjects={toggleProjectSidebar}
+                isConversationSidebarOpen={isConversationSidebarOpen}
+                onToggleConversationSidebar={toggleConversationSidebar}
                 onCreateConversation={handleCreateConversation}
                 onConversationMessageUpdate={handleConversationMessageUpdate}
               />
@@ -413,9 +413,9 @@ export default function ChatPageClient({
           <DisplayToggle />
         </main>
 
-        <Panel
-          isOpen={isPanelOpen}
-          onClose={closePanel}
+        <ChatActionPanel
+          isOpen={isChatActionPanelOpen}
+          onClose={closeChatActionPanel}
           onOpenFriends={openFriends}
           contacts={contacts}
           incomingRequests={chatContacts.incomingRequests}

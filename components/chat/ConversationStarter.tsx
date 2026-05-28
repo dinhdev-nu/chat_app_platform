@@ -23,14 +23,14 @@ function getSuggestionPrompts(currentUserName?: string) {
   ];
 }
 
-interface PromptInputProps {
+interface ConversationStarterProps {
   conv?: ConversationListItem;
   isSending?: boolean;
   onSend?: (text: string) => void | Promise<void>;
   onTyping?: () => void;
 }
 
-export default function PromptInput({ conv, isSending = false, onSend, onTyping }: PromptInputProps) {
+export default function ConversationStarter({ conv, isSending = false, onSend, onTyping }: ConversationStarterProps) {
   const currentUserName = useAuthStore((state) => state.user?.name);
   const suggestionPrompts = useMemo(
     () => getSuggestionPrompts(currentUserName),

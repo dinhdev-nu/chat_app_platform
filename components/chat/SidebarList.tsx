@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useCallback } from "react";
-import ProjectItem from "./ProjectItem";
+import ConversationItem from "./ConversationItem";
 import ContactItem from "./ContactItem";
 import { ConversationListItem } from "./conversation-data";
 import { ContactUserResponse } from "./contact-data";
@@ -75,7 +75,7 @@ function SidebarList({
                                 const isLast = index === conversations.length - 1;
                                 return (
                                     <div key={conversation.id} ref={isLast ? lastConversationElementRef : null}>
-                                        <ProjectItem
+                                        <ConversationItem
                                             conversation={conversation}
                                             isActive={conversation.id === activeConversationId}
                                             onSelect={onSelectConversation}

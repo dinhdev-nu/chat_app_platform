@@ -9,10 +9,10 @@ import SidebarList from "./SidebarList";
 
 type SidebarFilter = "all" | "friends";
 
-interface ProjectSidebarProps {
+interface ConversationSidebarProps {
   isMobileOpen?: boolean;
   onClose?: () => void;
-  onOpenPanel?: () => void;
+  onOpenActionPanel?: () => void;
   activeConversationId?: string;
   onSelectConversation?: (conv: ConversationListItem) => void;
   onSelectContact?: (contact: ContactUserResponse) => void;
@@ -26,10 +26,10 @@ interface ProjectSidebarProps {
   hasMoreConversations?: boolean;
 }
 
-export default function ProjectSidebar({
+export default function ConversationSidebar({
   isMobileOpen = false,
   onClose,
-  onOpenPanel,
+  onOpenActionPanel,
   conversations = MOCK_CONVERSATIONS,
   contacts = MOCK_CONTACT_USERS,
   isContactsLoading = false,
@@ -41,7 +41,7 @@ export default function ProjectSidebar({
   onActiveTabChange,
   onLoadMoreConversations,
   hasMoreConversations,
-}: ProjectSidebarProps) {
+}: ConversationSidebarProps) {
   const isMobile = useIsMobile();
   const isHiddenOnMobile = isMobile && !isMobileOpen;
   const [uncontrolledActiveTab, setUncontrolledActiveTab] = useState<SidebarFilter>("all");
@@ -137,7 +137,7 @@ export default function ProjectSidebar({
 
   return (
     <section
-      id="recent-projects-panel"
+      id="conversation-sidebar-panel"
       aria-hidden={isHiddenOnMobile}
       inert={isHiddenOnMobile}
       className={`
@@ -272,7 +272,7 @@ export default function ProjectSidebar({
               </div>
               <button
                 type="button"
-                onClick={onOpenPanel}
+                onClick={onOpenActionPanel}
                 aria-label="Tạo hội thoại hoặc thêm contact"
                 title="Tạo hội thoại hoặc thêm contact"
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"
