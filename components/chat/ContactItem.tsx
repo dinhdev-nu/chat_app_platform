@@ -4,8 +4,8 @@ import React from "react";
 import {
     ContactUserResponse,
     formatContactPresence,
-} from "./contact-data";
-import { UserIcon } from "./icons";
+} from "@/data/contact-data";
+import { UserIcon } from "@/components/ui/icons";
 
 interface ContactItemProps {
     contact: ContactUserResponse;

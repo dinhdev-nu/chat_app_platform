@@ -8,7 +8,7 @@ import ProfileModal from "./ProfileModal";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function ChatHeader() {
-  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const user = useAuthStore((state) => state.user);
 
   return (
@@ -37,10 +37,10 @@ export default function ChatHeader() {
         <HeaderActions
           userName={user?.name ?? user?.email}
           userAvatarUrl={user?.avatarUrl}
-          onAccountClick={() => setIsShareOpen(true)}
+          onAccountClick={() => setIsProfileOpen(true)}
         />
       </header>
-      <ProfileModal open={isShareOpen} onOpenChange={setIsShareOpen} />
+      {isProfileOpen ? <ProfileModal onOpenChange={setIsProfileOpen} /> : null}
     </>
   );
 }

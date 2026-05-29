@@ -1,13 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useReducer, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 import { getApiErrorMessage } from "@/services/http";
 import { conversationService } from "@/services/conversationService";
 import { selectConversationList, useChatStore } from "@/stores/chatStore";
 import type { PaginationMeta } from "@/types/api";
-import type { ConversationListItem } from "@/components/chat/conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 
 const DEFAULT_PAGE_LIMIT = 20;
 
@@ -22,15 +22,48 @@ interface UseConversationsOptions {
   limit?: number;
 }
 
+interface ConversationLoadState {
+  pagination: PaginationMeta | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+type ConversationLoadAction =
+  | { type: "setLoading"; value: boolean }
+  | { type: "setError"; value: string | null }
+  | { type: "setPagination"; value: PaginationMeta | null };
+
+const initialConversationLoadState: ConversationLoadState = {
+  pagination: null,
+  isLoading: false,
+  error: null,
+};
+
+function conversationLoadReducer(
+  state: ConversationLoadState,
+  action: ConversationLoadAction,
+): ConversationLoadState {
+  switch (action.type) {
+    case "setLoading":
+      return { ...state, isLoading: action.value };
+    case "setError":
+      return { ...state, error: action.value };
+    case "setPagination":
+      return { ...state, pagination: action.value };
+  }
+}
+
 export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }: UseConversationsOptions = {}) {
   const conversations = useChatStore(useShallow(selectConversationList));
   const setStoreConversations = useChatStore((state) => state.setConversations);
   const upsertConversation = useChatStore((state) => state.upsertConversation);
   const patchConversation = useChatStore((state) => state.patchConversation);
   const removeStoreConversation = useChatStore((state) => state.removeConversation);
-  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loadState, dispatchLoadState] = useReducer(
+    conversationLoadReducer,
+    initialConversationLoadState,
+  );
+  const { pagination, isLoading, error } = loadState;
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -43,8 +76,8 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
   const loadConversations = useCallback(
     ({ cursor, append = false, silent = false }: LoadPageOptions = {}) => {
       if (!enabled) return;
-      if (!silent) setIsLoading(true);
-      setError(null);
+      if (!silent) dispatchLoadState({ type: "setLoading", value: true });
+      dispatchLoadState({ type: "setError", value: null });
 
       if (!isMountedRef.current) return;
 
@@ -53,14 +86,16 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
         .then((result) => {
           if (!isMountedRef.current) return;
           setStoreConversations(result.data, { append });
-          setPagination(result.pagination);
+          dispatchLoadState({ type: "setPagination", value: result.pagination });
         })
         .catch((err) => {
           if (!isMountedRef.current) return;
-          setError(getApiErrorMessage(err));
+          dispatchLoadState({ type: "setError", value: getApiErrorMessage(err) });
         })
         .finally(() => {
-          if (isMountedRef.current && !silent) setIsLoading(false);
+          if (isMountedRef.current && !silent) {
+            dispatchLoadState({ type: "setLoading", value: false });
+          }
         });
     },
     [enabled, limit, setStoreConversations],

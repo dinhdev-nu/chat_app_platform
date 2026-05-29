@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SunIcon, MoonIcon } from "./icons";
+import { SunIcon, MoonIcon } from "@/components/ui/icons";
 
 function getInitialIsDark() {
   if (typeof document === "undefined") return true;

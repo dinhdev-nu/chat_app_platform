@@ -3,7 +3,7 @@
 import React, { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { Check, Loader2, Send, User, UserPlus } from "lucide-react";
 
-import { BackIcon, CloseIcon, SearchIcon } from "@/components/chat/icons";
+import { BackIcon, CloseIcon, SearchIcon } from "@/components/ui/icons";
 import { ContactStatus } from "@/types/user";
 import type { ContactRequestStatusResponse, SearchUser } from "@/types/user";
 

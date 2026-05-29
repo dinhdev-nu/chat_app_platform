@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { MoreHorizontal, Phone, Video } from "lucide-react";
 
-import type { ConversationListItem } from "./conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 
 function HeaderActionButton({
   label,

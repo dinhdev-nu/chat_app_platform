@@ -5,7 +5,7 @@ import {
   CloseIcon,
   PaletteIcon,
   PlusIcon,
-} from "./icons";
+} from "@/components/ui/icons";
 
 interface ChatActionMenuProps {
   onClose?: () => void;

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { ConversationListItem } from "@/components/chat/conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 import type { MessageResponse, MessageReactionResponse } from "@/types/message";
 import { mapConversationResponseToListItem } from "@/types/conversation";
 import type {

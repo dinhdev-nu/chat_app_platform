@@ -15,7 +15,7 @@ import {
   GiftIcon,
   MoreDotsIcon,
   XIcon,
-} from "./icons";
+} from "@/components/ui/icons";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 

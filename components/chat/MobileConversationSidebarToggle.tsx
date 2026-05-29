@@ -1,4 +1,4 @@
-import { ListBulletIcon } from "./icons";
+import { ListBulletIcon } from "@/components/ui/icons";
 
 interface MobileConversationSidebarToggleProps {
   isOpen: boolean;

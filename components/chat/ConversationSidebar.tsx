@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useDeferredValue, useMemo, useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { GridIcon, SearchIcon, CloseIcon, UserGroupIcon, UsersIcon, PlusIcon } from "./icons";
-import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
-import { ContactUserResponse, MOCK_CONTACT_USERS } from "./contact-data";
+import { GridIcon, SearchIcon, CloseIcon, UserGroupIcon, UsersIcon, PlusIcon } from "@/components/ui/icons";
+import { ConversationListItem, MOCK_CONVERSATIONS } from "@/data/conversation-data";
+import { ContactUserResponse, MOCK_CONTACT_USERS } from "@/data/contact-data";
 import SidebarList from "./SidebarList";
 
 type SidebarFilter = "all" | "friends";
@@ -19,7 +19,7 @@ interface ConversationSidebarProps {
   conversations?: ConversationListItem[];
   contacts?: ContactUserResponse[];
   isContactsLoading?: boolean;
-  contactsError?: any;
+  contactsError?: string | null;
   activeTab?: SidebarFilter;
   onActiveTabChange?: (tab: SidebarFilter) => void;
   onLoadMoreConversations?: () => void;
@@ -49,51 +49,6 @@ export default function ConversationSidebar({
   const activeTab = activeTabProp ?? uncontrolledActiveTab;
   const deferredSearchQuery = useDeferredValue(searchQuery);
   const query = useMemo(() => deferredSearchQuery.trim().toLowerCase(), [deferredSearchQuery]);
-
-  const tabsRef = useRef<HTMLDivElement | null>(null);
-  const buttonsRef = useRef<(HTMLButtonElement | null)[]>([]);
-  const [indicator, setIndicator] = useState({ left: 0, width: 0, visible: false });
-
-  const measureActive = useCallback(() => {
-    const container = tabsRef.current;
-    if (!container) {
-      setIndicator((current) => (current.visible ? { ...current, visible: false } : current));
-      return;
-    }
-
-    const index = activeTab === "all" ? 0 : 1;
-    const btn = buttonsRef.current[index];
-    if (!btn) {
-      setIndicator((current) => (current.visible ? { ...current, visible: false } : current));
-      return;
-    }
-
-    const cRect = container.getBoundingClientRect();
-    const bRect = btn.getBoundingClientRect();
-    const left = Math.round(bRect.left - cRect.left + container.scrollLeft);
-    const width = Math.round(bRect.width);
-
-    setIndicator((current) => {
-      if (current.visible && current.left === left && current.width === width) {
-        return current;
-      }
-
-      return { left, width, visible: true };
-    });
-  }, [activeTab]);
-
-  useEffect(() => {
-    measureActive();
-    const onResize = () => measureActive();
-    window.addEventListener("resize", onResize);
-    const ro = typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measureActive);
-    if (ro && tabsRef.current) ro.observe(tabsRef.current);
-    buttonsRef.current.forEach((b) => b && ro?.observe(b));
-    return () => {
-      window.removeEventListener("resize", onResize);
-      ro?.disconnect?.();
-    };
-  }, [measureActive]);
 
   const selectTab = useCallback(
     (tab: SidebarFilter) => {
@@ -179,7 +134,6 @@ export default function ConversationSidebar({
         <div className="hide-scrollbar flex w-full flex-1 flex-col gap-1 overflow-y-scroll pb-4">
           <div
             role="radiogroup"
-            ref={tabsRef}
             className="
               relative flex gap-1 p-0.5 rounded-[32px] mb-2
               bg-[rgb(var(--backgroundColor-surface-container)/.5)]
@@ -190,18 +144,13 @@ export default function ConversationSidebar({
             <div
               aria-hidden
               className={`absolute z-0 rounded-[32px] bg-[rgb(var(--backgroundColor-state-active))] `}
-              style={
-                indicator.visible
-                  ? {
-                    left: `${indicator.left}px`,
-                    width: `${indicator.width}px`,
-                    top: 0,
-                    bottom: 0,
-                    transition: "left 520ms cubic-bezier(0.16, 1, 0.3, 1), width 520ms cubic-bezier(0.16, 1, 0.3, 1)",
-                    willChange: "left, width",
-                  }
-                  : { opacity: 0, transition: "opacity 200ms ease-out" }
-              }
+              style={{
+                left: activeTab === "all" ? "2px" : "calc(50% + 1px)",
+                width: "calc(50% - 3px)",
+                top: 2,
+                bottom: 2,
+                transition: "left 520ms cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
             />
             <button
               type="button"
@@ -212,7 +161,6 @@ export default function ConversationSidebar({
                 text-subtitle-sm font-bold cursor-pointer transition-colors z-10 text-center
                 ${activeTab === "all" ? "text-primary" : "text-secondary"}
               `}
-              ref={(el) => { buttonsRef.current[0] = el; }}
               onClick={() => selectTab("all")}
               style={{ fontWeight: 600 }}
             >
@@ -233,7 +181,6 @@ export default function ConversationSidebar({
                 text-subtitle-sm font-bold cursor-pointer transition-colors z-10 text-center
                 ${activeTab === "friends" ? "text-primary" : "text-secondary"}
               `}
-              ref={(el) => { buttonsRef.current[1] = el; }}
               onClick={() => selectTab("friends")}
               style={{ fontWeight: 600 }}
             >

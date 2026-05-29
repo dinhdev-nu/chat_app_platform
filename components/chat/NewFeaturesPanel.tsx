@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, RefObject } from "react";
 
-import { CloseIcon } from "./icons";
+import { CloseIcon } from "@/components/ui/icons";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -84,7 +84,7 @@ export default function NewFeaturesPanel({
   labelledBy,
   onClose,
 }: NewFeaturesPanelProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDialogElement>(null);
   const [floatingStyle, setFloatingStyle] = useState<CSSProperties>({
     position: "fixed",
     visibility: "hidden",
@@ -150,15 +150,14 @@ export default function NewFeaturesPanel({
   return createPortal(
     <div className="chat-root fixed inset-0 z-[70] pointer-events-none">
       <div role="presentation" style={overlayStyle} onMouseDown={onClose} />
-      <section
+      <dialog
+        open
         ref={panelRef}
         id={id}
-        role="dialog"
         aria-modal="false"
         aria-labelledby={labelledBy}
-        className="pointer-events-auto flex max-h-[var(--available-height)] flex-col overflow-hidden rounded-xl border border-secondary bg-[rgb(var(--backgroundColor-surface-container)/.96)] text-primary shadow-xl backdrop-blur-glass motion-safe:transition-[transform,scale,opacity]"
+        className="pointer-events-auto m-0 flex max-h-[var(--available-height)] flex-col overflow-hidden rounded-xl border border-secondary bg-[rgb(var(--backgroundColor-surface-container)/.96)] p-0 text-primary shadow-xl backdrop-blur-glass motion-safe:transition-[transform,scale,opacity]"
         style={{ ...floatingStyle, transformOrigin: "var(--transform-origin)" }}
-        onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between px-3.5 pb-1.5 pt-3.5">
           <h2 id={labelledBy} className="m-0 text-[14px] font-semibold leading-[1.2] tracking-normal">
@@ -200,7 +199,7 @@ export default function NewFeaturesPanel({
             ))}
           </div>
         </div>
-      </section>
+      </dialog>
     </div>,
     document.body,
   );

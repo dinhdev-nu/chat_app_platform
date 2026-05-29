@@ -4,7 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { useAuthStore } from "@/stores/authStore";
 import ChatInput from "./ChatInput";
-import type { ConversationListItem } from "./conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 
 const STATIC_SUGGESTION_PROMPTS = [
   "Chào ngày mới! Ngày hôm nay của bạn thế nào rồi?",

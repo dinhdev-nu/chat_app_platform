@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useReducer, useRef } from "react";
 import { useShallow } from "zustand/react/shallow";
 
 import type { ChatTypingUser } from "@/components/chat/ChatActiveState";
@@ -38,6 +38,62 @@ interface UseConversationMessagesOptions {
   currentUser?: AuthUser | null;
   enabled?: boolean;
   limit?: number;
+}
+
+interface MessageLoadState {
+  pagination: PaginationMeta | null;
+  isLoading: boolean;
+  isLoadingMore: boolean;
+  isSending: boolean;
+  error: string | null;
+  actionError: string | null;
+}
+
+type MessageLoadAction =
+  | { type: "setPagination"; value: PaginationMeta | null }
+  | { type: "setLoading"; value: boolean }
+  | { type: "setLoadingMore"; value: boolean }
+  | { type: "setSending"; value: boolean }
+  | { type: "setError"; value: string | null }
+  | { type: "setActionError"; value: string | null }
+  | { type: "resetInactive" };
+
+const initialMessageLoadState: MessageLoadState = {
+  pagination: null,
+  isLoading: false,
+  isLoadingMore: false,
+  isSending: false,
+  error: null,
+  actionError: null,
+};
+
+function messageLoadReducer(
+  state: MessageLoadState,
+  action: MessageLoadAction,
+): MessageLoadState {
+  switch (action.type) {
+    case "setPagination":
+      return { ...state, pagination: action.value };
+    case "setLoading":
+      return { ...state, isLoading: action.value };
+    case "setLoadingMore":
+      return { ...state, isLoadingMore: action.value };
+    case "setSending":
+      return { ...state, isSending: action.value };
+    case "setError":
+      return { ...state, error: action.value };
+    case "setActionError":
+      return { ...state, actionError: action.value };
+    case "resetInactive":
+      return {
+        ...state,
+        pagination: null,
+        isLoading: false,
+        isLoadingMore: false,
+        error: null,
+        actionError: null,
+      };
+  }
 }
 
 function isSameUser(left?: string | null, right?: string | null) {
@@ -107,12 +163,18 @@ export function useConversationMessages({
   const applyReactionToggle = useChatStore((state) => state.applyReactionToggle);
   const currentUserId = currentUser?.id;
 
-  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
+  const [loadState, dispatchLoadState] = useReducer(
+    messageLoadReducer,
+    initialMessageLoadState,
+  );
+  const {
+    pagination,
+    isLoading,
+    isLoadingMore,
+    isSending,
+    error,
+    actionError,
+  } = loadState;
   const isMountedRef = useRef(true);
   const latestRequestIdRef = useRef(0);
   const rawMessagesRef = useRef<MessageResponse[]>([]);
@@ -160,10 +222,12 @@ export function useConversationMessages({
       const requestId = ++latestRequestIdRef.current;
 
       if (!silent) {
-        if (append) setIsLoadingMore(true);
-        else setIsLoading(true);
+        dispatchLoadState({
+          type: append ? "setLoadingMore" : "setLoading",
+          value: true,
+        });
       }
-      setError(null);
+      dispatchLoadState({ type: "setError", value: null });
 
       if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
 
@@ -173,16 +237,18 @@ export function useConversationMessages({
           const orderedMessages = result.data.slice().reverse();
           if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
           setStoreMessages(conversationId, orderedMessages, { append });
-          setPagination(result.pagination);
+          dispatchLoadState({ type: "setPagination", value: result.pagination });
         })
         .catch((err) => {
           if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
-          setError(getApiErrorMessage(err));
+          dispatchLoadState({ type: "setError", value: getApiErrorMessage(err) });
         })
         .finally(() => {
           if (isMountedRef.current && requestId === latestRequestIdRef.current && !silent) {
-            if (append) setIsLoadingMore(false);
-            else setIsLoading(false);
+            dispatchLoadState({
+              type: append ? "setLoadingMore" : "setLoading",
+              value: false,
+            });
           }
         });
     },
@@ -194,11 +260,7 @@ export function useConversationMessages({
 
     if (!enabled || !conversationId) {
       const timeoutId = window.setTimeout(() => {
-        setPagination(null);
-        setError(null);
-        setActionError(null);
-        setIsLoading(false);
-        setIsLoadingMore(false);
+        dispatchLoadState({ type: "resetInactive" });
       }, 0);
 
       return () => window.clearTimeout(timeoutId);
@@ -230,8 +292,8 @@ export function useConversationMessages({
         currentUser,
       );
 
-      setIsSending(true);
-      setActionError(null);
+      dispatchLoadState({ type: "setSending", value: true });
+      dispatchLoadState({ type: "setActionError", value: null });
       upsertStoreMessage(targetConversationId, optimisticMessage);
 
       try {
@@ -250,12 +312,14 @@ export function useConversationMessages({
       } catch (err) {
         if (isMountedRef.current) {
           removeStoreMessage(targetConversationId, optimisticMessage.id);
-          setActionError(getApiErrorMessage(err));
+          dispatchLoadState({ type: "setActionError", value: getApiErrorMessage(err) });
         }
 
         throw err;
       } finally {
-        if (isMountedRef.current) setIsSending(false);
+        if (isMountedRef.current) {
+          dispatchLoadState({ type: "setSending", value: false });
+        }
       }
     },
     [
@@ -276,7 +340,7 @@ export function useConversationMessages({
       const snapshot = rawMessagesRef.current;
       const editedAt = new Date().toISOString();
 
-      setActionError(null);
+      dispatchLoadState({ type: "setActionError", value: null });
       patchStoreMessage(conversationId, messageId, {
         content: trimmedText,
         is_edited: true,
@@ -301,7 +365,7 @@ export function useConversationMessages({
       } catch (err) {
         if (isMountedRef.current) {
           setStoreMessages(conversationId, snapshot);
-          setActionError(getApiErrorMessage(err));
+          dispatchLoadState({ type: "setActionError", value: getApiErrorMessage(err) });
         }
 
         throw err;
@@ -316,7 +380,7 @@ export function useConversationMessages({
 
       const snapshot = rawMessagesRef.current;
 
-      setActionError(null);
+      dispatchLoadState({ type: "setActionError", value: null });
       removeStoreMessage(conversationId, messageId);
 
       try {
@@ -334,7 +398,7 @@ export function useConversationMessages({
       } catch (err) {
         if (isMountedRef.current) {
           setStoreMessages(conversationId, snapshot);
-          setActionError(getApiErrorMessage(err));
+          dispatchLoadState({ type: "setActionError", value: getApiErrorMessage(err) });
         }
 
         throw err;
@@ -351,7 +415,7 @@ export function useConversationMessages({
       const currentMessage = getStoreMessage(conversationId, messageId);
       const optimisticAction = getOptimisticReactionAction(currentMessage, currentUserId, emoji);
 
-      setActionError(null);
+      dispatchLoadState({ type: "setActionError", value: null });
       applyReactionToggle({
         event: "reaction.toggle",
         conv_id: conversationId,
@@ -377,7 +441,7 @@ export function useConversationMessages({
       } catch (err) {
         if (isMountedRef.current) {
           setStoreMessages(conversationId, snapshot);
-          setActionError(getApiErrorMessage(err));
+          dispatchLoadState({ type: "setActionError", value: getApiErrorMessage(err) });
         }
 
         throw err;
@@ -408,6 +472,6 @@ export function useConversationMessages({
     deleteMessage,
     toggleReaction,
     sendTyping,
-    clearActionError: () => setActionError(null),
+    clearActionError: () => dispatchLoadState({ type: "setActionError", value: null }),
   };
 }

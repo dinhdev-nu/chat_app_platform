@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent, KeyboardEvent } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 
 import IconSelector from "./IconSelector";
 import ModelSelector from "./ModelSelector";
@@ -13,7 +13,7 @@ import {
   PlusIcon,
   SlashIcon,
   VoiceSparkleIcon,
-} from "./icons";
+} from "@/components/ui/icons";
 
 const FILE_ACCEPT =
   "image/png,.png,image/jpeg,.jpg,.jpeg,image/gif,.gif,image/webp,.webp,image/heic,.heic,image/heif,.heif,text/plain,.txt,text/markdown,.md,.markdown,text/html,.html,.htm,text/javascript,.js,.jsx,.ts,.tsx,application/json,.json,text/css,.css,text/x-scss,.scss,text/x-sass,.sass,text/less,.less,text/x-vue,.vue,text/x-svelte,.svelte,text/x-astro,.astro,text/mdx,.mdx,image/svg+xml,.svg,text/csv,.csv,text/vnd.mermaid,.mmd,.mermaid,application/x-figma,.fig";
@@ -35,15 +35,10 @@ interface ChatInputProps {
   onTyping?: () => void;
 }
 
-function focusEditorEnd(editor: HTMLElement) {
+function focusEditorEnd(editor: HTMLTextAreaElement) {
   editor.focus();
-
-  const selection = window.getSelection();
-  const range = document.createRange();
-  range.selectNodeContents(editor);
-  range.collapse(false);
-  selection?.removeAllRanges();
-  selection?.addRange(range);
+  const end = editor.value.length;
+  editor.setSelectionRange(end, end);
 }
 
 export default function ChatInput({
@@ -57,8 +52,7 @@ export default function ChatInput({
   onTyping,
 }: ChatInputProps) {
   const paletteButtonRef = useRef<HTMLButtonElement>(null);
-  const editorRef = useRef<HTMLDivElement>(null);
-  const [editorResetKey, setEditorResetKey] = useState(0);
+  const editorRef = useRef<HTMLTextAreaElement>(null);
   const [inputText, setInputText] = useState("");
   const [isIconSelectorOpen, setIsIconSelectorOpen] = useState(false);
 
@@ -78,20 +72,18 @@ export default function ChatInput({
     if (suggestedTextKey === undefined || suggestedText === undefined) return;
 
     const editor = editorRef.current;
-    if (editor) {
-      editor.textContent = suggestedText;
-      focusEditorEnd(editor);
-    }
+    if (editor) editor.value = suggestedText;
 
     const timeoutId = window.setTimeout(() => {
       setInputText(suggestedText);
+      if (editorRef.current) focusEditorEnd(editorRef.current);
     }, 0);
 
     return () => window.clearTimeout(timeoutId);
   }, [suggestedText, suggestedTextKey]);
 
-  const handleEditorInput = (event: FormEvent<HTMLDivElement>) => {
-    const nextText = event.currentTarget.textContent ?? "";
+  const handleEditorInput = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const nextText = event.currentTarget.value;
 
     setInputText(nextText);
     if (nextText.trim()) onTyping?.();
@@ -101,10 +93,9 @@ export default function ChatInput({
     if (!canSend) return;
     void onSend?.(trimmedText);
     setInputText("");
-    setEditorResetKey((key) => key + 1);
   };
 
-  const handleEditorKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleEditorKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (onSend && event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
       handleSend();
@@ -120,7 +111,7 @@ export default function ChatInput({
 
     if (!editor) return;
 
-    editor.textContent = nextText;
+    editor.value = nextText;
     focusEditorEnd(editor);
   };
 
@@ -139,26 +130,17 @@ export default function ChatInput({
             <div className="chat-tiptap-v3">
               <div className="relative w-full overflow-auto">
                 <div className="tiptap-editor">
-                  <div
+                  <textarea
                     ref={editorRef}
-                    key={editorResetKey}
-                    contentEditable
-                    role="textbox"
                     translate="no"
-                    className="tiptap ProseMirror"
-                    tabIndex={0}
+                    className="tiptap ProseMirror min-h-[24px] w-full resize-none bg-transparent"
                     aria-label={ariaLabel}
-                    suppressContentEditableWarning
-                    onInput={handleEditorInput}
+                    placeholder={placeholder}
+                    value={inputText}
+                    rows={1}
+                    onChange={handleEditorInput}
                     onKeyDown={handleEditorKeyDown}
-                  >
-                    <p
-                      data-placeholder={placeholder}
-                      className={trimmedText === "" ? "is-empty is-editor-empty" : undefined}
-                    >
-                      <br className="ProseMirror-trailingBreak" />
-                    </p>
-                  </div>
+                  />
                 </div>
               </div>
             </div>

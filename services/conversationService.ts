@@ -8,7 +8,7 @@ import type {
   ListConversationsParams,
 } from "@/types/conversation";
 import { mapConversationResponseToListItem } from "@/types/conversation";
-import type { ConversationListItem } from "@/components/chat/conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 import { http, normalizeApiError, unwrapApiData, unwrapPaginatedApiData } from "./http";
 
 function toCursorParams({ cursor, limit = 20 }: ListConversationsParams = {}) {

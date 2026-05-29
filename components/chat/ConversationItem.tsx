@@ -5,8 +5,8 @@ import {
   ConversationListItem,
   formatConversationActivity,
   getConversationTypeLabel,
-} from "./conversation-data";
-import { UserIcon, ListBulletIcon, UsersIcon, BellSlashIcon } from "./icons";
+} from "@/data/conversation-data";
+import { UserIcon, ListBulletIcon, UsersIcon, BellSlashIcon } from "@/components/ui/icons";
 
 interface ConversationItemProps {
   conversation: ConversationListItem;

@@ -3,7 +3,7 @@
 import { createPortal } from "react-dom";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, RefObject } from "react";
-import { CheckIcon } from "./icons";
+import { CheckIcon } from "@/components/ui/icons";
 
 // SSR-safe layout effect: falls back to useEffect on the server.
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;

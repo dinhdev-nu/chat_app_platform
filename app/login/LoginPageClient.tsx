@@ -2,8 +2,8 @@
 
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import AuthHero from "../../components/login/login-hero";
-import { Navigation } from "@/components/landing/navigation";
+import { Navigation } from "@/components/landing";
+import { LoginHero } from "@/components/login";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function LoginPageClient() {
@@ -33,7 +33,7 @@ export default function LoginPageClient() {
   return (
     <main className="relative min-h-screen overflow-x-hidden">
       <Navigation hideLinks />
-      <AuthHero
+      <LoginHero
         onSendOtp={handleSendOtp}
         onVerifyOtp={handleVerifyOtp}
         error={error}
