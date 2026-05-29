@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Check, MoreHorizontal, Paperclip, Pencil, SmilePlus, X } from "lucide-react";
 
@@ -180,10 +181,10 @@ export default function ChatMessageBubble({
       style={{ marginTop: isGroupedWithPrev ? 2 : 10 }}
     >
       {!isOwn && (
-        <div className="shrink-0 w-7 h-7 self-end">
+        <div className="shrink-0 size-7 self-end">
           {!isGroupedWithNext && (
             <div
-              className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
+              className="size-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
               style={{
                 background: "rgb(var(--backgroundColor-state-enabled) / 0.8)",
                 border: "1px solid rgb(var(--borderColor-secondary) / 0.15)",
@@ -191,10 +192,13 @@ export default function ChatMessageBubble({
               }}
             >
               {msg.senderAvatar ? (
-                <img
+                <Image
                   src={msg.senderAvatar}
                   alt={msg.senderName ?? ""}
-                  className="w-7 h-7 object-cover rounded-full"
+                  width={28}
+                  height={28}
+                  unoptimized
+                  className="size-7 object-cover rounded-full"
                 />
               ) : (
                 (msg.senderName ?? "?")[0].toUpperCase()
@@ -229,7 +233,6 @@ export default function ChatMessageBubble({
                 aria-label="Chỉnh sửa tin nhắn"
                 className="block min-h-16 w-full resize-none bg-transparent text-[14px] leading-[1.5] outline-none"
                 style={{ color: "rgb(var(--textColor-primary))" }}
-                autoFocus
                 onChange={(event) => setDraftText(event.target.value)}
                 onKeyDown={(event) => {
                   if (event.key === "Escape") {
@@ -265,9 +268,18 @@ export default function ChatMessageBubble({
             </div>
           ) : (
             <div
+              role="button"
+              tabIndex={0}
+              aria-label="Mo thao tac tin nhan"
               className="flex max-w-full flex-col gap-2 rounded-2xl px-3 py-2 font-sans text-[14px] leading-[1.5] break-words"
               style={bubbleStyle}
               onClick={showActionBar}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  showActionBar();
+                }
+              }}
             >
               {msg.text ? <p className="whitespace-pre-wrap">{msg.text}</p> : null}
               {!isDeleted && msg.attachments?.length ? (

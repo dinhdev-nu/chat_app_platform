@@ -1,7 +1,8 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
-import { useEffect, useRef } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 const footerLinks = {
   "Sản phẩm": [
@@ -12,93 +13,39 @@ const footerLinks = {
   ],
   "Phát triển": [
     { name: "Tài liệu", href: "#developers" },
-    { name: "Mã nguồn", href: "#" },
+    { name: "Mã nguồn", href: "https://github.com" },
     { name: "API", href: "#developers" },
-    { name: "Trạng thái", href: "#" },
+    { name: "Trạng thái", href: "#infra" },
   ],
   "Công ty": [
-    { name: "Về chúng tôi", href: "#" },
-    { name: "Blog", href: "#" },
-    { name: "Tuyển dụng", href: "#", badge: "Đang tuyển" },
-    { name: "Liên hệ", href: "#" },
+    { name: "Về chúng tôi", href: "#features" },
+    { name: "Blog", href: "#developers" },
+    { name: "Tuyển dụng", href: "#developers", badge: "Đang tuyển" },
+    { name: "Liên hệ", href: "mailto:hello@stello.app" },
   ],
   "Pháp lý": [
-    { name: "Quyền riêng tư", href: "#" },
-    { name: "Điều khoản", href: "#" },
+    { name: "Quyền riêng tư", href: "#security" },
+    { name: "Điều khoản", href: "#pricing" },
     { name: "Bảo mật", href: "#security" },
   ],
 };
 
 const socialLinks = [
-  { name: "Twitter", href: "#" },
-  { name: "GitHub", href: "#" },
-  { name: "LinkedIn", href: "#" },
+  { name: "Twitter", href: "https://x.com" },
+  { name: "GitHub", href: "https://github.com" },
+  { name: "LinkedIn", href: "https://www.linkedin.com" },
 ];
-
-function AnimatedWaveCanvas() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animationId: number;
-    let time = 0;
-
-    const resize = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio;
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio;
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const animate = () => {
-      const width = canvas.offsetWidth;
-      const height = canvas.offsetHeight;
-      ctx.clearRect(0, 0, width, height);
-
-      ctx.strokeStyle = "rgba(100, 200, 150, 0.3)";
-      ctx.lineWidth = 1;
-
-      for (let wave = 0; wave < 3; wave++) {
-        ctx.beginPath();
-        for (let x = 0; x <= width; x += 5) {
-          const y =
-            height * 0.5 +
-            Math.sin(x * 0.01 + time + wave * 0.5) * 30 +
-            Math.sin(x * 0.02 + time * 1.5 + wave) * 20;
-          if (x === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-      }
-
-      time += 0.02;
-      animationId = requestAnimationFrame(animate);
-    };
-    animate();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      cancelAnimationFrame(animationId);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="w-full h-full" />;
-}
 
 export function FooterSection() {
   return (
-    <footer className="relative bg-black">
+    <footer className="relative bg-[oklch(0.06_0.008_260)]">
       {/* Panoramic banner image */}
       <div className="relative w-full h-[340px] md:h-[420px] overflow-hidden">
-        <img
+        <Image
           src="/images/upscaled_2.png"
           alt="Bioluminescent landscape"
+          fill
+          sizes="100vw"
           className="w-full h-full object-cover object-center"
         />
         {/* Gradient fade to black at bottom */}
@@ -114,13 +61,16 @@ export function FooterSection() {
           <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
-              <a href="#" className="inline-flex items-center gap-2 mb-6">
-                <img 
-                  src="/assets/home/stello_beta.svg" 
-                  alt="Stello Logo" 
+              <Link href="/" className="inline-flex items-center gap-2 mb-6">
+                <Image
+                  src="/assets/home/stello_beta.svg"
+                  alt="Stello Logo"
+                  width={129}
+                  height={24}
+                  unoptimized
                   className="h-7 invert brightness-0"
                 />
-              </a>
+              </Link>
 
               <p className="text-white/50 leading-relaxed mb-8 max-w-xs text-sm">
                 Nền tảng giao tiếp hiện đại dành cho đội nhóm. Kết nối và chia sẻ thông tin dễ dàng mọi lúc mọi nơi.
@@ -135,7 +85,7 @@ export function FooterSection() {
                     className="text-sm text-white/40 hover:text-white transition-colors flex items-center gap-1 group"
                   >
                     {link.name}
-                    <ArrowUpRight className="w-3 h-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                    <ArrowUpRight className="size-3 opacity-0 -translate-x-1 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
                   </a>
                 ))}
               </div>
@@ -175,7 +125,7 @@ export function FooterSection() {
 
           <div className="flex items-center gap-4 text-sm text-white/30">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-[#eca8d6]" />
+              <span className="size-2 rounded-full bg-[#eca8d6]" />
               Hệ thống hoạt động tốt
             </span>
           </div>

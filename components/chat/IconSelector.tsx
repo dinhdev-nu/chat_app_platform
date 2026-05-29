@@ -173,33 +173,41 @@ export default function IconSelector({
       "--transform-origin": `${transformOriginX}px ${transformOriginY}`,
     } as CSSProperties);
   }, [anchorRef]);
+  const updatePositionRef = useRef(updatePosition);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    updatePositionRef.current = updatePosition;
+    onCloseRef.current = onClose;
+  }, [onClose, updatePosition]);
 
   useIsomorphicLayoutEffect(() => {
     updatePosition();
   }, [updatePosition]);
 
   useEffect(() => {
-    updatePosition();
+    updatePositionRef.current();
 
     const handleKeyDown = (event: globalThis.KeyboardEvent) => {
-      if (event.key === "Escape") onClose?.();
+      if (event.key === "Escape") onCloseRef.current?.();
     };
+    const handlePositionChange = () => updatePositionRef.current();
 
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    window.addEventListener("resize", handlePositionChange);
+    window.addEventListener("scroll", handlePositionChange, true);
     document.addEventListener("keydown", handleKeyDown);
 
     const resizeObserver =
-      typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(updatePosition);
+      typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(handlePositionChange);
     if (menuRef.current) resizeObserver?.observe(menuRef.current);
 
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", handlePositionChange);
+      window.removeEventListener("scroll", handlePositionChange, true);
       document.removeEventListener("keydown", handleKeyDown);
       resizeObserver?.disconnect();
     };
-  }, [onClose, updatePosition]);
+  }, []);
 
   const mergedFloatingStyle = {
     ...defaultFloatingStyle,
@@ -219,7 +227,7 @@ export default function IconSelector({
         className={["pointer-events-auto", className ?? "z-50"].filter(Boolean).join(" ")}
         style={mergedFloatingStyle}
       >
-        <span data-type="inside" aria-hidden="true" tabIndex={0} data-base-ui-focus-guard="" style={focusGuardStyle} />
+        <button type="button" aria-label="Focus guard" data-type="inside" data-base-ui-focus-guard="" style={focusGuardStyle} />
 
         <div
           ref={menuRef}
@@ -252,7 +260,7 @@ export default function IconSelector({
           </div>
         </div>
 
-        <span data-type="inside" aria-hidden="true" tabIndex={0} data-base-ui-focus-guard="" style={focusGuardStyle} />
+        <button type="button" aria-label="Focus guard" data-type="inside" data-base-ui-focus-guard="" style={focusGuardStyle} />
       </div>
     </>
   );

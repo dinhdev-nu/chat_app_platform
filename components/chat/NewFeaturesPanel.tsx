@@ -118,6 +118,13 @@ export default function NewFeaturesPanel({
       "--transform-origin": `${transformOriginX}px -${PANEL_GAP}px`,
     } as CSSProperties);
   }, [anchorRef]);
+  const updatePositionRef = useRef(updatePosition);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    updatePositionRef.current = updatePosition;
+    onCloseRef.current = onClose;
+  }, [onClose, updatePosition]);
 
   useIsomorphicLayoutEffect(() => {
     updatePosition();
@@ -125,17 +132,18 @@ export default function NewFeaturesPanel({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    const handlePositionChange = () => updatePositionRef.current();
+    window.addEventListener("resize", handlePositionChange);
+    window.addEventListener("scroll", handlePositionChange, true);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", handlePositionChange);
+      window.removeEventListener("scroll", handlePositionChange, true);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose, updatePosition]);
+  }, []);
 
   if (typeof document === "undefined") return null;
 

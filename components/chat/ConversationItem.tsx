@@ -52,7 +52,7 @@ function ConversationItem({ conversation, isActive = false, onSelect }: Conversa
         <div className="relative shrink-0">
           <div
             className={`
-              w-10 h-10 min-w-[2.5rem] rounded-xl
+              size-10 min-w-[2.5rem] rounded-xl
               flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
               ${isActive ? "bg-[rgb(var(--backgroundColor-state-enabled)/.65)]" : "bg-[rgb(var(--backgroundColor-state-enabled)/.575)]"}
               border border-[rgb(var(--borderColor-secondary)/.15)]
@@ -93,7 +93,7 @@ function ConversationItem({ conversation, isActive = false, onSelect }: Conversa
                 <span
                   title="Đang tắt thông báo"
                   aria-label="Đang tắt thông báo"
-                  className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[rgb(var(--backgroundColor-state-active))] text-[rgb(var(--textColor-secondary))]"
+                  className="inline-flex size-6 items-center justify-center rounded-full bg-[rgb(var(--backgroundColor-state-active))] text-[rgb(var(--textColor-secondary))]"
                 >
                   <BellSlashIcon size={14} />
                 </span>

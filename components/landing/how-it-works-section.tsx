@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const steps = [
   {
@@ -40,20 +41,7 @@ const steps = [
 
 export function HowItWorksSection() {
   const [activeStep, setActiveStep] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const isVisible = true;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -65,10 +53,9 @@ export function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      ref={sectionRef}
       className="relative py-24 lg:py-32 bg-[oklch(0.09_0.01_260)] text-white overflow-hidden"
     >
-      <div className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full bg-white/[0.02] blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-0 size-[400px] rounded-full bg-white/[0.02] blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
         {/* Header — titre + image cerisier */}
@@ -93,10 +80,12 @@ export function HowItWorksSection() {
           {/* Image cerisier — se colle en bas sur les blocs */}
           <div className={`relative h-[320px] lg:h-[640px] overflow-hidden transition-all duration-1000 delay-200 ${isVisible ? "opacity-100" : "opacity-0"
             }`}>
-            <img
+            <Image
               src="/images/tree.png"
               alt=""
               aria-hidden="true"
+              fill
+              sizes="(min-width: 1024px) 50vw, 100vw"
               className="absolute bottom-0 left-0 w-full h-full object-contain object-bottom"
             />
             {/* Fade sur le bord gauche */}
@@ -154,7 +143,7 @@ export function HowItWorksSection() {
 
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes progress {
           from { width: 0%; }
           to { width: 100%; }

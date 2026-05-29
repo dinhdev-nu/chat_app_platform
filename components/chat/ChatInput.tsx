@@ -166,7 +166,14 @@ export default function ChatInput({
             {/* Toolbar row */}
             <div className="flex items-center gap-2 flex-shrink-0 pt-5">
               {/* Hidden file input */}
-              <input accept={FILE_ACCEPT} multiple tabIndex={-1} type="file" className={hiddenInputClass} />
+              <input
+                accept={FILE_ACCEPT}
+                multiple
+                tabIndex={-1}
+                type="file"
+                aria-label="Tep dinh kem"
+                className={hiddenInputClass}
+              />
 
               {/* Add attachment — not yet wired up */}
               <div data-base-ui-inert="">
@@ -258,7 +265,7 @@ export default function ChatInput({
                 {/* Voice input */}
                 <button
                   type="button"
-                  className="w-8 h-8 flex items-center justify-center rounded-full transition-colors focus-ring active:bg-[rgb(var(--backgroundColor-state-pressed))] active:scale-95 hover:bg-[rgb(var(--backgroundColor-state-hover))]"
+                  className="size-8 flex items-center justify-center rounded-full transition-colors focus-ring active:bg-[rgb(var(--backgroundColor-state-pressed))] active:scale-95 hover:bg-[rgb(var(--backgroundColor-state-hover))]"
                   aria-label="Giọng nói"
                 >
                   <VoiceSparkleIcon size={16} />

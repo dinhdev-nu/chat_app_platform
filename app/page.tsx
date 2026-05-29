@@ -11,6 +11,12 @@ import { TestimonialsSection } from "@/components/landing/testimonials-section";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { CtaSection } from "@/components/landing/cta-section";
 import { FooterSection } from "@/components/landing/footer-section";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Stello - Ung dung nhan tin hien dai",
+  description: "Nen tang giao tiep hien dai de nhan tin, lam viec va chia se cung doi nhom.",
+};
 
 export default function Home() {
   return (

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef } from "react";
+import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 import type { ConversationListItem } from "./conversation-data";
@@ -107,9 +108,9 @@ function TypingIndicator({
       transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
       className="mt-3 flex items-end gap-2"
     >
-      <div className="shrink-0 w-7 h-7 self-end">
+      <div className="shrink-0 size-7 self-end">
         <div
-          className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
+          className="size-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
           style={{
             background: "rgb(var(--backgroundColor-state-enabled) / 0.8)",
             border: "1px solid rgb(var(--borderColor-secondary) / 0.15)",
@@ -117,10 +118,13 @@ function TypingIndicator({
           }}
         >
           {primaryUser.avatarUrl ? (
-            <img
+            <Image
               src={primaryUser.avatarUrl}
               alt=""
-              className="w-7 h-7 object-cover rounded-full"
+              width={28}
+              height={28}
+              unoptimized
+              className="size-7 object-cover rounded-full"
             />
           ) : (
             initials
@@ -133,8 +137,8 @@ function TypingIndicator({
           className="rounded-2xl px-3 py-2 font-sans text-[14px] leading-[1.5]"
           style={{
             background: "rgb(var(--backgroundColor-surface-container) / 0.45)",
-            backdropFilter: "blur(40px)",
-            WebkitBackdropFilter: "blur(40px)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
             border: "1px solid rgb(var(--borderColor-secondary) / 0.1)",
             borderBottomLeftRadius: "6px",
             color: "rgb(var(--textColor-primary))",
@@ -242,7 +246,7 @@ export default function ChatActiveState({
               role="status"
               className="flex min-h-[220px] items-center justify-center text-sm text-[rgb(var(--textColor-secondary))]"
             >
-              Đang tải tin nhắn...
+              Đang tải tin nhắn…
             </div>
           ) : null}
 
@@ -258,7 +262,7 @@ export default function ChatActiveState({
                 disabled={isLoadingMoreMessages}
                 onClick={onLoadMoreMessages}
               >
-                {isLoadingMoreMessages ? "Đang tải..." : "Tải tin cũ hơn"}
+                {isLoadingMoreMessages ? "Đang tải…" : "Tải tin cũ hơn"}
               </button>
             </div>
           ) : null}
@@ -319,7 +323,7 @@ export default function ChatActiveState({
         ) : null}
         <ChatInput
           ariaLabel={conv.name ? `Nhắn tin tới ${conv.name}` : "Nhắn tin"}
-          placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}...`}
+          placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}…`}
           sendLabel="Gửi tin nhắn"
           isSending={isSending}
           onSend={onSend}

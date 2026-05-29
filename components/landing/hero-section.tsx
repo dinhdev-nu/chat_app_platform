@@ -1,65 +1,11 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 const words = ["trò chuyện", "làm việc", "chia sẻ", "gắn kết"];
 
 function BlurWord({ word, trigger }: { word: string; trigger: number }) {
   const letters = word.split("");
-  const STAGGER = 45;      // ms between each letter
-  const DURATION = 500;    // blur+opacity fade duration per letter
-  const GRADIENT_HOLD = STAGGER * letters.length + DURATION + 200;
-
-  const [letterStates, setLetterStates] = useState<{ opacity: number; blur: number }[]>(
-    letters.map(() => ({ opacity: 0, blur: 20 }))
-  );
-  const [showGradient, setShowGradient] = useState(true);
-  const framesRef = useRef<number[]>([]);
-  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  useEffect(() => {
-    // reset
-    framesRef.current.forEach(cancelAnimationFrame);
-    timersRef.current.forEach(clearTimeout);
-    framesRef.current = [];
-    timersRef.current = [];
-
-    setLetterStates(letters.map(() => ({ opacity: 0, blur: 20 })));
-    setShowGradient(true);
-
-    // stagger each letter
-    letters.forEach((_, i) => {
-      const t = setTimeout(() => {
-        const start = performance.now();
-        const tick = (now: number) => {
-          const progress = Math.min((now - start) / DURATION, 1);
-          const eased = 1 - Math.pow(1 - progress, 3);
-          setLetterStates(prev => {
-            const next = [...prev];
-            next[i] = { opacity: eased, blur: 20 * (1 - eased) };
-            return next;
-          });
-          if (progress < 1) {
-            const id = requestAnimationFrame(tick);
-            framesRef.current.push(id);
-          }
-        };
-        const id = requestAnimationFrame(tick);
-        framesRef.current.push(id);
-      }, i * STAGGER);
-      timersRef.current.push(t);
-    });
-
-    // remove gradient once all letters are settled
-    const gt = setTimeout(() => setShowGradient(false), GRADIENT_HOLD);
-    timersRef.current.push(gt);
-
-    return () => {
-      framesRef.current.forEach(cancelAnimationFrame);
-      timersRef.current.forEach(clearTimeout);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [trigger]);
 
   // gradient colours cycling across letter positions
   const gradientColors = ["#eca8d6", "#a78bfa", "#67e8f9", "#fbbf24", "#eca8d6"];
@@ -87,14 +33,13 @@ function BlurWord({ word, trigger }: { word: string; trigger: number }) {
 
         return (
           <span
-            key={i}
+            key={`${trigger}-${i}-${char}`}
+            className="blur-word-char"
             style={{
-              display: "inline-block",
-              opacity: letterStates[i]?.opacity ?? 0,
-              filter: `blur(${letterStates[i]?.blur ?? 20}px)`,
-              color: showGradient ? `rgb(${r},${g},${b})` : "white",
-              transition: "color 0.4s ease",
-            }}
+              "--blur-word-color": `rgb(${r},${g},${b})`,
+              animationDelay: `${i * 45}ms`,
+              animationDuration: "700ms",
+            } as CSSProperties}
           >
             {char === " " ? "\u00A0" : char}
           </span>
@@ -105,12 +50,8 @@ function BlurWord({ word, trigger }: { word: string; trigger: number }) {
 }
 
 export function HeroSection() {
-  const [isVisible, setIsVisible] = useState(false);
+  const isVisible = true;
   const [wordIndex, setWordIndex] = useState(0);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -120,7 +61,7 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center items-start overflow-hidden bg-black">
+    <section className="relative min-h-screen flex flex-col justify-center items-start overflow-hidden bg-[oklch(0.06_0.008_260)]">
       {/* Background video */}
       <div className="absolute inset-0 z-0">
         <video
@@ -128,7 +69,7 @@ export function HeroSection() {
           muted
           loop
           playsInline
-          aria-hidden="true"
+          aria-label="Background video"
           className="w-full h-full object-cover object-center opacity-80"
         >
           <source src="/images/bg-hero.mp4" type="video/mp4" />

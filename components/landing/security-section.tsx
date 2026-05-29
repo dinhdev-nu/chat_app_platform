@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Shield, Lock, Eye, FileCheck } from "lucide-react";
 
 const securityFeatures = [
@@ -33,21 +34,8 @@ const securityFeatures = [
 const certifications = ["SOC 2", "ISO 27001", "HIPAA", "GDPR"];
 
 export function SecuritySection() {
-  const [isVisible, setIsVisible] = useState(false);
+  const isVisible = true;
   const [activeFeature, setActiveFeature] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -57,7 +45,7 @@ export function SecuritySection() {
   }, []);
 
   return (
-    <section id="security" ref={sectionRef} className="relative py-32 lg:py-40 overflow-hidden">
+    <section id="security" className="relative py-32 lg:py-40 overflow-hidden">
       {/* Background accent removed */}
 
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -94,10 +82,13 @@ export function SecuritySection() {
             {/* Dynamic feature image with cross-fade — desktop only */}
             <div className="absolute inset-0 pointer-events-none items-center justify-end hidden lg:flex">
               {securityFeatures.map((feature, index) => (
-                <img
+                <Image
                   key={feature.image}
                   src={feature.image}
                   alt={feature.title}
+                  width={840}
+                  height={840}
+                  sizes="(min-width: 1024px) 44vw, 100vw"
                   className="absolute h-3/4 w-3/4 object-contain object-right transition-opacity duration-500"
                   style={{ opacity: activeFeature === index ? 0.85 : 0 }}
                 />
@@ -130,9 +121,10 @@ export function SecuritySection() {
           {/* Feature cards stack */}
           <div className="lg:col-span-5 flex flex-col gap-4">
             {securityFeatures.map((feature, index) => (
-              <div
+              <button
+                type="button"
                 key={feature.title}
-                className={`p-6 border transition-all duration-500 cursor-default ${activeFeature === index
+                className={`w-full text-left p-6 border transition-all duration-500 cursor-default ${activeFeature === index
                   ? "border-foreground/30 bg-foreground/[0.04]"
                   : "border-foreground/10"
                   } ${isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8"}`}
@@ -141,18 +133,18 @@ export function SecuritySection() {
                 onMouseEnter={() => setActiveFeature(index)}
               >
                 <div className="flex items-start gap-4">
-                  <div className={`shrink-0 w-10 h-10 flex items-center justify-center border transition-colors ${activeFeature === index
+                  <div className={`shrink-0 size-10 flex items-center justify-center border transition-colors ${activeFeature === index
                     ? "border-foreground bg-foreground text-background"
                     : "border-foreground/20"
                     }`}>
-                    <feature.icon className="w-5 h-5" />
+                    <feature.icon className="size-5" />
                   </div>
                   <div>
                     <h3 className="font-medium mb-1">{feature.title}</h3>
                     <p className="text-sm text-muted-foreground">{feature.description}</p>
                   </div>
                 </div>
-              </div>
+              </button>
             ))}
           </div>
         </div>

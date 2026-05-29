@@ -32,7 +32,7 @@ function ContactItem({ contact, onSelect }: ContactItemProps) {
             <div className="relative shrink-0">
                 <div
                     className={`
-            w-10 h-10 min-w-[2.5rem] rounded-xl
+            size-10 min-w-[2.5rem] rounded-xl
             flex items-center justify-center overflow-hidden bg-cover bg-center bg-no-repeat
             bg-[rgb(var(--backgroundColor-state-enabled)/.575)]
             border border-[rgb(var(--borderColor-secondary)/.15)]

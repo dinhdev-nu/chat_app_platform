@@ -236,8 +236,9 @@ export function useChatRealtime({
     const typingCleanupTimers = typingCleanupTimersRef.current;
 
     return () => {
-      if (conversationSyncTimerRef.current) {
-        window.clearTimeout(conversationSyncTimerRef.current);
+      const conversationSyncTimer = conversationSyncTimerRef.current;
+      if (conversationSyncTimer) {
+        window.clearTimeout(conversationSyncTimer);
       }
 
       Object.values(messageSyncTimers).forEach((timer) => window.clearTimeout(timer));

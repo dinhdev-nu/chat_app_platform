@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 
 const containerVariants = {
   initial: { opacity: 0 },
@@ -15,7 +14,7 @@ const containerVariants = {
   },
 };
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   initial: { opacity: 0, y: 16 },
   animate: {
     opacity: 1,
@@ -35,9 +34,6 @@ const fadeVariants = {
 export default function ChatEmptyState() {
   // Chỉ trigger animate sau khi client đã hydrate xong
   // Tránh flash: SSR render visible → JS set opacity:0 → animate
-  const [isReady, setIsReady] = useState(false);
-  useEffect(() => { setIsReady(true); }, []);
-
   return (
     <section
       id="chat-empty-state"
@@ -47,7 +43,7 @@ export default function ChatEmptyState() {
       <motion.div
         variants={containerVariants}
         initial="initial"
-        animate={isReady ? "animate" : "initial"}
+        animate="animate"
         className="flex flex-col items-center my-auto py-8 px-4 w-full"
       >
         <div className="relative z-10 text-center">
@@ -64,7 +60,7 @@ export default function ChatEmptyState() {
           {/* Heading */}
           <motion.h2
             id="chat-empty-heading"
-            variants={fadeUpVariants as any}
+            variants={fadeUpVariants}
             className="text-4xl md:text-5xl lg:text-6xl font-display tracking-tight leading-[1.1] text-primary"
           >
             Kết nối

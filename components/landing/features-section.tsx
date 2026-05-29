@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
+import Image from "next/image";
 
 const features = [
   {
@@ -32,10 +33,10 @@ const features = [
 // Floating dot particles visualization
 function ParticleVisualization() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameRef = useRef(0);
   const mouseRef = useRef({ x: 0.5, y: 0.5 });
 
   useEffect(() => {
+    let frameId = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -108,14 +109,14 @@ function ParticleVisualization() {
       });
 
       time += 0.016;
-      frameRef.current = requestAnimationFrame(render);
+      frameId = requestAnimationFrame(render);
     };
     render();
 
     return () => {
       window.removeEventListener("resize", resize);
       canvas.removeEventListener("mousemove", handleMouseMove);
-      cancelAnimationFrame(frameRef.current);
+      cancelAnimationFrame(frameId);
     };
   }, []);
 
@@ -129,26 +130,11 @@ function ParticleVisualization() {
 }
 
 export function FeaturesSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeFeature, setActiveFeature] = useState(0);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const isVisible = true;
 
   return (
     <section
       id="features"
-      ref={sectionRef}
       className="relative py-24 lg:py-32 overflow-hidden"
     >
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -182,12 +168,11 @@ export function FeaturesSection() {
         <div className="grid lg:grid-cols-12 gap-4 lg:gap-6">
           {/* Large feature card */}
           <div
-            className={`lg:col-span-12 relative bg-black border border-foreground/10 min-h-[500px] overflow-hidden group transition-all duration-700 flex ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
+            className={`lg:col-span-12 relative bg-[oklch(0.06_0.008_260)] border border-foreground/10 min-h-[500px] overflow-hidden group transition-all duration-700 flex ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"
               }`}
-            onMouseEnter={() => setActiveFeature(0)}
           >
             {/* Left: text content */}
-            <div className="relative flex-1 p-8 lg:p-12 bg-black">
+            <div className="relative flex-1 p-8 lg:p-12 bg-[oklch(0.06_0.008_260)]">
               <ParticleVisualization />
               <div className="relative z-10">
                 <span className="font-mono text-sm text-muted-foreground">{features[0].number}</span>
@@ -206,10 +191,12 @@ export function FeaturesSection() {
 
             {/* Right: mirrored image, full height */}
             <div className="hidden lg:block relative w-[42%] shrink-0 overflow-hidden">
-              <img
+              <Image
                 src="/images/upscaled_3.png"
                 alt=""
                 aria-hidden="true"
+                fill
+                sizes="42vw"
                 className="absolute inset-0 w-full h-full object-cover object-center"
                 style={{ transform: "scaleX(-1)" }}
               />

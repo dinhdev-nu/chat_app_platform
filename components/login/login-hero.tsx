@@ -38,7 +38,7 @@ const AuthHero: FC<AuthHeroProps> = ({
   otpExpiresAt,
 }) => {
   return (
-    <main className="relative h-screen flex items-center justify-center lg:items-start lg:justify-start overflow-hidden bg-black">
+    <main className="relative h-screen flex items-center justify-center lg:items-start lg:justify-start overflow-hidden bg-[oklch(0.06_0.008_260)]">
       {/* Background video */}
       <div className="absolute inset-0 z-0">
         <video
@@ -46,7 +46,7 @@ const AuthHero: FC<AuthHeroProps> = ({
           muted
           loop
           playsInline
-          aria-hidden="true"
+          aria-label="Background video"
           className="w-full h-full object-cover object-center opacity-80"
         >
           <source src="/images/bg-hero.mp4" type="video/mp4" />

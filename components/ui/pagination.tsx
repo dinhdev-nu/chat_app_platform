@@ -6,12 +6,12 @@ import {
 } from 'lucide-react'
 
 import { cn } from '@/lib/utils'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { Button } from '@/components/ui/button'
+import { buttonVariants } from '@/components/ui/button-variants'
 
 function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
   return (
     <nav
-      role="navigation"
       aria-label="pagination"
       data-slot="pagination"
       className={cn('mx-auto flex w-full justify-center', className)}
@@ -50,7 +50,9 @@ function PaginationLink({
 }: PaginationLinkProps) {
   return (
     <a
+      {...props}
       aria-current={isActive ? 'page' : undefined}
+      aria-label={props['aria-label'] ?? 'Pagination link'}
       data-slot="pagination-link"
       data-active={isActive}
       className={cn(
@@ -60,7 +62,6 @@ function PaginationLink({
         }),
         className,
       )}
-      {...props}
     />
   )
 }

@@ -41,24 +41,27 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
   }, []);
 
   const loadConversations = useCallback(
-    async ({ cursor, append = false, silent = false }: LoadPageOptions = {}) => {
+    ({ cursor, append = false, silent = false }: LoadPageOptions = {}) => {
       if (!enabled) return;
       if (!silent) setIsLoading(true);
       setError(null);
 
-      try {
-        const result = await conversationService.listConversations({ cursor, limit });
+      if (!isMountedRef.current) return;
 
-        if (!isMountedRef.current) return;
-
-        setStoreConversations(result.data, { append });
-        setPagination(result.pagination);
-      } catch (err) {
-        if (!isMountedRef.current) return;
-        setError(getApiErrorMessage(err));
-      } finally {
-        if (isMountedRef.current && !silent) setIsLoading(false);
-      }
+      return conversationService
+        .listConversations({ cursor, limit })
+        .then((result) => {
+          if (!isMountedRef.current) return;
+          setStoreConversations(result.data, { append });
+          setPagination(result.pagination);
+        })
+        .catch((err) => {
+          if (!isMountedRef.current) return;
+          setError(getApiErrorMessage(err));
+        })
+        .finally(() => {
+          if (isMountedRef.current && !silent) setIsLoading(false);
+        });
     },
     [enabled, limit, setStoreConversations],
   );
@@ -74,9 +77,9 @@ export function useConversations({ enabled = true, limit = DEFAULT_PAGE_LIMIT }:
     return () => window.clearTimeout(timeoutId);
   }, [enabled, loadConversations]);
 
-  const loadMore = useCallback(async () => {
+  const loadMore = useCallback(() => {
     if (!pagination?.hasNext || !pagination.nextCursor) return;
-    await loadConversations({ cursor: pagination.nextCursor, append: true });
+    return loadConversations({ cursor: pagination.nextCursor, append: true });
   }, [pagination, loadConversations]);
 
   /**

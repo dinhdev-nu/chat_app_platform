@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { ArrowRight, Check, Zap } from "lucide-react";
 
 const plans = [
@@ -51,24 +51,11 @@ const plans = [
 ];
 
 export function PricingSection() {
-  const [isAnnual, setIsAnnual] = useState(true);
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const isAnnual = true;
+  const isVisible = true;
 
   return (
-    <section id="pricing" ref={sectionRef} className="relative py-32 lg:py-40">
+    <section id="pricing" className="relative py-32 lg:py-40">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         {/* Header - Dramatic offset */}
         <div className="grid lg:grid-cols-12 gap-8 mb-20">
@@ -91,9 +78,11 @@ export function PricingSection() {
             <div className={`absolute inset-0 pointer-events-none transition-all duration-1000 delay-100 ${
               isVisible ? "opacity-100" : "opacity-0"
             }`}>
-              <img
+              <Image
                 src="/images/whale.png"
                 alt="Organic whale"
+                fill
+                sizes="(min-width: 1024px) 42vw, 100vw"
                 className="w-full h-full object-contain object-center"
               />
             </div>
@@ -118,7 +107,7 @@ export function PricingSection() {
                 {plan.highlight && (
                   <div className="absolute -top-4 left-8 right-8 flex justify-center">
                     <span className="inline-flex items-center gap-2 px-4 py-2 bg-foreground text-background text-xs font-mono uppercase tracking-widest">
-                      <Zap className="w-3 h-3" />
+                      <Zap className="size-3" />
                       Phổ biến nhất
                     </span>
                   </div>
@@ -157,7 +146,7 @@ export function PricingSection() {
                   <ul className="space-y-3 mb-10">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <Check className="w-4 h-4 text-[#eca8d6] mt-0.5 shrink-0" />
+                        <Check className="size-4 text-[#eca8d6] mt-0.5 shrink-0" />
                         <span className="text-sm text-muted-foreground">{feature}</span>
                       </li>
                     ))}
@@ -165,6 +154,7 @@ export function PricingSection() {
 
                   {/* CTA */}
                   <button
+                    type="button"
                     className={`w-full py-4 flex items-center justify-center gap-2 text-sm font-medium transition-all group ${
                       plan.highlight
                         ? "bg-foreground text-background hover:bg-foreground/90"
@@ -172,7 +162,7 @@ export function PricingSection() {
                     }`}
                   >
                     {plan.cta}
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                   </button>
                 </div>
               </div>
@@ -186,25 +176,25 @@ export function PricingSection() {
         }`}>
           <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
             <span className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#eca8d6]" />
+              <Check className="size-4 text-[#eca8d6]" />
               Mã hóa cuộc gọi
             </span>
             <span className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#eca8d6]" />
+              <Check className="size-4 text-[#eca8d6]" />
               Quản lý truy cập
             </span>
             <span className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#eca8d6]" />
+              <Check className="size-4 text-[#eca8d6]" />
               Đa thiết bị
             </span>
           </div>
-          <a href="#" className="text-sm underline underline-offset-4 hover:text-foreground transition-colors">
+          <a href="#pricing" className="text-sm underline underline-offset-4 hover:text-foreground transition-colors">
             Xem bảng giá chi tiết
           </a>
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         .text-stroke {
           -webkit-text-stroke: 1.5px currentColor;
           -webkit-text-fill-color: transparent;

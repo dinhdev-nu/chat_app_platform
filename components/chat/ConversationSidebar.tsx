@@ -169,7 +169,7 @@ export default function ConversationSidebar({
           <button
             type="button"
             aria-label="Đóng menu"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"
+            className="flex size-8 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"
             onClick={onClose}
           >
             <CloseIcon />
@@ -275,7 +275,7 @@ export default function ConversationSidebar({
                 onClick={onOpenActionPanel}
                 aria-label="Tạo hội thoại hoặc thêm contact"
                 title="Tạo hội thoại hoặc thêm contact"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"
+                className="flex size-8 shrink-0 items-center justify-center rounded-full text-[rgb(var(--textColor-primary))] transition-colors hover:bg-[rgb(var(--backgroundColor-state-hover))]"
               >
                 <PlusIcon size={16} />
               </button>

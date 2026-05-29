@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useRef, useCallback } from "react";
 import ConversationItem from "./ConversationItem";
 import ContactItem from "./ContactItem";
 import { ConversationListItem } from "./conversation-data";

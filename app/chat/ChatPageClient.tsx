@@ -98,7 +98,7 @@ export default function ChatPageClient({
   conversationList,
   contactList,
 }: ChatPageClientProps) {
-  const router = useRouter();
+  const { replace } = useRouter();
   const accessToken = useAuthStore((state) => state.accessToken);
   const expiresAt = useAuthStore((state) => state.expiresAt);
   const currentUser = useAuthStore((state) => state.user);
@@ -131,8 +131,8 @@ export default function ChatPageClient({
   useEffect(() => {
     if (authState !== "unauthenticated") return;
     clearSession();
-    router.replace("/login");
-  }, [authState, clearSession, router]);
+    replace("/login");
+  }, [authState, clearSession, replace]);
 
   useEffect(() => {
     if (authState !== "authenticated") return;
@@ -149,14 +149,14 @@ export default function ChatPageClient({
 
       if (status === 401) {
         clearSession();
-        router.replace("/login");
+        replace("/login");
       }
     });
 
     return () => {
       cancelled = true;
     };
-  }, [authState, clearSession, refreshProfile, router]);
+  }, [authState, clearSession, refreshProfile, replace]);
 
   const chatContacts = useChatContacts({ enabled: authState === "authenticated" });
 

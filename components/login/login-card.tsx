@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { FormEvent } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -147,7 +148,7 @@ export default function AuthCard({
                     aria-disabled={true}
                     className="w-full inline-flex items-center justify-center gap-3 px-4 py-2.5 rounded-xl border border-border/50 bg-secondary/30 text-foreground opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
                   >
-                    <img src="/google.svg" alt="" width={20} height={20} className="w-5 h-5" />
+                    <Image src="/google.svg" alt="" width={20} height={20} unoptimized className="size-5" />
                     Tiếp tục với Google
                   </button>
                 </motion.div>
@@ -166,6 +167,7 @@ export default function AuthCard({
                   <span className="sr-only">Email</span>
                   <input
                     type="email"
+                    aria-label="Email"
                     placeholder="Nhập email của bạn"
                     required
                     autoComplete="email"
@@ -197,7 +199,7 @@ export default function AuthCard({
                     disabled={isEmailSubmitDisabled}
                     aria-disabled={isEmailSubmitDisabled}
                   >
-                    {isSendingOtp ? "Đang gửi mã..." : "Tiếp tục với email"}
+                    {isSendingOtp ? "Đang gửi mã…" : "Tiếp tục với email"}
                   </button>
                 </motion.div>
 
@@ -228,7 +230,7 @@ export default function AuthCard({
               animate="center"
               exit="exit"
             >
-              <form onSubmit={handleOtpSubmit} className="flex flex-col space-y-5">
+              <form onSubmit={handleOtpSubmit} className="flex flex-col gap-y-5">
                 <motion.div
                   custom={0}
                   variants={itemVariants}
@@ -242,7 +244,7 @@ export default function AuthCard({
                     className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-full hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring -ml-1.5"
                     aria-label="Go back"
                   >
-                    <ArrowLeft className="w-5 h-5" />
+                    <ArrowLeft className="size-5" />
                   </button>
                   <h2 className="text-lg font-medium text-foreground">Nhập mã xác nhận</h2>
                 </motion.div>
@@ -302,11 +304,11 @@ export default function AuthCard({
                     {isVerifyingOtp ? (
                       <span className="inline-flex items-center gap-2">
                         <motion.span
-                          className="block w-4 h-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
+                          className="block size-4 rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
                           animate={{ rotate: 360 }}
                           transition={{ repeat: Infinity, duration: 0.7, ease: "linear" }}
                         />
-                        Đang xác thực...
+                        Đang xác thực…
                       </span>
                     ) : (
                       "Xác nhận mã"
@@ -328,7 +330,7 @@ export default function AuthCard({
                     onClick={handleResendOtp}
                     className="text-foreground underline hover:no-underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
                   >
-                    {isSendingOtp ? "Đang gửi..." : "Gửi lại"}
+                    {isSendingOtp ? "Đang gửi…" : "Gửi lại"}
                   </button>
                 </motion.p>
               </form>

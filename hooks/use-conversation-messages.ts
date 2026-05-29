@@ -154,7 +154,7 @@ export function useConversationMessages({
   }, [rawMessages]);
 
   const loadMessages = useCallback(
-    async ({ cursor, append = false, silent = false }: LoadPageOptions = {}) => {
+    ({ cursor, append = false, silent = false }: LoadPageOptions = {}) => {
       if (!enabled || !conversationId) return;
 
       const requestId = ++latestRequestIdRef.current;
@@ -165,23 +165,26 @@ export function useConversationMessages({
       }
       setError(null);
 
-      try {
-        const result = await messageService.listMessages(conversationId, { cursor, limit });
-        const orderedMessages = result.data.slice().reverse();
+      if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
 
-        if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
-
-        setStoreMessages(conversationId, orderedMessages, { append });
-        setPagination(result.pagination);
-      } catch (err) {
-        if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
-        setError(getApiErrorMessage(err));
-      } finally {
-        if (isMountedRef.current && requestId === latestRequestIdRef.current && !silent) {
-          if (append) setIsLoadingMore(false);
-          else setIsLoading(false);
-        }
-      }
+      return messageService
+        .listMessages(conversationId, { cursor, limit })
+        .then((result) => {
+          const orderedMessages = result.data.slice().reverse();
+          if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
+          setStoreMessages(conversationId, orderedMessages, { append });
+          setPagination(result.pagination);
+        })
+        .catch((err) => {
+          if (!isMountedRef.current || requestId !== latestRequestIdRef.current) return;
+          setError(getApiErrorMessage(err));
+        })
+        .finally(() => {
+          if (isMountedRef.current && requestId === latestRequestIdRef.current && !silent) {
+            if (append) setIsLoadingMore(false);
+            else setIsLoading(false);
+          }
+        });
     },
     [conversationId, enabled, limit, setStoreMessages],
   );
@@ -208,10 +211,10 @@ export function useConversationMessages({
     return () => window.clearTimeout(timeoutId);
   }, [conversationId, enabled, loadMessages]);
 
-  const loadMore = useCallback(async () => {
+  const loadMore = useCallback(() => {
     if (!pagination?.hasNext || !pagination.nextCursor || isLoadingMore) return;
 
-    await loadMessages({ cursor: pagination.nextCursor, append: true });
+    return loadMessages({ cursor: pagination.nextCursor, append: true });
   }, [isLoadingMore, loadMessages, pagination]);
 
   const sendMessage = useCallback(

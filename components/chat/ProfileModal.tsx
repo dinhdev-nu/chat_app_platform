@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
@@ -37,7 +38,7 @@ export default function ProfileModal({
   onSave,
   onLogout,
 }: ProfileModalProps) {
-  const router = useRouter();
+  const { replace } = useRouter();
   const authUser = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const logout = useAuthStore((state) => state.logout);
@@ -129,7 +130,7 @@ export default function ProfileModal({
         await onLogout();
       } else {
         await logout();
-        router.replace("/login");
+        replace("/login");
       }
 
       onOpenChange(false);
@@ -156,7 +157,7 @@ export default function ProfileModal({
         style={{ userSelect: "none" }}
       />
 
-      <span aria-hidden tabIndex={0} style={FOCUS_GUARD} />
+      <button type="button" aria-label="Focus guard" style={FOCUS_GUARD} />
 
       <div
         className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
@@ -182,17 +183,20 @@ export default function ProfileModal({
                 <h3 className="text-xs text-secondary font-medium">Tên & ảnh đại diện</h3>
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+                    className="size-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
                     style={{
                       background: "rgb(var(--backgroundColor-surface-container))",
                       border: "1px solid rgb(var(--backgroundColor-state-enabled))",
                     }}
                   >
                     {showAvatar ? (
-                      <img
+                      <Image
                         src={avatarUrl.trim()}
                         alt="Ảnh đại diện"
-                        className="w-full h-full object-cover"
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="size-12 object-cover"
                         onError={() => setAvatarError(true)}
                       />
                     ) : (
@@ -207,7 +211,7 @@ export default function ProfileModal({
                   <input
                     id="profile-name"
                     type="text"
-                    placeholder="Tên hiển thị..."
+                    placeholder="Tên hiển thị…"
                     value={name}
                     maxLength={50}
                     onChange={(event) => setName(event.target.value)}
@@ -247,7 +251,7 @@ export default function ProfileModal({
                 <textarea
                   id="profile-bio"
                   rows={2}
-                  placeholder="Thêm mô tả về bạn..."
+                  placeholder="Thêm mô tả về bạn…"
                   value={bio}
                   maxLength={300}
                   onChange={(event) => setBio(event.target.value)}
@@ -291,7 +295,7 @@ export default function ProfileModal({
                       <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                     </svg>
                     <span className="font-medium text-sm" aria-live="polite">
-                      Đang lưu...
+                      Đang lưu…
                     </span>
                   </>
                 ) : (
@@ -312,7 +316,7 @@ export default function ProfileModal({
                     focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2"
                 >
                   <LogOut size={15} aria-hidden="true" />
-                  <span className="font-medium text-sm">{isLogoutPending ? "Đang đăng xuất..." : "Đăng xuất"}</span>
+                  <span className="font-medium text-sm">{isLogoutPending ? "Đang đăng xuất…" : "Đăng xuất"}</span>
                 </button>
               ) : null}
               <div className="h-2" />
@@ -339,7 +343,7 @@ export default function ProfileModal({
         </div>
       </div>
 
-      <span aria-hidden tabIndex={0} style={FOCUS_GUARD} />
+      <button type="button" aria-label="Focus guard" style={FOCUS_GUARD} />
     </div>
   );
 }

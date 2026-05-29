@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 const regions = [
   { name: "Bắc Mỹ", nodes: 12, status: "hoạt động tốt" },
@@ -10,21 +11,8 @@ const regions = [
 ];
 
 export function InfrastructureSection() {
-  const [isVisible, setIsVisible] = useState(false);
+  const isVisible = true;
   const [activeRegion, setActiveRegion] = useState(0);
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -34,7 +22,7 @@ export function InfrastructureSection() {
   }, []);
 
   return (
-    <section id="infra" ref={sectionRef} className="relative py-32 lg:py-40 overflow-hidden">
+    <section id="infra" className="relative py-32 lg:py-40 overflow-hidden">
       {/* Background accent — retiré, remplacé par l'image sphère */}
 
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -50,9 +38,12 @@ export function InfrastructureSection() {
             {/* Image globe — colonne gauche, pleine hauteur */}
             <div className={`w-48 lg:w-72 xl:w-80 shrink-0 transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
               }`}>
-              <img
+              <Image
                 src="/images/world.png"
                 alt="Global network sphere"
+                width={1369}
+                height={1369}
+                sizes="(min-width: 1280px) 20rem, (min-width: 1024px) 18rem, 12rem"
                 className="w-full h-full object-contain object-center"
               />
             </div>
@@ -126,7 +117,7 @@ export function InfrastructureSection() {
               {[...Array(20)].map((_, i) => (
                 <div
                   key={i}
-                  className="absolute w-1.5 h-1.5 rounded-full bg-[#eca8d6]"
+                  className="absolute size-1.5 rounded-full bg-[#eca8d6]"
                   style={{
                     left: `${10 + (i % 5) * 20}%`,
                     top: `${10 + Math.floor(i / 5) * 25}%`,
@@ -175,7 +166,7 @@ export function InfrastructureSection() {
                 }`}
             >
               <div className="flex items-center gap-2 mb-3">
-                <span className={`w-2 h-2 rounded-full transition-colors ${activeRegion === index ? "bg-[#eca8d6]" : "bg-foreground/20"
+                <span className={`size-2 rounded-full transition-colors ${activeRegion === index ? "bg-[#eca8d6]" : "bg-foreground/20"
                   }`} />
                 <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
                   {region.status}

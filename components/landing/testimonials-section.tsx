@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
 const testimonials = [
@@ -36,49 +36,31 @@ const testimonials = [
 
 export function TestimonialsSection() {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(false);
-  const [direction, setDirection] = useState<"left" | "right">("right");
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const isVisible = true;
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setDirection("right");
       setActiveIndex((prev) => (prev + 1) % testimonials.length);
     }, 8000);
     return () => clearInterval(interval);
   }, []);
 
   const goTo = (index: number) => {
-    setDirection(index > activeIndex ? "right" : "left");
     setActiveIndex(index);
   };
 
   const goPrev = () => {
-    setDirection("left");
     setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
   const goNext = () => {
-    setDirection("right");
     setActiveIndex((prev) => (prev + 1) % testimonials.length);
   };
 
   const activeTestimonial = testimonials[activeIndex];
 
   return (
-    <section ref={sectionRef} className="relative py-32 lg:py-40 bg-foreground text-background overflow-hidden">
+    <section className="relative py-32 lg:py-40 bg-foreground text-background overflow-hidden">
       {/* ASCII background pattern */}
       <div className="absolute inset-0 font-mono text-[10px] text-background/[0.02] leading-tight overflow-hidden whitespace-pre select-none">
         {Array.from({ length: 60 }, (_, i) =>
@@ -106,16 +88,18 @@ export function TestimonialsSection() {
           {/* Navigation arrows */}
           <div className="hidden lg:flex items-center gap-2">
             <button
+              type="button"
               onClick={goPrev}
               className="p-4 border border-background/20 hover:bg-background/10 transition-colors"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="size-5" />
             </button>
             <button
+              type="button"
               onClick={goNext}
               className="p-4 border border-background/20 hover:bg-background/10 transition-colors"
             >
-              <ArrowRight className="w-5 h-5" />
+              <ArrowRight className="size-5" />
             </button>
           </div>
         </div>
@@ -139,7 +123,7 @@ export function TestimonialsSection() {
 
               {/* Author */}
               <div className="mt-12 flex items-center gap-6">
-                <div className="w-14 h-14 rounded-full bg-background/10 flex items-center justify-center">
+                <div className="size-14 rounded-full bg-background/10 flex items-center justify-center">
                   <span className="font-display text-xl">
                     {activeTestimonial.author.charAt(0)}
                   </span>
@@ -171,9 +155,11 @@ export function TestimonialsSection() {
 
             {/* Progress indicators */}
             <div className="flex gap-2">
-              {testimonials.map((_, idx) => (
+              {testimonials.map((testimonial, idx) => (
                 <button
-                  key={idx}
+                  key={testimonial.company}
+                  type="button"
+                  aria-label={`Xem nhan xet ${idx + 1}`}
                   onClick={() => goTo(idx)}
                   className="flex-1 h-1 bg-background/20 overflow-hidden"
                 >
@@ -195,6 +181,7 @@ export function TestimonialsSection() {
                 {testimonials.map((t, idx) => (
                   <button
                     key={t.company}
+                    type="button"
                     onClick={() => goTo(idx)}
                     className={`px-4 py-2 text-sm border transition-all ${idx === activeIndex
                       ? "border-background/40 text-background"
@@ -210,7 +197,7 @@ export function TestimonialsSection() {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes fadeSlideIn {
           from {
             opacity: 0;

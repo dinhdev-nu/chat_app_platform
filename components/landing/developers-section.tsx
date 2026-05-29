@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 
 const features = [
   {
@@ -22,33 +22,22 @@ const features = [
 ];
 
 export function DevelopersSection() {
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
+  const isVisible = true;
 
   return (
-    <section id="developers" ref={sectionRef} className="relative py-24 lg:py-32 overflow-hidden">
+    <section id="developers" className="relative py-24 lg:py-32 overflow-hidden">
 
       {/* Image — absolute, bottom-right, behind all content */}
       <div
         className={`absolute bottom-0 right-0 w-[55%] h-[85%] pointer-events-none transition-all duration-1000 delay-300 ${isVisible ? "opacity-100" : "opacity-0"
           }`}
       >
-        <img
+        <Image
           src="/images/upscaled.png"
           alt=""
           aria-hidden="true"
+          fill
+          sizes="55vw"
           className="w-full h-full object-cover object-left-top"
         />
         {/* Fade left edge */}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import Image from "next/image";
 
 const metrics = [
   {
@@ -30,13 +31,13 @@ function AnimatedNumber({ end, suffix = "", prefix = "" }: { end: number; suffix
   const [count, setCount] = useState(0);
   const [isScrambling, setIsScrambling] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const hasAnimatedRef = useRef(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setHasAnimated(true);
+        if (entry.isIntersecting && !hasAnimatedRef.current) {
+          hasAnimatedRef.current = true;
           const duration = 2500;
           const startTime = performance.now();
           const animate = (currentTime: number) => {
@@ -54,7 +55,7 @@ function AnimatedNumber({ end, suffix = "", prefix = "" }: { end: number; suffix
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
-  }, [end, hasAnimated]);
+  }, [end]);
 
   const displayValue = count.toLocaleString();
 
@@ -62,15 +63,9 @@ function AnimatedNumber({ end, suffix = "", prefix = "" }: { end: number; suffix
     <div ref={ref} className="inline-flex items-baseline">
       <span className="text-muted-foreground mr-1">{prefix}</span>
       <span className="tabular-nums">
-        {displayValue.split("").map((char, i) => (
-          <span
-            key={i}
-            className={`inline-block transition-all duration-150 ${isScrambling && char !== "," ? "blur-[1px]" : ""
-              }`}
-          >
-            {char}
-          </span>
-        ))}
+        <span className={`inline-block transition-all duration-150 ${isScrambling ? "blur-[1px]" : ""}`}>
+          {displayValue}
+        </span>
       </span>
       <span className="text-muted-foreground">{suffix}</span>
     </div>
@@ -80,9 +75,9 @@ function AnimatedNumber({ end, suffix = "", prefix = "" }: { end: number; suffix
 function GridBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const timeRef = useRef(0);
-  const frameRef = useRef(0);
 
   useEffect(() => {
+    let frameId = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -123,13 +118,13 @@ function GridBackground() {
       ctx.lineTo(width, pulseY);
       ctx.stroke();
       timeRef.current += 0.02;
-      frameRef.current = requestAnimationFrame(render);
+      frameId = requestAnimationFrame(render);
     };
     render();
 
     return () => {
       window.removeEventListener("resize", resize);
-      cancelAnimationFrame(frameRef.current);
+      cancelAnimationFrame(frameId);
     };
   }, []);
 
@@ -162,10 +157,11 @@ function DotGraph({
   amplitude?: number;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const frameRef = useRef(0);
-  const timeRef = useRef(Math.random() * 100);
+  const timeRef = useRef(0);
 
   useEffect(() => {
+    timeRef.current = Math.random() * 100;
+    let frameId = 0;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
@@ -200,11 +196,11 @@ function DotGraph({
       }
 
       timeRef.current += speed;
-      frameRef.current = requestAnimationFrame(render);
+      frameId = requestAnimationFrame(render);
     };
 
     render();
-    return () => cancelAnimationFrame(frameRef.current);
+    return () => cancelAnimationFrame(frameId);
   }, [color, height, freq1, freq2, freqT, speed, baseline, amplitude]);
 
   return (
@@ -216,29 +212,16 @@ function DotGraph({
 }
 
 export function MetricsSection() {
-  const [time, setTime] = useState<Date | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
-  const sectionRef = useRef<HTMLElement>(null);
+  const [time, setTime] = useState(() => new Date());
+  const isVisible = true;
 
   useEffect(() => {
-    setTime(new Date());
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) setIsVisible(true);
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section ref={sectionRef} className="relative py-32 lg:py-40 overflow-hidden">
+    <section className="relative py-32 lg:py-40 overflow-hidden">
       <GridBackground />
 
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -247,7 +230,7 @@ export function MetricsSection() {
           <div className="lg:col-span-8 lg:col-start-1">
             <div className="flex items-center gap-4 mb-6">
               <span className="flex items-center gap-2 px-3 py-1 bg-[#eca8d6]/10 text-[#eca8d6] text-xs font-mono">
-                <span className="w-2 h-2 rounded-full bg-[#eca8d6] animate-pulse" />
+                <span className="size-2 rounded-full bg-[#eca8d6] animate-pulse" />
                 TRỰC TIẾP
               </span>
               <span className="text-sm font-mono text-muted-foreground">
@@ -267,10 +250,13 @@ export function MetricsSection() {
         {/* Organic graph image */}
         <div className={`w-full mb-0 transition-all duration-1000 delay-200 ${isVisible ? "opacity-100" : "opacity-0"
           }`}>
-          <img
+          <Image
             src="/images/real-time-graph.png"
             alt=""
             aria-hidden="true"
+            width={2492}
+            height={824}
+            sizes="100vw"
             className="w-full h-auto object-cover"
           />
         </div>

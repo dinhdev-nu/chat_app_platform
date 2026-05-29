@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import HeaderActions from "./HeaderActions";
 import ProfileModal from "./ProfileModal";
 import { useAuthStore } from "@/stores/authStore";
@@ -20,13 +22,16 @@ export default function ChatHeader() {
       "
       >
         <div className="flex w-full flex-row gap-5 items-center">
-          <a href="/" className="select-none cursor-pointer no-underline focus-ring rounded-md">
-            <img
-              alt="Tên sản phẩm, Stello (beta)"
-              className="block dark:invert dark:opacity-90 h-6"
+          <Link href="/" className="select-none cursor-pointer no-underline focus-ring rounded-md">
+            <Image
+              alt="Ten san pham, Stello (beta)"
+              width={129}
+              height={24}
+              unoptimized
+              className="block h-6 dark:invert dark:opacity-90"
               src="/assets/home/stello_beta.svg"
             />
-          </a>
+          </Link>
         </div>
 
         <HeaderActions

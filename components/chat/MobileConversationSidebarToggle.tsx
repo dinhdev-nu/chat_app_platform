@@ -15,7 +15,7 @@ export default function MobileConversationSidebarToggle({
       className="
         fixed right-2 top-16 z-20 md:hidden
         flex items-center justify-center rounded-xl
-        h-10 w-10
+        size-10
         bg-[rgb(var(--backgroundColor-surface-container)/.5)]
         backdrop-blur-[40px]
         border border-[rgb(var(--borderColor-secondary)/.15)]

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import {
   BackIcon,
   SearchIcon,
@@ -195,9 +196,9 @@ export default function CreateConversationForm({
           <div className="flex flex-col gap-3">
             <h3 className="text-xs text-secondary font-medium">Tên và ảnh đại diện</h3>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden border border-[rgb(var(--backgroundColor-state-enabled))]">
+              <div className="size-12 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] flex items-center justify-center flex-shrink-0 cursor-pointer overflow-hidden border border-[rgb(var(--backgroundColor-state-enabled))]">
                 {avatarUrl ? (
-                  <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                  <Image src={avatarUrl} alt="Avatar" width={48} height={48} unoptimized className="size-12 object-cover" />
                 ) : (
                   <span className="text-secondary"><UserGroupIcon size={24} /></span>
                 )}
@@ -284,7 +285,7 @@ export default function CreateConversationForm({
               <div className="flex flex-col gap-1">
                 {[...Array(4)].map((_, i) => (
                   <div key={i} className="flex items-center gap-3 p-2 rounded-xl animate-pulse">
-                    <div className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] flex-shrink-0" />
+                    <div className="size-10 rounded-full bg-[rgb(var(--backgroundColor-state-enabled)/.4)] flex-shrink-0" />
                     <div className="flex flex-col gap-1.5 flex-1">
                       <div className="h-3 w-24 rounded bg-[rgb(var(--backgroundColor-state-enabled)/.4)]" />
                       <div className="h-2.5 w-36 rounded bg-[rgb(var(--backgroundColor-state-enabled)/.25)]" />
@@ -307,9 +308,9 @@ export default function CreateConversationForm({
                       }`}
                   >
                     <div className="relative">
-                      <div className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0">
+                      <div className="size-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0">
                         {user.avatarUrl ? (
-                          <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                          <Image src={user.avatarUrl} alt={user.username} width={40} height={40} unoptimized className="size-10 object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-[rgb(var(--backgroundColor-state-enabled)/.4)] text-primary font-medium">
                             {user.username.charAt(0).toUpperCase()}
@@ -317,7 +318,7 @@ export default function CreateConversationForm({
                         )}
                       </div>
                       {isSelected && (
-                        <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[rgb(var(--colors-blue-700))] text-white rounded-full flex items-center justify-center border-2 border-[rgb(var(--backgroundColor-surface))]">
+                        <div className="absolute -bottom-0.5 -right-0.5 size-4 bg-[rgb(var(--colors-blue-700))] text-white rounded-full flex items-center justify-center border-2 border-[rgb(var(--backgroundColor-surface))]">
                           <CheckIcon size={10} />
                         </div>
                       )}
