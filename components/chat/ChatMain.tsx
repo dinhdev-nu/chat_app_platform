@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useCallback, useMemo, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion, type Variants } from "framer-motion";
+import React, { useCallback, useMemo } from "react";
+import { AnimatePresence, m, useReducedMotion, type Variants } from "framer-motion";
 
 import { useConversationMessages } from "@/hooks/use-conversation-messages";
 import type { AuthUser } from "@/types/user";
-import { ConversationListItem, MOCK_CONVERSATIONS } from "./conversation-data";
+import { ConversationListItem } from "@/data/conversation-data";
 import ChatEmptyState from "./ChatEmptyState";
 import ChatActiveState from "./ChatActiveState";
-import type { ChatMessage } from "./chat-message-types";
+import type { ChatMessage } from "@/types/message";
 import ConversationStarter from "./ConversationStarter";
 import MobileConversationSidebarToggle from "./MobileConversationSidebarToggle";
 
@@ -167,7 +167,7 @@ export default function ChatMain({
 
       <AnimatePresence mode="sync" initial={false}>
         {stateKey === "empty" && (
-          <motion.div
+          <m.div
             key="empty"
             className="absolute inset-0 flex min-h-0"
             variants={pageVariant}
@@ -176,11 +176,11 @@ export default function ChatMain({
             exit="exit"
           >
             <ChatEmptyState />
-          </motion.div>
+          </m.div>
         )}
 
         {stateKey === "new" && activeConv && (
-          <motion.div
+          <m.div
             key={`new-${activeConv.id}`}
             className="absolute inset-0 flex min-h-0"
             variants={pageVariant}
@@ -194,11 +194,11 @@ export default function ChatMain({
               onSend={handleSend}
               onTyping={sendTyping}
             />
-          </motion.div>
+          </m.div>
         )}
 
         {stateKey === "active" && activeConv && (
-          <motion.div
+          <m.div
             key={`active-${activeConv.id}`}
             className="absolute inset-0 flex min-h-0"
             variants={pageVariant}
@@ -211,12 +211,14 @@ export default function ChatMain({
               messages={messages}
               currentUserId={currentUser?.id}
               typingUsers={typingUsers}
-              isLoadingMessages={isLoading}
-              isLoadingMoreMessages={isLoadingMore}
-              hasMoreMessages={Boolean(pagination?.hasNext)}
+              activityState={{
+                isLoadingMessages: isLoading,
+                isLoadingMoreMessages: isLoadingMore,
+                hasMoreMessages: Boolean(pagination?.hasNext),
+                isSending,
+              }}
               messagesError={error}
               actionError={actionError}
-              isSending={isSending}
               onRetryLoad={() => void loadMessages()}
               onLoadMoreMessages={() => void loadMore()}
               onSend={handleSend}
@@ -225,55 +227,9 @@ export default function ChatMain({
               onDeleteMessage={handleDeleteMessage}
               onReactMessage={handleReactMessage}
             />
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
-
-export function ChatMainDemo() {
-  const [activeConv, setActiveConv] = useState<ConversationListItem | undefined>(undefined);
-
-  return (
-    <div
-      className="flex h-screen w-full bg-transparent"
-      style={{ fontFamily: "var(--font-sans-theme, var(--font-sans), sans-serif)" }}
-    >
-      <div
-        className="shrink-0 flex flex-col gap-1 p-3 border-r w-52 overflow-y-auto hide-scrollbar"
-        style={{ borderColor: "rgb(var(--borderColor-secondary) / 0.12)" }}
-      >
-        <button
-          type="button"
-          className="text-left px-3 py-2 rounded-xl text-[13px] font-medium transition-all"
-          style={{
-            background: activeConv === undefined ? "rgb(var(--backgroundColor-state-active) / 1)" : "transparent",
-            color: "rgb(var(--textColor-primary))",
-          }}
-          onClick={() => setActiveConv(undefined)}
-        >
-          (Không chọn) → State 1
-        </button>
-        {MOCK_CONVERSATIONS.map((conv) => (
-          <button
-            key={conv.id}
-            type="button"
-            className="text-left px-3 py-2 rounded-xl text-[13px] font-medium transition-all truncate"
-            style={{
-              background: activeConv?.id === conv.id ? "rgb(var(--backgroundColor-state-active) / 1)" : "transparent",
-              color: "rgb(var(--textColor-primary))",
-            }}
-            onClick={() => setActiveConv(conv)}
-          >
-            {conv.name}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex-1 overflow-hidden">
-        <ChatMain activeConv={activeConv} useMessageApi={false} />
-      </div>
     </div>
   );
 }

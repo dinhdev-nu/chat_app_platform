@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-import type { ConversationListItem } from "@/components/chat/conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 import type { MessageResponse, MessageReactionResponse } from "@/types/message";
 import { mapConversationResponseToListItem } from "@/types/conversation";
 import type {
@@ -109,7 +109,7 @@ function sortConversationIds(
   ids: string[],
   conversationsById: Record<string, ConversationListItem>,
 ) {
-  return [...ids].sort(
+  return ids.toSorted(
     (left, right) =>
       getConversationSortTime(conversationsById[right]) -
       getConversationSortTime(conversationsById[left]),
@@ -125,7 +125,7 @@ function getMessageSortValue(message?: MessageResponse) {
 }
 
 function sortMessageIds(ids: string[], messagesById: Record<string, MessageResponse>) {
-  return [...ids].sort(
+  return ids.toSorted(
     (left, right) =>
       getMessageSortValue(messagesById[left]) - getMessageSortValue(messagesById[right]),
   );
@@ -229,13 +229,17 @@ export const useChatStore = create<ChatState>()((set, get) => ({
     set((state) => {
       const nextById = options.append ? { ...state.conversationsById } : {};
       const nextIds = options.append ? [...state.conversationIds] : [];
+      const nextIdSet = new Set(nextIds);
 
       for (const conversation of conversations) {
         const conversationKey = conversation.id;
         if (!conversationKey) continue;
 
         nextById[conversationKey] = mergeConversation(nextById[conversationKey], conversation);
-        if (!nextIds.includes(conversationKey)) nextIds.push(conversationKey);
+        if (!nextIdSet.has(conversationKey)) {
+          nextIds.push(conversationKey);
+          nextIdSet.add(conversationKey);
+        }
       }
 
       return {
@@ -329,6 +333,7 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         : createEmptyThread();
       const byId = { ...currentThread.byId };
       const ids = [...currentThread.ids];
+      const idSet = new Set(ids);
       const messageIdToConvId = { ...state.messageIdToConvId };
       let usersById = state.usersById;
 
@@ -337,7 +342,10 @@ export const useChatStore = create<ChatState>()((set, get) => ({
         if (!messageKey) continue;
 
         byId[messageKey] = message;
-        if (!ids.includes(messageKey)) ids.push(messageKey);
+        if (!idSet.has(messageKey)) {
+          ids.push(messageKey);
+          idSet.add(messageKey);
+        }
         messageIdToConvId[messageKey] = conversationKey;
         usersById = upsertMessageSender(usersById, message);
       }
@@ -849,9 +857,10 @@ export const useChatStore = create<ChatState>()((set, get) => ({
 }));
 
 export function selectConversationList(state: ChatState) {
-  return state.conversationIds
-    .map((id) => state.conversationsById[id])
-    .filter(Boolean);
+  return state.conversationIds.flatMap((id) => {
+    const conversation = state.conversationsById[id];
+    return conversation ? [conversation] : [];
+  });
 }
 
 export function selectMessagesForConversation(state: ChatState, conversationId?: string) {
@@ -861,7 +870,10 @@ export function selectMessagesForConversation(state: ChatState, conversationId?:
   const thread = state.messageThreadsByConvId[conversationKey];
   if (!thread) return [];
 
-  return thread.ids.map((id) => thread.byId[id]).filter(Boolean);
+  return thread.ids.flatMap((id) => {
+    const message = thread.byId[id];
+    return message ? [message] : [];
+  });
 }
 
 export function selectTypingUsersForConversation(
@@ -876,7 +888,8 @@ export function selectTypingUsersForConversation(
   const typingUsers = state.typingByConvId[conversationKey] ?? {};
   const now = Date.now();
 
-  return Object.entries(typingUsers)
-    .filter(([userId, expiresAt]) => expiresAt > now && userId !== currentUserKey)
-    .map(([userId]) => state.usersById[userId] ?? { id: userId, name: "Ai đó" });
+  return Object.entries(typingUsers).flatMap(([userId, expiresAt]) => {
+    if (expiresAt <= now || userId === currentUserKey) return [];
+    return [state.usersById[userId] ?? { id: userId, name: "Unknown user" }];
+  });
 }

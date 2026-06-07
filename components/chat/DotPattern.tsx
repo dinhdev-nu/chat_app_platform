@@ -1,49 +1,52 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
+
+function subscribeToTheme(onStoreChange: () => void) {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+  return () => observer.disconnect();
+}
+
+function getThemeSnapshot() {
+  return document.documentElement.classList.contains("dark");
+}
+
+function subscribeToTouch(onStoreChange: () => void) {
+  const mediaQuery = window.matchMedia("(hover: none), (pointer: coarse)");
+  mediaQuery.addEventListener("change", onStoreChange);
+  return () => mediaQuery.removeEventListener("change", onStoreChange);
+}
+
+function getTouchSnapshot() {
+  return window.matchMedia("(hover: none), (pointer: coarse)").matches;
+}
 
 export default function DotPattern() {
   const dotRef = useRef<HTMLDivElement>(null);
-  const rafRef = useRef<number>(null);
-  const [isDark, setIsDark] = useState(false);
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const isDark = useSyncExternalStore(subscribeToTheme, getThemeSnapshot, () => false);
+  const isTouchDevice = useSyncExternalStore(subscribeToTouch, getTouchSnapshot, () => false);
 
   /* ── Sync dark state từ <html> class ── */
-  useEffect(() => {
-    const check = () => setIsDark(document.documentElement.classList.contains("dark"));
-    check();
-
-    const observer = new MutationObserver(check);
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
-    return () => observer.disconnect();
-  }, []);
-
   /* ── Detect touch/coarse pointer devices ── */
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(hover: none), (pointer: coarse)");
-
-    const updateTouchState = () => setIsTouchDevice(mediaQuery.matches);
-    updateTouchState();
-
-    mediaQuery.addEventListener("change", updateTouchState);
-    return () => mediaQuery.removeEventListener("change", updateTouchState);
-  }, []);
-
   /* ── Track vị trí chuột ── */
   useEffect(() => {
+    let frameId: number | null = null;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!dotRef.current) return;
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-      rafRef.current = requestAnimationFrame(() => {
+      if (frameId !== null) cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(() => {
         if (!dotRef.current) return;
-        dotRef.current.style.setProperty("--mouse-x", `${e.clientX}px`);
-        dotRef.current.style.setProperty("--mouse-y", `${e.clientY}px`);
+        const mask = `radial-gradient(circle 150px at ${e.clientX}px ${e.clientY}px, black, transparent)`;
+        dotRef.current.style.maskImage = mask;
+        dotRef.current.style.webkitMaskImage = mask;
       });
     };
     window.addEventListener("mousemove", handleMouseMove);
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (frameId !== null) cancelAnimationFrame(frameId);
     };
   }, []);
 
@@ -60,31 +63,27 @@ export default function DotPattern() {
     : "rgba(0, 0, 0, 0.60)";
 
   return (
-    <div style={{ position: "absolute", inset: 0, pointerEvents: "none", overflow: "hidden" }}>
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
       {/* Base layer: dots mờ tĩnh */}
       <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          position: "absolute",
-          inset: 0,
           backgroundImage: `radial-gradient(circle, ${baseDotColor} 0.5px, transparent 0.5px)`,
           backgroundSize: "10px 10px",
           backgroundPosition: "5px 5px",
-          pointerEvents: "none",
         }}
       />
 
       {!isTouchDevice && (
         <div
           ref={dotRef}
+          className="absolute inset-0 pointer-events-none"
           style={{
-            position: "absolute",
-            inset: 0,
             backgroundImage: `radial-gradient(circle, ${spotDotColor} 0.5px, transparent 0.5px)`,
             backgroundSize: "10px 10px",
             backgroundPosition: "5px 5px",
-            pointerEvents: "none",
-            maskImage: "radial-gradient(circle 150px at var(--mouse-x, -9999px) var(--mouse-y, -9999px), black, transparent)",
-            WebkitMaskImage: "radial-gradient(circle 150px at var(--mouse-x, -9999px) var(--mouse-y, -9999px), black, transparent)",
+            maskImage: "radial-gradient(circle 150px at -9999px -9999px, black, transparent)",
+            WebkitMaskImage: "radial-gradient(circle 150px at -9999px -9999px, black, transparent)",
           }}
         />
       )}

@@ -1,6 +1,6 @@
 import type { ApiErrorCode } from "@/types/api";
 
-export const API_ERROR_MESSAGES = {
+const API_ERROR_MESSAGES = {
   INTERNAL_SERVER_ERROR: "Đã có lỗi hệ thống. Vui lòng thử lại sau.",
   VALIDATION_ERROR: "Thông tin nhập chưa hợp lệ. Vui lòng kiểm tra lại.",
   INVALID_REQUEST: "Yêu cầu không hợp lệ.",

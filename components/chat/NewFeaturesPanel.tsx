@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, RefObject } from "react";
 
-import { CloseIcon } from "./icons";
+import { CloseIcon } from "@/components/ui/icons";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -84,7 +84,7 @@ export default function NewFeaturesPanel({
   labelledBy,
   onClose,
 }: NewFeaturesPanelProps) {
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDialogElement>(null);
   const [floatingStyle, setFloatingStyle] = useState<CSSProperties>({
     position: "fixed",
     visibility: "hidden",
@@ -118,6 +118,13 @@ export default function NewFeaturesPanel({
       "--transform-origin": `${transformOriginX}px -${PANEL_GAP}px`,
     } as CSSProperties);
   }, [anchorRef]);
+  const updatePositionRef = useRef(updatePosition);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    updatePositionRef.current = updatePosition;
+    onCloseRef.current = onClose;
+  }, [onClose, updatePosition]);
 
   useIsomorphicLayoutEffect(() => {
     updatePosition();
@@ -125,32 +132,32 @@ export default function NewFeaturesPanel({
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    const handlePositionChange = () => updatePositionRef.current();
+    window.addEventListener("resize", handlePositionChange);
+    window.addEventListener("scroll", handlePositionChange, true);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", handlePositionChange);
+      window.removeEventListener("scroll", handlePositionChange, true);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose, updatePosition]);
+  }, []);
 
   if (typeof document === "undefined") return null;
 
   return createPortal(
     <div className="chat-root fixed inset-0 z-[70] pointer-events-none">
       <div role="presentation" style={overlayStyle} onMouseDown={onClose} />
-      <section
+      <dialog
+        open
         ref={panelRef}
         id={id}
-        role="dialog"
         aria-modal="false"
         aria-labelledby={labelledBy}
-        className="pointer-events-auto flex max-h-[var(--available-height)] flex-col overflow-hidden rounded-xl border border-secondary bg-[rgb(var(--backgroundColor-surface-container)/.96)] text-primary shadow-xl backdrop-blur-glass motion-safe:transition-[transform,scale,opacity]"
+        className="pointer-events-auto m-0 flex max-h-[var(--available-height)] flex-col overflow-hidden rounded-xl border border-secondary bg-[rgb(var(--backgroundColor-surface-container)/.96)] p-0 text-primary shadow-xl backdrop-blur-glass motion-safe:transition-[transform,scale,opacity]"
         style={{ ...floatingStyle, transformOrigin: "var(--transform-origin)" }}
-        onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between px-3.5 pb-1.5 pt-3.5">
           <h2 id={labelledBy} className="m-0 text-[14px] font-semibold leading-[1.2] tracking-normal">
@@ -168,13 +175,14 @@ export default function NewFeaturesPanel({
 
         <div className="no-scrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-2.5 pb-2.5">
           <div className="flex flex-col gap-1">
-            {FEATURE_UPDATES.map((item) => (
+            {FEATURE_UPDATES.map((item, index) => (
               <article
                 key={item.id}
-                className={`grid grid-cols-[minmax(0,1fr)_auto] gap-x-2.5 rounded-[7px] px-2.5 py-2.5 transition-colors ${item.highlighted
+                className={`grid grid-cols-[minmax(0,1fr)_auto] gap-x-2.5 rounded-[7px] px-2.5 py-2.5 transition-colors motion-safe:animate-m3-menu-item-enter ${item.highlighted
                   ? "bg-[rgb(var(--backgroundColor-state-enabled)/.58)]"
                   : "hover:bg-[rgb(var(--backgroundColor-state-hover)/.35)]"
                   }`}
+                style={{ "--stagger-index": index + 1 } as CSSProperties}
               >
                 <h3 className="m-0 text-[14px] font-semibold leading-[1.25] tracking-normal text-primary">
                   {item.title}
@@ -192,7 +200,7 @@ export default function NewFeaturesPanel({
             ))}
           </div>
         </div>
-      </section>
+      </dialog>
     </div>,
     document.body,
   );

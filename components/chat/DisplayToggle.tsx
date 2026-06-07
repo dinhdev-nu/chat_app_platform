@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { SunIcon, MoonIcon } from "./icons";
+import { SunIcon, MoonIcon } from "@/components/ui/icons";
 
 function getInitialIsDark() {
   if (typeof document === "undefined") return true;
@@ -36,7 +36,7 @@ export default function DisplayToggle() {
         aria-label={isDark ? "Chuyển sang giao diện sáng" : "Chuyển sang giao diện tối"}
         onClick={toggle}
         className="
-          flex items-center justify-center w-8 h-8 rounded-full cursor-pointer select-none
+          flex items-center justify-center size-8 rounded-full cursor-pointer select-none
           transition-colors duration-200 ease-out
           backdrop-blur-[40px]
           border border-[rgb(var(--borderColor-secondary)/.15)]

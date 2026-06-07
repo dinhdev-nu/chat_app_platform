@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, m } from "framer-motion";
 import { useState } from "react";
 import ChatActionMenu from "./ChatActionMenu";
 import CreateConversationForm from "./CreateConversationForm";
@@ -49,7 +49,7 @@ export default function ChatActionPanel({
   return (
     <AnimatePresence initial={false} onExitComplete={() => setActiveView("menu")}>
       {isOpen ? (
-        <motion.div
+        <m.div
           key="panel-backdrop"
           className="md:hidden fixed inset-0 z-[50] bg-black/40"
           initial={{ opacity: 0 }}
@@ -61,7 +61,7 @@ export default function ChatActionPanel({
       ) : null}
 
       {isOpen ? (
-        <motion.div
+        <m.div
           key="panel-shell"
           className={[
             "z-[60] pointer-events-auto flex flex-col",
@@ -73,7 +73,7 @@ export default function ChatActionPanel({
           exit={{ opacity: 0 }}
           transition={{ duration: 0.24, ease: "easeOut" }}
         >
-          <motion.div
+          <m.div
             className="relative h-full min-h-[66vh] w-full bg-surface-container backdrop-blur-glass border border-chat-secondary rounded-3xl shadow-glass-soft overflow-hidden flex flex-col"
             initial={{ y: 12 }}
             animate={{ y: 0 }}
@@ -139,8 +139,8 @@ export default function ChatActionPanel({
                 />
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       ) : null}
     </AnimatePresence>
   );

@@ -3,7 +3,7 @@
 import React, { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { Check, Loader2, Send, User, UserPlus } from "lucide-react";
 
-import { BackIcon, CloseIcon, SearchIcon } from "@/components/chat/icons";
+import { BackIcon, CloseIcon, SearchIcon } from "@/components/ui/icons";
 import { ContactStatus } from "@/types/user";
 import type { ContactRequestStatusResponse, SearchUser } from "@/types/user";
 
@@ -25,6 +25,9 @@ interface UserActionProps {
   onSendContactRequest?: AddFriendPanelProps["onSendContactRequest"];
   onAcceptContactRequest?: AddFriendPanelProps["onAcceptContactRequest"];
 }
+
+const EMPTY_USERS: SearchUser[] = [];
+const EMPTY_PENDING_ACTION_IDS: string[] = [];
 
 function runAction(action?: () => Promise<unknown> | unknown) {
   void Promise.resolve(action?.()).catch(() => undefined);
@@ -110,10 +113,10 @@ function UserAction({
 function AddFriendPanel({
   isActive = true,
   onBack,
-  users = [],
+  users = EMPTY_USERS,
   isSearching = false,
   error,
-  pendingActionIds = [],
+  pendingActionIds = EMPTY_PENDING_ACTION_IDS,
   onSearchUsers,
   onSendContactRequest,
   onAcceptContactRequest,
@@ -180,7 +183,7 @@ function AddFriendPanel({
               <SearchIcon />
             </span>
             <input
-              placeholder="Tìm kiếm bạn bè..."
+              placeholder="Tìm kiếm bạn bè…"
               className="w-full bg-transparent text-body-sm outline-none text-primary placeholder:text-[rgb(var(--textColor-secondary))]"
               type="text"
               name="friendSearch"
@@ -213,7 +216,7 @@ function AddFriendPanel({
           {showSearching ? (
             <div className="flex items-center justify-center gap-2 text-sm text-secondary py-8">
               <Loader2 size={16} className="animate-spin" />
-              Đang tìm...
+              Đang tìm…
             </div>
           ) : filteredUsers.length > 0 ? (
             filteredUsers.map((user) => {
@@ -226,7 +229,7 @@ function AddFriendPanel({
                 >
                   <div className="relative">
                     <div
-                      className="w-10 h-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0 bg-cover bg-center flex items-center justify-center"
+                      className="size-10 rounded-full bg-[rgb(var(--backgroundColor-surface-container))] overflow-hidden flex-shrink-0 bg-cover bg-center flex items-center justify-center"
                       style={{ backgroundImage: user.avatarUrl ? `url(${user.avatarUrl})` : undefined }}
                       aria-hidden="true"
                     >

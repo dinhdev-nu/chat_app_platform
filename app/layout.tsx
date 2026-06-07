@@ -1,6 +1,7 @@
 import React from "react"
 import type { Metadata } from 'next'
 import { Be_Vietnam_Pro, Instrument_Serif, JetBrains_Mono } from 'next/font/google'
+import { MotionProvider } from "@/components/motion/MotionProvider"
 import { ThemeProvider } from "@/components/theme-provider"
 import './globals.css'
 
@@ -32,10 +33,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${instrumentSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} font-sans antialiased overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"`}>
+    <html lang="en" suppressHydrationWarning className="scroll-smooth">
+      <body className={`${instrumentSans.variable} ${instrumentSerif.variable} ${jetbrainsMono.variable} font-sans antialiased [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
+          <MotionProvider>{children}</MotionProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,34 +1,39 @@
 "use client";
 
 import { Fragment, useEffect, useMemo, useRef } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 
-import type { ConversationListItem } from "./conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 import ChatInput from "./ChatInput";
 import ChatConversationHeader from "./ChatConversationHeader";
 import ChatDateSeparator from "./ChatDateSeparator";
 import ChatMessageBubble from "./ChatMessageBubble";
 import ChatSystemMessage from "./ChatSystemMessage";
-import type { ChatMessage } from "./chat-message-types";
+import type { ChatMessage } from "@/types/message";
 import {
   formatMessageDateLabel,
   isSameMessageDate,
   isSystemMessage,
-} from "./chat-message-utils";
+} from "@/lib/chat-message-utils";
 
-export type { ChatMessage, ChatMessageReaction } from "./chat-message-types";
+export type { ChatMessage, ChatMessageReaction } from "@/types/message";
+
+interface ChatActivityState {
+  isLoadingMessages?: boolean;
+  isLoadingMoreMessages?: boolean;
+  hasMoreMessages?: boolean;
+  isSending?: boolean;
+}
 
 interface ChatActiveStateProps {
   conv: ConversationListItem;
   messages: ChatMessage[];
   currentUserId?: string;
   typingUsers?: ChatTypingUser[];
-  isLoadingMessages?: boolean;
-  isLoadingMoreMessages?: boolean;
-  hasMoreMessages?: boolean;
+  activityState?: ChatActivityState;
   messagesError?: string | null;
   actionError?: string | null;
-  isSending?: boolean;
   onRetryLoad?: () => void;
   onLoadMoreMessages?: () => void;
   onSend?: (text: string) => void | Promise<void>;
@@ -97,9 +102,8 @@ function TypingIndicator({
   const label = formatTypingLabel(users);
 
   return (
-    <motion.div
+    <m.div
       key="typing-indicator"
-      role="status"
       aria-live="polite"
       initial={reduceMotion ? false : { opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
@@ -107,9 +111,9 @@ function TypingIndicator({
       transition={reduceMotion ? { duration: 0 } : { duration: 0.18, ease: "easeOut" }}
       className="mt-3 flex items-end gap-2"
     >
-      <div className="shrink-0 w-7 h-7 self-end">
+      <div className="shrink-0 size-7 self-end">
         <div
-          className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
+          className="size-7 rounded-full flex items-center justify-center text-[11px] font-semibold overflow-hidden"
           style={{
             background: "rgb(var(--backgroundColor-state-enabled) / 0.8)",
             border: "1px solid rgb(var(--borderColor-secondary) / 0.15)",
@@ -117,10 +121,13 @@ function TypingIndicator({
           }}
         >
           {primaryUser.avatarUrl ? (
-            <img
+            <Image
               src={primaryUser.avatarUrl}
               alt=""
-              className="w-7 h-7 object-cover rounded-full"
+              width={28}
+              height={28}
+              unoptimized
+              className="size-7 object-cover rounded-full"
             />
           ) : (
             initials
@@ -133,8 +140,8 @@ function TypingIndicator({
           className="rounded-2xl px-3 py-2 font-sans text-[14px] leading-[1.5]"
           style={{
             background: "rgb(var(--backgroundColor-surface-container) / 0.45)",
-            backdropFilter: "blur(40px)",
-            WebkitBackdropFilter: "blur(40px)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
             border: "1px solid rgb(var(--borderColor-secondary) / 0.1)",
             borderBottomLeftRadius: "6px",
             color: "rgb(var(--textColor-primary))",
@@ -143,7 +150,7 @@ function TypingIndicator({
           <span className="sr-only">{label}</span>
           <span aria-hidden="true" className="flex items-center gap-1">
             {[0, 1, 2].map((dot) => (
-              <motion.span
+              <m.span
                 key={dot}
                 className="block size-1.5 rounded-full bg-[rgb(var(--textColor-secondary))]"
                 animate={reduceMotion ? { opacity: 0.65 } : { opacity: [0.35, 1, 0.35], y: [0, -2, 0] }}
@@ -168,7 +175,7 @@ function TypingIndicator({
           {label}
         </span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -178,12 +185,9 @@ export default function ChatActiveState({
   messages,
   currentUserId,
   typingUsers,
-  isLoadingMessages = false,
-  isLoadingMoreMessages = false,
-  hasMoreMessages = false,
+  activityState,
   messagesError,
   actionError,
-  isSending = false,
   onRetryLoad,
   onLoadMoreMessages,
   onSend,
@@ -192,6 +196,12 @@ export default function ChatActiveState({
   onDeleteMessage,
   onReactMessage,
 }: ChatActiveStateProps) {
+  const {
+    isLoadingMessages = false,
+    isLoadingMoreMessages = false,
+    hasMoreMessages = false,
+    isSending = false,
+  } = activityState ?? {};
   const shouldReduceMotion = useReducedMotion() ?? false;
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const visibleTypingUsers = useMemo(
@@ -206,13 +216,13 @@ export default function ChatActiveState({
 
   return (
     <div className="grid h-full min-h-0 w-full grid-rows-[auto_minmax(0,1fr)_auto] bg-transparent overflow-hidden">
-      <motion.div
+      <m.div
         initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
       >
         <ChatConversationHeader conv={conv} />
-      </motion.div>
+      </m.div>
 
       <div className="message-scrollbar min-h-0 overflow-x-hidden overflow-y-scroll overscroll-contain px-4 py-3">
         <div className="flex min-h-full flex-col justify-end">
@@ -238,12 +248,12 @@ export default function ChatActiveState({
           ) : null}
 
           {isLoadingMessages && messages.length === 0 ? (
-            <div
-              role="status"
+            <output
+              aria-live="polite"
               className="flex min-h-[220px] items-center justify-center text-sm text-[rgb(var(--textColor-secondary))]"
             >
-              Đang tải tin nhắn...
-            </div>
+              Đang tải tin nhắn…
+            </output>
           ) : null}
 
           {messages.length > 0 && (hasMoreMessages || isLoadingMoreMessages) ? (
@@ -258,7 +268,7 @@ export default function ChatActiveState({
                 disabled={isLoadingMoreMessages}
                 onClick={onLoadMoreMessages}
               >
-                {isLoadingMoreMessages ? "Đang tải..." : "Tải tin cũ hơn"}
+                {isLoadingMoreMessages ? "Đang tải…" : "Tải tin cũ hơn"}
               </button>
             </div>
           ) : null}
@@ -306,7 +316,7 @@ export default function ChatActiveState({
         </div>
       </div>
 
-      <motion.div
+      <m.div
         className="shrink-0 flex flex-col items-center px-4 pb-4 pt-2"
         initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
@@ -319,13 +329,13 @@ export default function ChatActiveState({
         ) : null}
         <ChatInput
           ariaLabel={conv.name ? `Nhắn tin tới ${conv.name}` : "Nhắn tin"}
-          placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}...`}
+          placeholder={`Nhắn tin ${conv.name ? `tới ${conv.name}` : ""}…`}
           sendLabel="Gửi tin nhắn"
           isSending={isSending}
           onSend={onSend}
           onTyping={onTyping}
         />
-      </motion.div>
+      </m.div>
     </div>
   );
 }

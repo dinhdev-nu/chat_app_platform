@@ -1,6 +1,7 @@
 "use client";
 
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { CSSProperties, MouseEvent, ReactNode, RefObject } from "react";
 
@@ -14,7 +15,7 @@ import {
   GiftIcon,
   MoreDotsIcon,
   XIcon,
-} from "./icons";
+} from "@/components/ui/icons";
 
 const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -203,6 +204,13 @@ function HeaderMoreMenu({
       "--transform-origin": `${transformOriginX}px -${MENU_GAP}px`,
     } as CSSProperties);
   }, [anchorRef]);
+  const updatePositionRef = useRef(updatePosition);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    updatePositionRef.current = updatePosition;
+    onCloseRef.current = onClose;
+  }, [onClose, updatePosition]);
 
   // Runs synchronously before first paint to avoid position flash
   useIsomorphicLayoutEffect(() => {
@@ -212,17 +220,18 @@ function HeaderMoreMenu({
   // Resize/scroll listeners + Escape handler only (no duplicate updatePosition call)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") onCloseRef.current();
     };
-    window.addEventListener("resize", updatePosition);
-    window.addEventListener("scroll", updatePosition, true);
+    const handlePositionChange = () => updatePositionRef.current();
+    window.addEventListener("resize", handlePositionChange);
+    window.addEventListener("scroll", handlePositionChange, true);
     document.addEventListener("keydown", handleKeyDown);
     return () => {
-      window.removeEventListener("resize", updatePosition);
-      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("resize", handlePositionChange);
+      window.removeEventListener("scroll", handlePositionChange, true);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose, updatePosition]);
+  }, []);
 
   if (typeof document === "undefined") return null;
 
@@ -423,11 +432,14 @@ export default function HeaderActions({
           className="rounded-full focus-ring"
           onClick={onAccountClick}
         >
-          <div className="flex items-center justify-center rounded-full text-lg font-medium select-none p-0 font-sans text-white bg-[rgb(var(--backgroundColor-secondary)/.5)] border border-[rgb(var(--borderColor-wash)/.2)] h-8 w-8 min-w-[2rem]">
+          <div className="flex items-center justify-center rounded-full text-lg font-medium select-none p-0 font-sans text-white bg-[rgb(var(--backgroundColor-secondary)/.5)] border border-[rgb(var(--borderColor-wash)/.2)] size-8 min-w-[2rem]">
             {userAvatarUrl ? (
-              <img
+              <Image
                 alt={userName ? `${userName} avatar` : "Profile image"}
-                className="rounded-full h-8 w-8 min-w-[2rem] object-cover"
+                width={32}
+                height={32}
+                unoptimized
+                className="rounded-full size-8 min-w-[2rem] object-cover"
                 referrerPolicy="no-referrer"
                 src={userAvatarUrl}
               />

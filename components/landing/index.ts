@@ -1,0 +1,13 @@
+export { CtaSection } from "./CtaSection";
+export { DevelopersSection } from "./DevelopersSection";
+export { FeaturesSection } from "./FeaturesSection";
+export { FooterSection } from "./FooterSection";
+export { HeroSection } from "./HeroSection";
+export { HowItWorksSection } from "./HowItWorksSection";
+export { InfrastructureSection } from "./InfrastructureSection";
+export { IntegrationsSection } from "./IntegrationsSection";
+export { MetricsSection } from "./MetricsSection";
+export { Navigation } from "./Navigation";
+export { PricingSection } from "./PricingSection";
+export { SecuritySection } from "./SecuritySection";
+export { TestimonialsSection } from "./TestimonialsSection";

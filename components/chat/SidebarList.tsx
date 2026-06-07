@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useRef, useCallback } from "react";
 import ConversationItem from "./ConversationItem";
 import ContactItem from "./ContactItem";
-import { ConversationListItem } from "./conversation-data";
-import { ContactUserResponse } from "./contact-data";
+import { ConversationListItem } from "@/data/conversation-data";
+import { ContactUserResponse } from "@/data/contact-data";
 
 type Props = {
     activeTab: "all" | "friends";

@@ -114,6 +114,14 @@ export function useChatRealtime({
     }, 4200);
   }, []);
 
+  const clearConversationSyncTimer = useCallback(() => {
+    const conversationSyncTimer = conversationSyncTimerRef.current;
+    if (conversationSyncTimer) {
+      window.clearTimeout(conversationSyncTimer);
+      conversationSyncTimerRef.current = null;
+    }
+  }, []);
+
   const syncAfterOpen = useCallback(async () => {
     await syncConversations();
 
@@ -236,12 +244,10 @@ export function useChatRealtime({
     const typingCleanupTimers = typingCleanupTimersRef.current;
 
     return () => {
-      if (conversationSyncTimerRef.current) {
-        window.clearTimeout(conversationSyncTimerRef.current);
-      }
+      clearConversationSyncTimer();
 
       Object.values(messageSyncTimers).forEach((timer) => window.clearTimeout(timer));
       Object.values(typingCleanupTimers).forEach((timer) => window.clearTimeout(timer));
     };
-  }, []);
+  }, [clearConversationSyncTimer]);
 }

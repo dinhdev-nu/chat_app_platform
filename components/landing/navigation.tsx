@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 
@@ -25,7 +26,7 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -48,9 +49,12 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
         >
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <img
+            <Image
               src="/assets/home/stello_beta.svg"
               alt="Stello Logo"
+              width={129}
+              height={24}
+              unoptimized
               className={`transition-all duration-500 h-6 sm:h-7 ${isScrolled ? "dark:invert" : "invert brightness-0"}`}
             />
           </Link>
@@ -88,14 +92,15 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
           {/* Mobile Menu Button */}
           {!hideLinks && (
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className={`md:hidden p-2 transition-colors duration-500 ${isScrolled || isMobileMenuOpen ? "text-foreground" : "text-white"}`}
               aria-label="Toggle menu"
             >
               {isMobileMenuOpen ? (
-                <X className="w-6 h-6" />
+                <X className="size-6" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="size-6" />
               )}
             </button>
           )}

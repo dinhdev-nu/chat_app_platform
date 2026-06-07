@@ -223,4 +223,27 @@
       background-position: 0% 50%;
     }
   }
+
+  .blur-word-char {
+    --blur-word-color: #fff;
+    display: inline-block;
+    color: var(--blur-word-color);
+    opacity: 0;
+    filter: blur(20px);
+    animation-name: blur-word-in;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes blur-word-in {
+    70% {
+      color: var(--blur-word-color);
+    }
+
+    100% {
+      color: #fff;
+      opacity: 1;
+      filter: blur(0);
+    }
+  }
 }

@@ -1,10 +1,10 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { m } from "framer-motion";
 import { Info } from "lucide-react";
 
-import type { ChatMessage } from "./chat-message-types";
-import { formatTime, msgVariants } from "./chat-message-utils";
+import type { ChatMessage } from "@/types/message";
+import { formatTime, msgVariants } from "@/lib/chat-message-utils";
 
 interface ChatSystemMessageProps {
   msg: ChatMessage;
@@ -13,7 +13,7 @@ interface ChatSystemMessageProps {
 
 export default function ChatSystemMessage({ msg, reduceMotion }: ChatSystemMessageProps) {
   return (
-    <motion.div
+    <m.div
       variants={msgVariants}
       initial={reduceMotion ? false : "hidden"}
       animate="visible"
@@ -31,6 +31,6 @@ export default function ChatSystemMessage({ msg, reduceMotion }: ChatSystemMessa
         <span className="min-w-0 text-center">{msg.text}</span>
         <span className="hidden shrink-0 opacity-60 sm:inline">{formatTime(msg.timestamp)}</span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }

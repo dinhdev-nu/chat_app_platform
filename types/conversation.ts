@@ -1,4 +1,4 @@
-import type { ConversationListItem, ConversationType, ConversationRole } from "@/components/chat/conversation-data";
+import type { ConversationListItem, ConversationType, ConversationRole } from "@/data/conversation-data";
 import type { CursorPaginationParams } from "./user";
 
 // ─── Request types ───────────────────────────────────────────────────────────

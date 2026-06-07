@@ -1,8 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { m, type Variants } from "framer-motion";
 
 const containerVariants = {
   initial: { opacity: 0 },
@@ -15,7 +14,7 @@ const containerVariants = {
   },
 };
 
-const fadeUpVariants = {
+const fadeUpVariants: Variants = {
   initial: { opacity: 0, y: 16 },
   animate: {
     opacity: 1,
@@ -35,54 +34,51 @@ const fadeVariants = {
 export default function ChatEmptyState() {
   // Chỉ trigger animate sau khi client đã hydrate xong
   // Tránh flash: SSR render visible → JS set opacity:0 → animate
-  const [isReady, setIsReady] = useState(false);
-  useEffect(() => { setIsReady(true); }, []);
-
   return (
     <section
       id="chat-empty-state"
       aria-labelledby="chat-empty-heading"
       className="relative w-full h-full flex flex-col overflow-hidden"
     >
-      <motion.div
+      <m.div
         variants={containerVariants}
         initial="initial"
-        animate={isReady ? "animate" : "initial"}
+        animate="animate"
         className="flex flex-col items-center my-auto py-8 px-4 w-full"
       >
         <div className="relative z-10 text-center">
           {/* Eyebrow label */}
-          <motion.span
+          <m.span
             variants={fadeVariants}
             className="inline-flex items-center gap-4 text-xs font-mono text-secondary mb-4 justify-center"
           >
             <span className="w-8 h-px bg-chat-secondary" aria-hidden="true" />
             Bắt đầu trò chuyện
             <span className="w-8 h-px bg-chat-secondary" aria-hidden="true" />
-          </motion.span>
+          </m.span>
 
           {/* Heading */}
-          <motion.h2
+          <m.h2
             id="chat-empty-heading"
-            variants={fadeUpVariants as any}
+            variants={fadeUpVariants}
             className="text-4xl md:text-5xl lg:text-6xl font-display tracking-tight leading-[1.1] text-primary"
           >
             Kết nối
             <br />
             <span className="text-secondary">mọi người.</span>
-          </motion.h2>
+          </m.h2>
 
           {/* Description */}
-          <motion.p
+          <m.p
             variants={fadeVariants}
             className="mt-4 text-base md:text-lg text-secondary leading-relaxed max-w-md mx-auto"
           >
             Trải nghiệm nhắn tin mượt mà và an toàn. Giữ liên lạc với bạn bè, đồng nghiệp và những người thân yêu mọi lúc, mọi nơi trên mọi thiết bị.
-          </motion.p>
+          </m.p>
         </div>
 
         {/* Decorative image */}
-        <motion.div
+        <m.div
           variants={fadeVariants}
           className="relative w-[150%] sm:w-[120%] max-w-4xl flex justify-center shrink-0 -mt-4 pointer-events-none"
         >
@@ -96,8 +92,8 @@ export default function ChatEmptyState() {
             className="w-full h-auto"
             priority={false}
           />
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </section>
   );
 }

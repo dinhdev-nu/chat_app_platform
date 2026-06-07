@@ -5,7 +5,7 @@ import {
   CloseIcon,
   PaletteIcon,
   PlusIcon,
-} from "./icons";
+} from "@/components/ui/icons";
 
 interface ChatActionMenuProps {
   onClose?: () => void;
@@ -19,15 +19,18 @@ interface ChatActionMenuProps {
   onAcceptContactRequest?: (senderUserId: string) => Promise<void> | void;
 }
 
+const EMPTY_INCOMING_REQUESTS: SearchUser[] = [];
+const EMPTY_PENDING_CONTACT_ACTION_IDS: string[] = [];
+
 function ChatActionMenu({
   onClose,
   onOpenFriends,
   onOpenAddFriends,
   onOpenCreateConversation,
-  incomingRequests = [],
+  incomingRequests = EMPTY_INCOMING_REQUESTS,
   isIncomingLoading = false,
   incomingError,
-  pendingContactActionIds = [],
+  pendingContactActionIds = EMPTY_PENDING_CONTACT_ACTION_IDS,
   onAcceptContactRequest,
 }: ChatActionMenuProps) {
   const handleAccept = (senderUserId: string) => {
@@ -99,7 +102,7 @@ function ChatActionMenu({
 
       <div className="flex-1 overflow-y-auto px-3 pb-4 flex flex-col gap-2 hide-scrollbar">
         {isIncomingLoading && incomingRequests.length === 0 ? (
-          <div className="px-2 py-8 text-center text-sm text-secondary">Đang tải yêu cầu...</div>
+          <div className="px-2 py-8 text-center text-sm text-secondary">Đang tải yêu cầu…</div>
         ) : incomingError ? (
           <div className="px-2 py-8 text-center text-sm text-[rgb(var(--textColor-danger))]" role="alert">
             {incomingError}
@@ -115,7 +118,7 @@ function ChatActionMenu({
                 className="flex items-center gap-3 p-2 rounded-xl hover-surface transition-colors"
               >
                 <div
-                  className="w-10 h-10 rounded-full flex-shrink-0 overflow-hidden bg-[rgb(var(--backgroundColor-state-enabled)/.5)] bg-cover bg-center flex items-center justify-center"
+                  className="size-10 rounded-full flex-shrink-0 overflow-hidden bg-[rgb(var(--backgroundColor-state-enabled)/.5)] bg-cover bg-center flex items-center justify-center"
                   style={{ backgroundImage: contact.avatarUrl ? `url(${contact.avatarUrl})` : undefined }}
                   aria-hidden="true"
                 >

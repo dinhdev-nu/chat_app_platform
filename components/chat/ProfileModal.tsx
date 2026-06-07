@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useEffectEvent, useReducer } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
@@ -9,7 +10,6 @@ import { useAuthStore } from "@/stores/authStore";
 import type { UpdateUserRequest } from "@/types/user";
 
 interface ProfileModalProps {
-  open: boolean;
   onOpenChange: (open: boolean) => void;
   initialData?: UpdateUserRequest;
   onSave?: (data: UpdateUserRequest) => void | Promise<void>;
@@ -30,14 +30,54 @@ const FOCUS_GUARD: React.CSSProperties = {
   margin: "-1px",
 };
 
+interface ProfileModalState {
+  name: string;
+  avatarUrl: string;
+  bio: string;
+  avatarError: boolean;
+  modalError: string | null;
+  isSaving: boolean;
+  isLoggingOut: boolean;
+}
+
+type ProfileModalAction =
+  | { type: "setName"; value: string }
+  | { type: "setAvatarUrl"; value: string }
+  | { type: "setBio"; value: string }
+  | { type: "setAvatarError"; value: boolean }
+  | { type: "setModalError"; value: string | null }
+  | { type: "setSaving"; value: boolean }
+  | { type: "setLoggingOut"; value: boolean };
+
+function profileModalReducer(
+  state: ProfileModalState,
+  action: ProfileModalAction,
+): ProfileModalState {
+  switch (action.type) {
+    case "setName":
+      return { ...state, name: action.value };
+    case "setAvatarUrl":
+      return { ...state, avatarUrl: action.value, avatarError: false };
+    case "setBio":
+      return { ...state, bio: action.value };
+    case "setAvatarError":
+      return { ...state, avatarError: action.value };
+    case "setModalError":
+      return { ...state, modalError: action.value };
+    case "setSaving":
+      return { ...state, isSaving: action.value };
+    case "setLoggingOut":
+      return { ...state, isLoggingOut: action.value };
+  }
+}
+
 export default function ProfileModal({
-  open,
   onOpenChange,
   initialData,
   onSave,
   onLogout,
 }: ProfileModalProps) {
-  const router = useRouter();
+  const { replace } = useRouter();
   const authUser = useAuthStore((state) => state.user);
   const updateProfile = useAuthStore((state) => state.updateProfile);
   const logout = useAuthStore((state) => state.logout);
@@ -46,56 +86,39 @@ export default function ProfileModal({
   const initialName = initialData?.name ?? authUser?.name ?? authUser?.email ?? "";
   const initialAvatarUrl = initialData?.avatarUrl ?? authUser?.avatarUrl ?? "";
   const initialBio = initialData?.bio ?? authUser?.bio ?? "";
-  const [shouldRender, setShouldRender] = useState(open);
-  const [isAnimatingOut, setIsAnimatingOut] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [name, setName] = useState(initialName);
-  const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
-  const [bio, setBio] = useState(initialBio);
-  const [avatarError, setAvatarError] = useState(false);
-  const [modalError, setModalError] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(profileModalReducer, {
+    name: initialName,
+    avatarUrl: initialAvatarUrl,
+    bio: initialBio,
+    avatarError: false,
+    modalError: null,
+    isSaving: false,
+    isLoggingOut: false,
+  });
+  const {
+    name,
+    avatarUrl,
+    bio,
+    avatarError,
+    modalError,
+    isSaving,
+    isLoggingOut,
+  } = state;
+  const closeModalFromEffect = useEffectEvent(() => onOpenChange(false));
 
   useEffect(() => {
-    if (open) {
-      setName(initialName);
-      setAvatarUrl(initialAvatarUrl);
-      setBio(initialBio);
-      setAvatarError(false);
-      setModalError(null);
-    }
-  }, [open, initialName, initialAvatarUrl, initialBio]);
-
-  useEffect(() => {
-    if (open) {
-      setShouldRender(true);
-      setIsAnimatingOut(false);
-    } else if (shouldRender) {
-      setIsAnimatingOut(true);
-    }
-  }, [open, shouldRender]);
-
-  useEffect(() => {
-    if (!open) return;
     const handler = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onOpenChange(false);
+      if (event.key === "Escape") closeModalFromEffect();
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [open, onOpenChange]);
-
-  const handleAnimationEnd = () => {
-    if (isAnimatingOut) {
-      setShouldRender(false);
-      setIsAnimatingOut(false);
-    }
-  };
+  }, []);
 
   const handleSave = async () => {
     if (isSaving || isUpdatingProfile || !name.trim()) return;
 
-    setIsSaving(true);
-    setModalError(null);
+    dispatch({ type: "setSaving", value: true });
+    dispatch({ type: "setModalError", value: null });
 
     try {
       const payload: UpdateUserRequest = {
@@ -112,31 +135,31 @@ export default function ProfileModal({
 
       onOpenChange(false);
     } catch (error) {
-      setModalError(getApiErrorMessage(error));
+      dispatch({ type: "setModalError", value: getApiErrorMessage(error) });
     } finally {
-      setIsSaving(false);
+      dispatch({ type: "setSaving", value: false });
     }
   };
 
   const handleLogout = async () => {
     if (isLoggingOut || isStoreLoggingOut) return;
 
-    setIsLoggingOut(true);
-    setModalError(null);
+    dispatch({ type: "setLoggingOut", value: true });
+    dispatch({ type: "setModalError", value: null });
 
     try {
       if (onLogout) {
         await onLogout();
       } else {
         await logout();
-        router.replace("/login");
+        replace("/login");
       }
 
       onOpenChange(false);
     } catch (error) {
-      setModalError(getApiErrorMessage(error));
+      dispatch({ type: "setModalError", value: getApiErrorMessage(error) });
     } finally {
-      setIsLoggingOut(false);
+      dispatch({ type: "setLoggingOut", value: false });
     }
   };
 
@@ -145,22 +168,20 @@ export default function ProfileModal({
   const avatarFallback = name.trim().charAt(0).toUpperCase() || "U";
   const showAvatar = avatarUrl.trim() && !avatarError;
 
-  if (!shouldRender) return null;
-
   return (
     <div data-base-ui-portal>
       <div
-        className={`overflow-hidden fixed inset-0 z-[9999] bg-overlay backdrop-blur-sm ${isAnimatingOut ? "modal-overlay-exit" : "modal-overlay-enter"}`}
+        className="overflow-hidden fixed inset-0 z-[9999] bg-overlay backdrop-blur-sm modal-overlay-enter"
         role="presentation"
         aria-hidden={true}
         style={{ userSelect: "none" }}
       />
 
-      <span aria-hidden tabIndex={0} style={FOCUS_GUARD} />
+      <button type="button" aria-label="Focus guard" style={FOCUS_GUARD} />
 
-      <div
-        className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-none"
-        role="dialog"
+      <dialog
+        open
+        className="fixed inset-0 z-[9999] m-0 flex max-h-none max-w-none items-center justify-center border-0 bg-transparent p-0 pointer-events-none"
         aria-modal="true"
         aria-labelledby="update-profile-title"
         tabIndex={-1}
@@ -169,8 +190,7 @@ export default function ProfileModal({
           className={`pointer-events-auto shadow-tool cursor-default flex w-full h-full overflow-hidden
             bg-surface border border-secondary md:rounded-xl relative text-primary justify-center
             md:w-[400px] md:h-auto p-4 md:p-6
-            ${isAnimatingOut ? "modal-content-exit" : "modal-content-enter"}`}
-          onAnimationEnd={handleAnimationEnd}
+            modal-content-enter`}
         >
           <div className="flex flex-col w-full justify-between gap-3">
             <div className="flex flex-col gap-8">
@@ -182,18 +202,21 @@ export default function ProfileModal({
                 <h3 className="text-xs text-secondary font-medium">Tên & ảnh đại diện</h3>
                 <div className="flex items-center gap-3">
                   <div
-                    className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
+                    className="size-12 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden"
                     style={{
                       background: "rgb(var(--backgroundColor-surface-container))",
                       border: "1px solid rgb(var(--backgroundColor-state-enabled))",
                     }}
                   >
                     {showAvatar ? (
-                      <img
+                      <Image
                         src={avatarUrl.trim()}
                         alt="Ảnh đại diện"
-                        className="w-full h-full object-cover"
-                        onError={() => setAvatarError(true)}
+                        width={48}
+                        height={48}
+                        unoptimized
+                        className="size-12 object-cover"
+                        onError={() => dispatch({ type: "setAvatarError", value: true })}
                       />
                     ) : (
                       <span className="text-primary font-medium" style={{ fontSize: 20, lineHeight: 1 }}>
@@ -207,10 +230,10 @@ export default function ProfileModal({
                   <input
                     id="profile-name"
                     type="text"
-                    placeholder="Tên hiển thị..."
+                    placeholder="Tên hiển thị…"
                     value={name}
                     maxLength={50}
-                    onChange={(event) => setName(event.target.value)}
+                    onChange={(event) => dispatch({ type: "setName", value: event.target.value })}
                     name="profileName"
                     autoComplete="name"
                     className="flex-1 modal-input-underline text-sm font-medium text-primary py-2"
@@ -227,8 +250,7 @@ export default function ProfileModal({
                   value={avatarUrl}
                   maxLength={512}
                   onChange={(event) => {
-                    setAvatarUrl(event.target.value);
-                    setAvatarError(false);
+                    dispatch({ type: "setAvatarUrl", value: event.target.value });
                   }}
                   name="profileAvatarUrl"
                   autoComplete="off"
@@ -247,10 +269,10 @@ export default function ProfileModal({
                 <textarea
                   id="profile-bio"
                   rows={2}
-                  placeholder="Thêm mô tả về bạn..."
+                  placeholder="Thêm mô tả về bạn…"
                   value={bio}
                   maxLength={300}
-                  onChange={(event) => setBio(event.target.value)}
+                  onChange={(event) => dispatch({ type: "setBio", value: event.target.value })}
                   name="profileBio"
                   autoComplete="off"
                   className="w-full text-sm text-primary modal-textarea rounded-xl p-3 resize-none"
@@ -291,7 +313,7 @@ export default function ProfileModal({
                       <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
                     </svg>
                     <span className="font-medium text-sm" aria-live="polite">
-                      Đang lưu...
+                      Đang lưu…
                     </span>
                   </>
                 ) : (
@@ -312,7 +334,7 @@ export default function ProfileModal({
                     focus-visible:outline-2 focus-visible:outline-current focus-visible:-outline-offset-2"
                 >
                   <LogOut size={15} aria-hidden="true" />
-                  <span className="font-medium text-sm">{isLogoutPending ? "Đang đăng xuất..." : "Đăng xuất"}</span>
+                  <span className="font-medium text-sm">{isLogoutPending ? "Đang đăng xuất…" : "Đăng xuất"}</span>
                 </button>
               ) : null}
               <div className="h-2" />
@@ -337,9 +359,9 @@ export default function ProfileModal({
             </span>
           </button>
         </div>
-      </div>
+      </dialog>
 
-      <span aria-hidden tabIndex={0} style={FOCUS_GUARD} />
+      <button type="button" aria-label="Focus guard" style={FOCUS_GUARD} />
     </div>
   );
 }

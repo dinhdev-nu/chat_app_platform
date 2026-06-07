@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import Image from "next/image";
 import { MoreHorizontal, Phone, Video } from "lucide-react";
 
-import type { ConversationListItem } from "./conversation-data";
+import type { ConversationListItem } from "@/data/conversation-data";
 
 function HeaderActionButton({
   label,
@@ -46,7 +47,14 @@ export default function ChatConversationHeader({ conv }: { conv: ConversationLis
     >
       <div className="relative shrink-0">
         {conv.avatarUrl ? (
-          <img src={conv.avatarUrl} alt={conv.name ?? "Avatar"} className="rounded-full object-cover" style={{ width: 36, height: 36 }} />
+          <Image
+            src={conv.avatarUrl}
+            alt={conv.name ?? "Avatar"}
+            width={36}
+            height={36}
+            unoptimized
+            className="rounded-full object-cover"
+          />
         ) : (
           <div
             className="rounded-full flex items-center justify-center text-sm font-semibold"
