@@ -24,7 +24,7 @@ export default function ChatHeader() {
         <div className="flex w-full flex-row gap-5 items-center">
           <Link href="/" className="select-none cursor-pointer no-underline focus-ring rounded-md">
             <Image
-              alt="Ten san pham, Stello (beta)"
+              alt="Tên sản phẩm, Stello (beta)"
               width={129}
               height={24}
               unoptimized

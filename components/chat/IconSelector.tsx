@@ -246,7 +246,7 @@ export default function IconSelector({
           <div className="flex items-center justify-between py-1.5 pl-2 shrink-0" style={{ "--stagger-index": 0 } as CSSProperties}>
             <div className="flex items-center gap-2">
               <EmojiIcon size={16} />
-              <span className="text-xs font-medium">ICONS</span>
+              <span className="text-xs font-medium">Biểu tượng</span>
             </div>
           </div>
 

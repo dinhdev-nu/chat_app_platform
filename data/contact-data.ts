@@ -55,7 +55,7 @@ export const MOCK_CONTACT_USERS: ContactUserResponse[] = [
 ];
 
 export function formatContactPresence(contact: ContactUserResponse) {
-  if (contact.isOnline) return "Đang online";
+  if (contact.isOnline) return "Đang trực tuyến";
 
   return formatContactLastSeen(contact.lastSeenAt);
 }

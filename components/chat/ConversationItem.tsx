@@ -30,7 +30,7 @@ function ConversationItem({ conversation, isActive = false, onSelect }: Conversa
   const initials = (conversation.name ?? "").trim().slice(0, 2).toUpperCase() || "CH";
   const typeLabel = getConversationTypeLabel(conversation.type);
   const activityLabel = formatConversationActivity(conversation.lastActivityAt);
-  const onlineLabel = conversation.isOnline ? "Đang online" : "Đang offline";
+  const onlineLabel = conversation.isOnline ? "Đang trực tuyến" : "Đang ngoại tuyến";
 
   return (
     <li>

@@ -255,7 +255,7 @@ function ConversationDetailsFields({
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
-                alt="Avatar"
+                alt="Ảnh đại diện"
                 width={48}
                 height={48}
                 unoptimized

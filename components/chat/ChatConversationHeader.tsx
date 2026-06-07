@@ -36,9 +36,9 @@ export default function ChatConversationHeader({ conv }: { conv: ConversationLis
   const presenceLabel =
     conv.type === 1
       ? isConversationOnline
-        ? "Đang online"
-        : "Đang offline"
-      : `${typeLabel} · ${conv.memberOnlineCount} online`;
+        ? "Đang trực tuyến"
+        : "Đang ngoại tuyến"
+      : `${typeLabel} · ${conv.memberOnlineCount} đang trực tuyến`;
 
   return (
     <div
@@ -49,7 +49,7 @@ export default function ChatConversationHeader({ conv }: { conv: ConversationLis
         {conv.avatarUrl ? (
           <Image
             src={conv.avatarUrl}
-            alt={conv.name ?? "Avatar"}
+            alt={conv.name ?? "Ảnh đại diện"}
             width={36}
             height={36}
             unoptimized

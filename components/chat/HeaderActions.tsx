@@ -264,7 +264,7 @@ function HeaderMoreMenu({
             onSelect={onClose}
             className="md:hidden"
           >
-            Docs
+            Tài liệu
           </HeaderMoreItem>
           <HeaderMoreItem
             id="header-more-discord"
@@ -356,13 +356,13 @@ export default function HeaderActions({
 
   return (
     <div className="flex gap-1 md:gap-2 items-center shrink-0">
-      <button type="button" className="no-underline hidden md:flex border-0 bg-transparent p-0" aria-label="Docs">
+      <button type="button" className="no-underline hidden md:flex border-0 bg-transparent p-0" aria-label="Tài liệu">
         <span className="cursor-pointer p-2 rounded-full select-none transition-colors flex items-center gap-1.5 text-[rgb(var(--textColor-primary))] hover:bg-[rgb(var(--backgroundColor-state-hover))] focus-ring">
           <span className="text-inherit" aria-hidden="true">
             <DocsIcon />
           </span>
           <span className="font-medium text-[13px] leading-[150%] text-[rgb(var(--textColor-primary))]">
-            Docs
+            Tài liệu
           </span>
         </span>
       </button>
