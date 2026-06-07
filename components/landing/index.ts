@@ -7,7 +7,7 @@ export { HowItWorksSection } from "./HowItWorksSection";
 export { InfrastructureSection } from "./InfrastructureSection";
 export { IntegrationsSection } from "./IntegrationsSection";
 export { MetricsSection } from "./MetricsSection";
-export { Navigation } from "./Navigation";
+export { Navigation } from "./navigation";
 export { PricingSection } from "./PricingSection";
 export { SecuritySection } from "./SecuritySection";
 export { TestimonialsSection } from "./TestimonialsSection";

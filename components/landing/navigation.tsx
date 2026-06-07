@@ -76,14 +76,14 @@ export function Navigation({ hideLinks = false }: NavigationProps = {}) {
           )}
 
           {/* Desktop & Mobile CTA (when hideLinks) */}
-          <div className={`${hideLinks ? "flex" : "hidden md:flex"} items-center gap-4`}>
+          <div className={`${hideLinks ? "hidden sm:flex" : "hidden md:flex"} min-w-0 items-center gap-2 sm:gap-4`}>
             <Link href="/login" className={`transition-all duration-500 ${isScrolled ? "text-xs text-foreground/70 hover:text-foreground" : "text-sm text-white/70 hover:text-white"}`}>
               Đăng nhập
             </Link>
             <Button
               asChild
               size="sm"
-              className={`rounded-full transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : "bg-white hover:bg-white/90 text-black px-6"}`}
+              className={`rounded-full whitespace-nowrap transition-all duration-500 ${isScrolled ? "bg-foreground hover:bg-foreground/90 text-background px-4 h-8 text-xs" : hideLinks ? "bg-white hover:bg-white/90 text-black px-4 h-9 text-sm" : "bg-white hover:bg-white/90 text-black px-6"}`}
             >
               <Link href="/chat">Mở Chat</Link>
             </Button>

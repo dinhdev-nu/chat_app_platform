@@ -122,7 +122,7 @@ export default function AuthCard({
 
   return (
     <m.div
-      initial={{ opacity: 0, y: 16, scale: 0.98 }}
+      initial={false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
       className="relative w-full max-w-[320px] mx-auto overflow-hidden rounded-[1.9rem] border border-border/40 bg-card/40 backdrop-blur-2xl shadow-2xl"
@@ -130,7 +130,7 @@ export default function AuthCard({
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.15),transparent_50%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.05),transparent_40%)] z-0" />
 
       <div className="relative z-10 p-6">
-        <AnimatePresence mode="wait" custom={direction}>
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
           {step === "email" ? (
             <m.div
               key="email-step"
@@ -141,7 +141,7 @@ export default function AuthCard({
               exit="exit"
             >
               <form onSubmit={goToOtp} className="space-y-4">
-                <m.div custom={0} variants={itemVariants} initial="hidden" animate="visible">
+                <m.div custom={0} variants={itemVariants} initial={false} animate="visible">
                   <button
                     type="button"
                     disabled
@@ -156,14 +156,14 @@ export default function AuthCard({
                 <m.div
                   custom={1}
                   variants={itemVariants}
-                  initial="hidden"
+                  initial={false}
                   animate="visible"
                   className="text-center text-xs text-muted-foreground"
                 >
                   HOẶC
                 </m.div>
 
-                <m.label custom={2} variants={itemVariants} initial="hidden" animate="visible" className="block">
+                <m.label custom={2} variants={itemVariants} initial={false} animate="visible" className="block">
                   <span className="sr-only">Email</span>
                   <input
                     type="email"
@@ -183,7 +183,7 @@ export default function AuthCard({
                   <m.p
                     custom={3}
                     variants={itemVariants}
-                    initial="hidden"
+                    initial={false}
                     animate="visible"
                     className="text-xs text-red-200 text-center"
                     role="alert"
@@ -192,7 +192,7 @@ export default function AuthCard({
                   </m.p>
                 ) : null}
 
-                <m.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
+                <m.div custom={4} variants={itemVariants} initial={false} animate="visible">
                   <button
                     type="submit"
                     className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-60 disabled:cursor-not-allowed hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
@@ -206,7 +206,7 @@ export default function AuthCard({
                 <m.p
                   custom={5}
                   variants={itemVariants}
-                  initial="hidden"
+                  initial={false}
                   animate="visible"
                   className="text-xs text-muted-foreground text-center"
                 >
@@ -234,7 +234,7 @@ export default function AuthCard({
                 <m.div
                   custom={0}
                   variants={itemVariants}
-                  initial="hidden"
+                  initial={false}
                   animate="visible"
                   className="flex items-center gap-1"
                 >
@@ -252,7 +252,7 @@ export default function AuthCard({
                 <m.p
                   custom={1}
                   variants={itemVariants}
-                  initial="hidden"
+                  initial={false}
                   animate="visible"
                   className="text-sm text-muted-foreground leading-snug"
                 >
@@ -264,7 +264,7 @@ export default function AuthCard({
                 <m.div
                   custom={2}
                   variants={itemVariants}
-                  initial="hidden"
+                  initial={false}
                   animate="visible"
                   className="flex justify-center"
                 >
@@ -285,7 +285,7 @@ export default function AuthCard({
                   <m.p
                     custom={3}
                     variants={itemVariants}
-                    initial="hidden"
+                    initial={false}
                     animate="visible"
                     className="text-xs text-red-200 text-center"
                     role="alert"
@@ -294,7 +294,7 @@ export default function AuthCard({
                   </m.p>
                 ) : null}
 
-                <m.div custom={4} variants={itemVariants} initial="hidden" animate="visible">
+                <m.div custom={4} variants={itemVariants} initial={false} animate="visible">
                   <button
                     type="submit"
                     className="w-full px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium disabled:opacity-60 disabled:cursor-not-allowed hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background transition-all"
@@ -319,7 +319,7 @@ export default function AuthCard({
                 <m.p
                   custom={5}
                   variants={itemVariants}
-                  initial="hidden"
+                  initial={false}
                   animate="visible"
                   className="text-xs text-muted-foreground text-center"
                 >

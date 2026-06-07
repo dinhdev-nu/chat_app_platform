@@ -110,9 +110,11 @@ export function HeroSection() {
             className={`mb-8 transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
           >
-            <span className="inline-flex items-center gap-3 text-sm font-mono text-white/60">
-              <span className="w-8 h-px bg-white/30" />
-              Nền tảng giao tiếp hiện đại dành cho mọi người
+            <span className="inline-flex max-w-full items-start gap-3 whitespace-normal text-sm font-mono text-white/60">
+              <span className="mt-[0.7em] h-px w-8 shrink-0 bg-white/30" />
+              <span className="min-w-0 max-w-[28ch] leading-relaxed sm:max-w-none">
+                Nền tảng giao tiếp hiện đại dành cho mọi người
+              </span>
             </span>
           </div>
 
@@ -122,8 +124,8 @@ export function HeroSection() {
               className={`text-left text-[clamp(1.75rem,5vw,5.5rem)] font-display leading-[1.1] tracking-tight text-white transition-all duration-1000 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
                 }`}
             >
-              <span className="block whitespace-nowrap">Kết nối mọi người,</span>
-              <span className="block whitespace-nowrap">
+              <span className="block sm:whitespace-nowrap">Kết nối mọi người,</span>
+              <span className="block sm:whitespace-nowrap">
                 để cùng nhau{" "}
                 <span className="relative inline-block">
                   <BlurWord word={words[wordIndex]} trigger={wordIndex} />
@@ -136,18 +138,18 @@ export function HeroSection() {
 
       {/* Stats — 3 metrics static, no auto-scroll */}
       <div
-        className={`absolute bottom-12 left-0 right-0 px-6 lg:px-12 transition-all duration-700 delay-500 ${isVisible ? "opacity-100" : "opacity-0"
+        className={`absolute bottom-8 left-0 right-0 px-6 sm:bottom-12 lg:px-12 transition-all duration-700 delay-500 ${isVisible ? "opacity-100" : "opacity-0"
           }`}
       >
-        <div className="max-w-[1400px] mx-auto flex items-start gap-10 lg:gap-20">
+        <div className="mx-0 grid max-w-[18rem] grid-cols-1 items-start gap-2 sm:mx-auto sm:max-w-[1400px] sm:flex sm:gap-10 lg:gap-20">
           {[
             { value: "10M+", label: "người dùng tích cực" },
             { value: "99.9%", label: "thời gian hoạt động" },
             { value: "<10ms", label: "độ trễ tin nhắn" },
           ].map((stat) => (
-            <div key={stat.label} className="flex flex-col gap-2">
-              <span className="text-3xl lg:text-4xl font-display text-white">{stat.value}</span>
-              <span className="text-xs text-white/50 leading-tight">
+            <div key={stat.label} className="grid min-w-0 grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 sm:flex sm:flex-col sm:gap-2">
+              <span className="block max-w-full whitespace-nowrap text-2xl sm:text-3xl lg:text-4xl font-display text-white">{stat.value}</span>
+              <span className="block w-full max-w-full break-words text-[11px] sm:text-xs text-white/50 leading-tight">
                 {stat.label}
               </span>
             </div>

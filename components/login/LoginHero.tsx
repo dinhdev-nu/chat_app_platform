@@ -59,14 +59,14 @@ const AuthHero: FC<AuthHeroProps> = ({
       <m.div
         className="relative z-10 w-full max-w-[700px] px-10 pt-28 pb-10 lg:pt-36 lg:pb-16 text-center lg:text-center"
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         animate="visible"
       >
         <h1 className="text-[clamp(2.2rem,4vw,3rem)] font-display leading-[0.92] tracking-tight text-white mb-4">
-          <m.span variants={lineVariants} className="block whitespace-nowrap">
+          <m.span variants={lineVariants} className="block sm:whitespace-nowrap">
             Nhanh,
           </m.span>
-          <m.span variants={lineVariants} className="block whitespace-nowrap">
+          <m.span variants={lineVariants} className="block sm:whitespace-nowrap">
             an toàn hơn
           </m.span>
         </h1>
