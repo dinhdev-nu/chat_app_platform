@@ -1,30 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useTheme } from "next-themes";
 import { SunIcon, MoonIcon } from "@/components/ui/icons";
 
-function getInitialIsDark() {
-  if (typeof document === "undefined") return true;
-
-  return document.documentElement.classList.contains("dark");
-}
-
 export default function DisplayToggle() {
-  const [isDark, setIsDark] = useState(getInitialIsDark);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("chat-theme");
-    const dark = saved !== "light";
-    document.documentElement.classList.toggle("dark", dark);
-    document.documentElement.style.colorScheme = dark ? "dark" : "light";
-  }, []);
+  const { resolvedTheme, setTheme } = useTheme();
+  const isDark = resolvedTheme !== "light";
 
   const toggle = () => {
-    const next = !isDark;
-    setIsDark(next);
-    document.documentElement.classList.toggle("dark", next);
-    document.documentElement.style.colorScheme = next ? "dark" : "light";
-    localStorage.setItem("chat-theme", next ? "dark" : "light");
+    setTheme(isDark ? "light" : "dark");
   };
 
   return (

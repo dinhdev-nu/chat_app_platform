@@ -60,7 +60,7 @@ export default function ConversationStarter({ conv, isSending = false, onSend, o
               <h1
                 className="
                   text-left font-normal leading-none
-                  font-sans
+                  font-display
                   text-[rgb(var(--textColor-primary))]
                   text-[clamp(2.25rem,6vw,4rem)]
                 "
@@ -101,10 +101,10 @@ export default function ConversationStarter({ conv, isSending = false, onSend, o
                 ))}
               </div>
 
-              <div className="flex w-full self-start justify-center md:border-none transition-all duration-300 rounded-3xl">
+              <div className="flex w-full self-start justify-center md:border-none transition-all duration-300 rounded-2xl">
                 <ChatInput
                   ariaLabel={conv?.name ? `Nhắn tin tới ${conv.name}` : undefined}
-                  placeholder={conv?.name ? `Nhắn tin tới ${conv.name}...` : undefined}
+                  placeholder={conv?.name ? `Nhắn tin tới ${conv.name}…` : undefined}
                   sendLabel={conv ? "Gửi tin nhắn" : undefined}
                   suggestedText={suggestedTextRequest?.text}
                   suggestedTextKey={suggestedTextRequest?.key}

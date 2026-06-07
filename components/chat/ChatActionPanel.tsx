@@ -51,7 +51,7 @@ export default function ChatActionPanel({
       {isOpen ? (
         <m.div
           key="panel-backdrop"
-          className="md:hidden fixed inset-0 z-[50] bg-black/40"
+          className="md:hidden fixed inset-0 z-[50] bg-black/45 backdrop-blur-sm"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -65,8 +65,8 @@ export default function ChatActionPanel({
           key="panel-shell"
           className={[
             "z-[60] pointer-events-auto flex flex-col",
-            "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] h-[80vh]",
-            "md:absolute md:left-[412px] md:-translate-x-0 md:w-[280px] md:h-[calc(100%-160px)]"
+            "fixed top-1/2 left-1/2 w-[90vw] h-[80vh] -translate-x-1/2 -translate-y-1/2",
+            "md:absolute md:left-[412px] md:w-[280px] md:h-[calc(100%-160px)] md:-translate-x-0",
           ].join(" ")}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -74,7 +74,7 @@ export default function ChatActionPanel({
           transition={{ duration: 0.24, ease: "easeOut" }}
         >
           <m.div
-            className="relative h-full min-h-[66vh] w-full bg-surface-container backdrop-blur-glass border border-chat-secondary rounded-3xl shadow-glass-soft overflow-hidden flex flex-col"
+            className="relative flex h-full min-h-[66vh] w-full flex-col overflow-hidden rounded-2xl border border-chat-secondary bg-surface-container shadow-glass-soft backdrop-blur-glass"
             initial={{ y: 12 }}
             animate={{ y: 0 }}
             exit={{ y: 12 }}

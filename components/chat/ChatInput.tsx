@@ -116,7 +116,7 @@ export default function ChatInput({
   };
 
   return (
-    <div className="relative z-[1] flex h-[101px] w-full max-w-[720px] flex-col justify-end overflow-hidden rounded-[24px] cursor-text bg-surface-container backdrop-blur-glass text-primary border border-secondary shadow-lg outline-none">
+    <div className="relative z-[1] flex h-[101px] w-full max-w-[720px] flex-col justify-end overflow-hidden rounded-[20px] cursor-text bg-surface-container backdrop-blur-glass text-primary border border-secondary shadow-glass-soft outline-none">
       <div>
         <div>
           <div

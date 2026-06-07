@@ -105,7 +105,7 @@ function SidebarList({
                     <ul>
                         {isContactsLoading && contacts.length === 0 ? (
                             <li className="px-3 py-8 text-center text-sm text-secondary">
-                                Đang tải bạn bè...
+                                Đang tải bạn bè…
                             </li>
                         ) : contactsError ? (
                             <li className="px-3 py-8 text-center text-sm text-[rgb(var(--textColor-danger))]" role="alert">

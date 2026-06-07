@@ -23,7 +23,7 @@ function ChatSkeleton() {
   return (
     <div
       aria-busy="true"
-      aria-label="Đang tải..."
+      aria-label="Đang tải…"
       className="chat-root flex h-svh bg-[rgb(var(--backgroundColor-primary))] text-[rgb(var(--textColor-primary))]"
     />
   );

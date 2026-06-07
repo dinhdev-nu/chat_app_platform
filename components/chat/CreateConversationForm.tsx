@@ -268,7 +268,7 @@ function ConversationDetailsFields({
             )}
           </div>
           <input
-            placeholder={type === 2 ? "Tên nhóm..." : "Tên kênh..."}
+            placeholder={type === 2 ? "Tên nhóm…" : "Tên kênh…"}
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
             className="flex-1 bg-transparent text-sm font-medium text-primary placeholder:text-[rgb(var(--textColor-secondary))] outline-none border-b border-transparent focus:border-[rgb(var(--textColor-primary)/0.3)] transition-colors py-2"
@@ -293,7 +293,7 @@ function ConversationDetailsFields({
       <div className="flex flex-col gap-3">
         <h3 className="text-xs text-secondary font-medium">Mô tả</h3>
         <textarea
-          placeholder="Thêm mô tả..."
+          placeholder="Thêm mô tả…"
           value={description}
           onChange={(event) => onDescriptionChange(event.target.value)}
           className="w-full bg-[rgb(var(--backgroundColor-surface-container)/.3)] text-sm text-primary placeholder:text-[rgb(var(--textColor-secondary))] outline-none border border-[rgb(var(--backgroundColor-state-enabled))] rounded-xl p-3 min-h-[80px] resize-none focus:border-[rgb(var(--textColor-primary)/0.3)] transition-colors"
@@ -361,7 +361,7 @@ function MemberSearchField({
             <SearchIcon />
           </span>
           <input
-            placeholder="Tìm kiếm người dùng..."
+            placeholder="Tìm kiếm người dùng…"
             className="w-full bg-transparent text-body-sm outline-none text-primary placeholder:text-[rgb(var(--textColor-secondary))]"
             type="text"
             name="memberSearch"

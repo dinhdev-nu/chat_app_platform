@@ -1,6 +1,6 @@
 /* ===== Chat Page Design System Variables ===== */
 .chat-root {
-  color-scheme: light;
+  color-scheme: dark;
   --colors-neutral-0: 255 255 255;
   --colors-neutral-25: 242 242 242;
   --colors-neutral-50: 250 250 250;
@@ -58,13 +58,119 @@
   --colors-red-400: 248 69 99;
   --colors-red-450: 250 91 56;
   --colors-red-500: 230 48 8;
+  --backgroundColor-selection-bg: 84 77 120;
+  --backgroundColor-primary: 8 9 13;
+  --backgroundColor-secondary: 13 14 20;
+  --backgroundColor-surface: 12 13 19;
+  --backgroundColor-surface-container: 20 21 29;
+  --backgroundColor-surface-inverse: 241 239 231;
+  --backgroundColor-transparent: 0 0 0;
+  --backgroundColor-state-enabled: 38 39 50;
+  --backgroundColor-state-hover: 55 56 69;
+  --backgroundColor-state-pressed: 74 73 88;
+  --backgroundColor-state-active: 31 32 43;
+  --backgroundColor-state-disabled: 25 26 33;
+  --backgroundColor-state-menu-hover: 241 239 231;
+  --backgroundColor-state-menu-active: 241 239 231;
+  --backgroundColor-top-layer: 16 17 24;
+  --backgroundColor-secondary-alt: 18 20 28;
+  --backgroundColor-design: 41 42 53;
+  --backgroundColor-placeholder: 78 79 90;
+  --backgroundColor-wash: 45 46 57;
+  --backgroundColor-surface-hover: 33 34 45;
+  --backgroundColor-surface-input: 24 25 34;
+  --backgroundColor-accent: 236 168 214;
+  --backgroundColor-dark: 8 9 13;
+  --backgroundColor-error: 230 48 8;
+  --backgroundColor-mobile: 255 177 238;
+  --backgroundColor-desktop: 94 155 255;
+  --textColor-selection-text: 255 255 255;
+  --textColor-primary: 241 239 231;
+  --textColor-secondary: 172 168 156;
+  --textColor-disabled: 128 124 115;
+  --textColor-inverse-primary: 8 9 13;
+  --textColor-inverse-secondary: 53 53 47;
+  --textColor-inverse-disabled: 95 95 86;
+  --textColor-accent: 236 168 214;
+  --textColor-light: 241 239 231;
+  --textColor-like: 248 69 99;
+  --textColor-mobile: 255 177 238;
+  --textColor-desktop: 94 155 255;
+  --textColor-success: 11 217 114;
+  --textColor-danger: 248 69 99;
+  --textColor-error: 250 91 56;
+  --borderColor-primary: 241 239 231;
+  --borderColor-secondary: 241 239 231;
+  --borderColor-tertiary: 172 168 156;
+  --borderColor-wash: 241 239 231;
+  --borderColor-disabled: 128 124 115;
+  --borderColor-error: 250 91 56;
+  --borderColor-accent: 236 168 214;
+  --borderColor-mobile: 255 177 238;
+  --borderColor-desktop: 103 232 249;
+  --borderColor-invisible: 0 0 0;
+  --outlineColor-primary: 241 239 231;
+  --outlineColor-focus-ring: 236 168 214;
+  --gradientColorStops-secondary-alt: 53 53 53;
+  --font-sans-theme: var(--font-sans);
+  --scrollbar-thumb: rgb(var(--borderColor-secondary) / .25);
+  --scrollbar-thumb-hover: rgb(var(--borderColor-secondary) / .4);
+}
+
+/* ===== Dark Theme Overrides ===== */
+.dark .chat-root {
+  color-scheme: dark;
+  --backgroundColor-selection-bg: 84 77 120;
+  --backgroundColor-primary: 8 9 13;
+  --backgroundColor-secondary: 13 14 20;
+  --backgroundColor-surface: 12 13 19;
+  --backgroundColor-surface-container: 20 21 29;
+  --backgroundColor-surface-inverse: 241 239 231;
+  --backgroundColor-transparent: 0 0 0;
+  --backgroundColor-state-enabled: 38 39 50;
+  --backgroundColor-state-hover: 55 56 69;
+  --backgroundColor-state-pressed: 74 73 88;
+  --backgroundColor-state-active: 31 32 43;
+  --backgroundColor-state-disabled: 25 26 33;
+  --backgroundColor-state-plain: 0 0 0;
+  --backgroundColor-state-menu-hover: 218 220 224;
+  --backgroundColor-state-menu-active: 218 220 224;
+  --backgroundColor-top-layer: 16 17 24;
+  --backgroundColor-secondary-alt: 18 20 28;
+  --backgroundColor-design: 41 42 53;
+  --backgroundColor-placeholder: 78 79 90;
+  --backgroundColor-wash: 45 46 57;
+  --backgroundColor-surface-hover: 33 34 45;
+  --backgroundColor-surface-input: 24 25 34;
+  --backgroundColor-accent: 236 168 214;
+  --backgroundColor-dark: 8 9 13;
+  --textColor-selection-text: 255 255 255;
+  --textColor-primary: 241 239 231;
+  --textColor-secondary: 172 168 156;
+  --textColor-disabled: 128 124 115;
+  --textColor-inverse-primary: 8 9 13;
+  --textColor-inverse-secondary: 53 53 47;
+  --textColor-inverse-disabled: 95 95 86;
+  --textColor-accent: 236 168 214;
+  --borderColor-primary: 241 239 231;
+  --borderColor-secondary: 241 239 231;
+  --borderColor-tertiary: 172 168 156;
+  --borderColor-wash: 241 239 231;
+  --borderColor-disabled: 128 124 115;
+  --borderColor-error: 230 48 8;
+  --borderColor-accent: 236 168 214;
+  --borderColor-invisible: 0 0 0;
+}
+
+/* ===== Light Theme Fallback ===== */
+.light .chat-root {
+  color-scheme: light;
   --backgroundColor-selection-bg: 199 220 242;
   --backgroundColor-primary: 241 243 244;
   --backgroundColor-secondary: 218 220 224;
   --backgroundColor-surface: 241 243 244;
   --backgroundColor-surface-container: 218 220 224;
   --backgroundColor-surface-inverse: 32 33 36;
-  --backgroundColor-transparent: 0 0 0;
   --backgroundColor-state-enabled: 218 220 224;
   --backgroundColor-state-hover: 218 220 224;
   --backgroundColor-state-pressed: 155 161 167;
@@ -81,9 +187,6 @@
   --backgroundColor-surface-input: 242 242 242;
   --backgroundColor-accent: 32 33 36;
   --backgroundColor-dark: 25 25 25;
-  --backgroundColor-error: 230 48 8;
-  --backgroundColor-mobile: 255 177 238;
-  --backgroundColor-desktop: 94 155 255;
   --textColor-selection-text: 44 44 42;
   --textColor-primary: 32 33 36;
   --textColor-secondary: 95 99 104;
@@ -93,73 +196,15 @@
   --textColor-inverse-disabled: 218 220 224;
   --textColor-accent: 96 86 240;
   --textColor-light: 25 25 25;
-  --textColor-like: 248 69 99;
-  --textColor-mobile: 255 177 238;
-  --textColor-desktop: 94 155 255;
-  --textColor-success: 11 217 114;
-  --textColor-danger: 248 69 99;
-  --textColor-error: 250 91 56;
   --borderColor-primary: 32 33 36;
   --borderColor-secondary: 22 23 24;
   --borderColor-tertiary: 95 99 104;
   --borderColor-wash: 22 23 24;
   --borderColor-disabled: 22 23 24;
-  --borderColor-error: 250 91 56;
   --borderColor-accent: 96 86 240;
-  --borderColor-mobile: 255 177 238;
-  --borderColor-desktop: 94 155 255;
   --borderColor-invisible: 255 255 255;
   --outlineColor-primary: 255 255 255;
-  --outlineColor-focus-ring: 241 243 244;
-  --gradientColorStops-secondary-alt: 53 53 53;
-  --font-sans-theme: var(--font-sans);
-  --scrollbar-thumb: rgb(var(--borderColor-secondary) / .25);
-  --scrollbar-thumb-hover: rgb(var(--borderColor-secondary) / .4);
-}
-
-/* ===== Dark Theme Overrides ===== */
-.dark .chat-root {
-  color-scheme: dark;
-  --backgroundColor-selection-bg: 82 82 82;
-  --backgroundColor-primary: 32 33 36;
-  --backgroundColor-secondary: 22 23 24;
-  --backgroundColor-surface: 32 33 36;
-  --backgroundColor-surface-container: 22 23 24;
-  --backgroundColor-surface-inverse: 241 243 244;
-  --backgroundColor-transparent: 0 0 0;
-  --backgroundColor-state-enabled: 56 59 61;
-  --backgroundColor-state-hover: 110 115 119;
-  --backgroundColor-state-pressed: 152 158 164;
-  --backgroundColor-state-active: 60 64 67;
-  --backgroundColor-state-disabled: 22 23 24;
-  --backgroundColor-state-plain: 0 0 0;
-  --backgroundColor-state-menu-hover: 218 220 224;
-  --backgroundColor-state-menu-active: 218 220 224;
-  --backgroundColor-top-layer: 21 19 21;
-  --backgroundColor-secondary-alt: 35 39 47;
-  --backgroundColor-design: 207 207 207;
-  --backgroundColor-placeholder: 111 111 111;
-  --backgroundColor-wash: 55 56 64;
-  --backgroundColor-surface-hover: 58 58 58;
-  --backgroundColor-surface-input: 42 42 42;
-  --backgroundColor-accent: 241 243 244;
-  --backgroundColor-dark: 229 229 229;
-  --textColor-selection-text: 255 255 255;
-  --textColor-primary: 241 243 244;
-  --textColor-secondary: 189 193 198;
-  --textColor-disabled: 218 220 224;
-  --textColor-inverse-primary: 32 33 36;
-  --textColor-inverse-secondary: 128 134 139;
-  --textColor-inverse-disabled: 22 23 24;
-  --textColor-accent: 113 104 246;
-  --borderColor-primary: 241 243 244;
-  --borderColor-secondary: 218 220 224;
-  --borderColor-tertiary: 128 134 139;
-  --borderColor-wash: 218 220 224;
-  --borderColor-disabled: 218 220 224;
-  --borderColor-error: 230 48 8;
-  --borderColor-accent: 113 104 246;
-  --borderColor-invisible: 0 0 0;
+  --outlineColor-focus-ring: 32 33 36;
 }
 
 /* ===== Font Heading ===== */
@@ -199,7 +244,7 @@
   background-color: rgb(var(--backgroundColor-secondary) / .5);
 }
 .chat-root .bg-surface-container {
-  background-color: rgb(var(--backgroundColor-surface-container) / .55);
+  background-color: rgb(var(--backgroundColor-surface-container) / .68);
 }
 /* bg-surface — matches modal.html's bg-surface */
 .chat-root .bg-surface {
@@ -207,7 +252,7 @@
 }
 /* Panel card — white in light, near-black in dark */
 .chat-root .bg-panel-surface {
-  background-color: rgb(var(--backgroundColor-top-layer) / 0.92);
+  background-color: rgb(var(--backgroundColor-top-layer) / 0.94);
 }
 .chat-root .bg-state-enabled {
   background-color: rgb(var(--backgroundColor-state-enabled) / .575);
@@ -450,15 +495,21 @@
 /* ===== Glass Shadow ===== */
 .chat-root .shadow-glass-soft {
   box-shadow:
-    0 4px 24px -4px rgb(0 0 0 / 0.10),
-    0 1px 6px -1px rgb(0 0 0 / 0.06),
-    0 0 0 1px rgb(0 0 0 / 0.04);
+    0 18px 56px -32px rgb(0 0 0 / 0.72),
+    0 8px 24px -18px rgb(0 0 0 / 0.55),
+    0 0 0 1px rgb(255 255 255 / 0.05);
 }
 .dark .chat-root .shadow-glass-soft {
   box-shadow:
-    0 4px 32px -4px rgb(0 0 0 / 0.45),
-    0 1px 8px -1px rgb(0 0 0 / 0.25),
-    0 0 0 1px rgb(255 255 255 / 0.06);
+    0 18px 56px -32px rgb(0 0 0 / 0.72),
+    0 8px 24px -18px rgb(0 0 0 / 0.55),
+    0 0 0 1px rgb(255 255 255 / 0.05);
+}
+.light .chat-root .shadow-glass-soft {
+  box-shadow:
+    0 4px 24px -4px rgb(0 0 0 / 0.10),
+    0 1px 6px -1px rgb(0 0 0 / 0.06),
+    0 0 0 1px rgb(0 0 0 / 0.04);
 }
 
 /* ===== Glass Backdrop ===== */

@@ -108,7 +108,7 @@ export default function ConversationSidebar({
       <div
         className="
           flex flex-col flex-1 min-h-0
-          rounded-3xl p-3 overflow-y-auto hide-scrollbar
+          rounded-2xl p-3 overflow-y-auto hide-scrollbar
           bg-surface-container backdrop-blur-glass
           border border-chat-secondary shadow-glass-soft
           w-full md:w-[375px]

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useEffectEvent, useReducer } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
@@ -168,8 +169,8 @@ export default function ProfileModal({
   const avatarFallback = name.trim().charAt(0).toUpperCase() || "U";
   const showAvatar = avatarUrl.trim() && !avatarError;
 
-  return (
-    <div data-base-ui-portal>
+  const modalContent = (
+    <div data-base-ui-portal className="chat-root">
       <div
         className="overflow-hidden fixed inset-0 z-[9999] bg-overlay backdrop-blur-sm modal-overlay-enter"
         role="presentation"
@@ -179,17 +180,15 @@ export default function ProfileModal({
 
       <button type="button" aria-label="Focus guard" style={FOCUS_GUARD} />
 
-      <dialog
-        open
-        className="fixed inset-0 z-[9999] m-0 flex max-h-none max-w-none items-center justify-center border-0 bg-transparent p-0 pointer-events-none"
-        aria-modal="true"
-        aria-labelledby="update-profile-title"
-        tabIndex={-1}
-      >
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none">
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="update-profile-title"
+          tabIndex={-1}
           className={`pointer-events-auto shadow-tool cursor-default flex w-full h-full overflow-hidden
             bg-surface border border-secondary md:rounded-xl relative text-primary justify-center
-            md:w-[400px] md:h-auto p-4 md:p-6
+            max-w-[400px] max-h-[calc(100svh-2rem)] md:h-auto p-4 md:p-6
             modal-content-enter`}
         >
           <div className="flex flex-col w-full justify-between gap-3">
@@ -359,9 +358,13 @@ export default function ProfileModal({
             </span>
           </button>
         </div>
-      </dialog>
+      </div>
 
       <button type="button" aria-label="Focus guard" style={FOCUS_GUARD} />
     </div>
   );
+
+  if (typeof document === "undefined") return null;
+
+  return createPortal(modalContent, document.body);
 }
