@@ -82,42 +82,10 @@ export function UserGroupIcon({ size = 18, className }: IconProps) {
   )
 }
 
-export function AchievementIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="m20.25 7.5-.625 10.63a2.25 2.25 0 0 1-2.25 2.12H6.62a2.25 2.25 0 0 1-2.25-2.12L3.75 7.5M10 11.25h4M3.38 7.5h17.25c.621 0 1.13-.504 1.13-1.13v-1.5c0-.621-.504-1.13-1.13-1.13H3.38c-.621 0-1.13.504-1.13 1.13v1.5c0 .621.5 1.13 1.13 1.13Z" />
-    </svg>
-  );
-}
-
-export function PushPinIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="m640-480 80 80v80H520v240l-40 40-40-40v-240H240v-80l80-80v-280h-40v-80h400v80h-40v280Zm-286 80h252l-46-46v-314H400v314l-46 46Zm126 0Z" />
-    </svg>
-  );
-}
-
 export function SearchIcon({ size = 16, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
       <path d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z" />
-    </svg>
-  );
-}
-
-export function DesktopIcon({ size = 12, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z" />
-    </svg>
-  );
-}
-
-export function MobileIcon({ size = 12, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M176,16H80A24,24,0,0,0,56,40V216a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V40A24,24,0,0,0,176,16ZM72,64H184V192H72Zm8-32h96a8,8,0,0,1,8,8v8H72V40A8,8,0,0,1,80,32Zm96,192H80a8,8,0,0,1-8-8v-8H184v8A8,8,0,0,1,176,224Z" />
     </svg>
   );
 }
@@ -178,37 +146,6 @@ export function CloseIcon({ size = 16, className }: IconProps) {
   );
 }
 
-export function MobileDeviceIcon({ size = 16, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M176,16H80A24,24,0,0,0,56,40V216a24,24,0,0,0,24,24h96a24,24,0,0,0,24-24V40A24,24,0,0,0,176,16Zm8,200a8,8,0,0,1-8,8H80a8,8,0,0,1-8-8V40a8,8,0,0,1,8-8h96a8,8,0,0,1,8,8ZM168,56a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,56Z" />
-    </svg>
-  );
-}
-
-export function DesktopDeviceIcon({ size = 16, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24h72v16H96a8,8,0,0,0,0,16h64a8,8,0,0,0,0-16H136V200h72a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40ZM48,56H208a8,8,0,0,1,8,8v80H40V64A8,8,0,0,1,48,56ZM208,184H48a8,8,0,0,1-8-8V160H216v16A8,8,0,0,1,208,184Z" />
-    </svg>
-  );
-}
-
-export function SparkleIcon({ size = 20, className }: IconProps) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
-      <g clipPath="url(#clip0_sparkle)">
-        <path d="M9 16.2C8.93 16.2 8.86 16.18 8.81 16.13C8.76 16.08 8.73 16.01 8.7 15.94C8.5 15.15 8.19 14.39 7.76 13.67C7.35 12.93 6.86 12.28 6.3 11.7C5.73 11.13 5.07 10.63 4.33 10.22C3.61 9.81 2.85 9.5 2.06 9.3C1.99 9.28 1.93 9.24 1.88 9.19C1.83 9.14 1.8 9.08 1.8 9C1.8 8.93 1.83 8.86 1.88 8.81C1.93 8.76 1.99 8.73 2.06 8.7C2.85 8.5 3.61 8.19 4.33 7.78C5.06 7.37 5.71 6.88 6.3 6.3C6.88 5.74 7.37 5.09 7.78 4.35C8.19 3.61 8.5 2.85 8.7 2.06C8.73 1.99 8.76 1.93 8.81 1.88C8.86 1.83 8.93 1.8 9 1.8C9.08 1.8 9.14 1.83 9.19 1.88C9.24 1.93 9.28 1.99 9.3 2.06C9.5 2.85 9.81 3.61 10.22 4.35C10.63 5.08 11.13 5.73 11.7 6.3C12.28 6.88 12.93 7.37 13.65 7.78C14.39 8.19 15.15 8.5 15.94 8.7C16.01 8.73 16.08 8.76 16.13 8.81C16.18 8.86 16.2 8.93 16.2 9C16.2 9.08 16.18 9.14 16.13 9.19C16.08 9.24 16.01 9.28 15.94 9.3C15.15 9.5 14.39 9.81 13.65 10.22C12.91 10.63 12.26 11.13 11.7 11.7C11.13 12.29 10.63 12.94 10.22 13.67C9.81 14.39 9.5 15.15 9.3 15.94C9.28 16.01 9.24 16.08 9.19 16.13C9.14 16.18 9.08 16.2 9 16.2Z" fill="currentColor" />
-      </g>
-      <defs>
-        <clipPath id="clip0_sparkle">
-          <rect width={18} height={18} fill="white" />
-        </clipPath>
-      </defs>
-    </svg>
-  );
-}
-
 export function ChevronDownIcon({ size = 12, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
@@ -217,26 +154,10 @@ export function ChevronDownIcon({ size = 12, className }: IconProps) {
   );
 }
 
-export function LiveModeIcon({ size = 20, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" height={size} viewBox="0 -960 960 960" width={size} fill="currentColor" className={className}>
-      <path d="M360-80v-720h80v720h-80Zm160-160v-400h80v400h-80Zm-320-80v-240h80v240h-80Zm480-40v-160h80v160h-80Zm60-200q0-75-52.5-127.5T560-740q75 0 127.5-52.5T740-920q0 75 52.5 127.5T920-740q-75 0-127.5 52.5T740-560ZM40-400v-80h80v80H40Z" />
-    </svg>
-  );
-}
-
 export function ArrowUpIcon({ size = 16, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
       <path d="M208.49,120.49a12,12,0,0,1-17,0L140,69V216a12,12,0,0,1-24,0V69L64.49,120.49a12,12,0,0,1-17-17l72-72a12,12,0,0,1,17,0l72,72A12,12,0,0,1,208.49,120.49Z" />
-    </svg>
-  );
-}
-
-export function DisplayIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M208,40H48A24,24,0,0,0,24,64V176a24,24,0,0,0,24,24H208a24,24,0,0,0,24-24V64A24,24,0,0,0,208,40Zm8,136a8,8,0,0,1-8,8H48a8,8,0,0,1-8-8V64a8,8,0,0,1,8-8H208a8,8,0,0,1,8,8Zm-48,48a8,8,0,0,1-8,8H96a8,8,0,0,1,0-16h64A8,8,0,0,1,168,224Z" />
     </svg>
   );
 }
@@ -281,30 +202,6 @@ export function BackIcon({ size = 16, className }: IconProps) {
   );
 }
 
-export function EditIcon({ size = 16, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z" />
-    </svg>
-  );
-}
-
-export function FontIcon({ size = 18, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M87.24,52.59a8,8,0,0,0-14.48,0l-64,136a8,8,0,1,0,14.48,6.81L39.9,160h80.2l16.66,35.4a8,8,0,1,0,14.48-6.81ZM47.43,144,80,74.79,112.57,144ZM200,96c-12.76,0-22.73,3.47-29.63,10.32a8,8,0,0,0,11.26,11.36c3.8-3.77,10-5.68,18.37-5.68,13.23,0,24,9,24,20v3.22A42.76,42.76,0,0,0,200,128c-22.06,0-40,16.15-40,36s17.94,36,40,36a42.73,42.73,0,0,0,24-7.25,8,8,0,0,0,16-.75V132C240,112.15,222.06,96,200,96Zm0,88c-13.23,0-24-9-24-20s10.77-20,24-20,24,9,24,20S213.23,184,200,184Z" />
-    </svg>
-  );
-}
-
-export function ChevronDownSmIcon({ size = 16, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80A8,8,0,0,1,53.66,90.34L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z" />
-    </svg>
-  );
-}
-
 export function FAQsIcon({ size = 16, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
@@ -325,14 +222,6 @@ export function FlySendIcon({ size = 16, className }: IconProps) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
       <path d="M227.32,28.68a16,16,0,0,0-15.66-4.08l-.15,0L19.57,82.84a16,16,0,0,0-2.49,29.8L102,154l41.3,84.87A15.86,15.86,0,0,0,157.74,248q.69,0,1.38-.06a15.88,15.88,0,0,0,14-11.51l58.2-191.94c0-.05,0-.1,0-.15A16,16,0,0,0,227.32,28.68ZM157.83,231.85l-.05.14,0-.07-40.06-82.3,48-48a8,8,0,0,0-11.31-11.31l-48,48L24.08,98.25l-.07,0,.14,0L216,40Z" />
-    </svg>
-  );
-}
-
-export function PrivacyIcon({ size = 16, className }: IconProps) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} fill="currentColor" viewBox="0 0 256 256" className={className}>
-      <path d="M208,40H48A16,16,0,0,0,32,56v56c0,52.72,25.52,84.67,46.93,102.19,23.06,18.86,46,25.26,47,25.53a8,8,0,0,0,4.2,0c1-.27,23.91-6.67,47-25.53C198.48,196.67,224,164.72,224,112V56A16,16,0,0,0,208,40Zm0,72c0,37.07-13.66,67.16-40.6,89.42A129.3,129.3,0,0,1,128,223.62a128.25,128.25,0,0,1-38.92-21.81C61.82,179.51,48,149.3,48,112l0-56,160,0ZM82.34,141.66a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35a8,8,0,0,1,11.32,11.32l-56,56a8,8,0,0,1-11.32,0Z" />
     </svg>
   );
 }

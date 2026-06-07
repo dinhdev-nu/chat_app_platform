@@ -3,12 +3,10 @@
 import { useEffect, useState, type CSSProperties } from "react";
 
 const words = ["trò chuyện", "làm việc", "chia sẻ", "gắn kết"];
+const gradientColors = ["#eca8d6", "#a78bfa", "#67e8f9", "#fbbf24", "#eca8d6"];
 
 function BlurWord({ word, trigger }: { word: string; trigger: number }) {
   const letters = word.split("");
-
-  // gradient colours cycling across letter positions
-  const gradientColors = ["#eca8d6", "#a78bfa", "#67e8f9", "#fbbf24", "#eca8d6"];
 
   return (
     <>

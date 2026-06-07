@@ -1,5 +1,4 @@
 import type { ContactUserResponse, SearchUser } from "@/types/user";
-import { ContactStatus } from "@/types/user";
 import {
   formatVietnamDate,
   formatVietnamTime,
@@ -7,7 +6,6 @@ import {
 } from "@/lib/chat-time-utils";
 
 export type { ContactUserResponse, SearchUser };
-export { ContactStatus };
 
 export const MOCK_CONTACT_USERS: ContactUserResponse[] = [
   {
@@ -62,7 +60,7 @@ export function formatContactPresence(contact: ContactUserResponse) {
   return formatContactLastSeen(contact.lastSeenAt);
 }
 
-export function formatContactLastSeen(value?: string | null) {
+function formatContactLastSeen(value?: string | null) {
   if (!value) return "Chưa cập nhật";
 
   const diffInDays = getVietnamDayDiffFromNow(value);

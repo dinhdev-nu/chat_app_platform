@@ -26,16 +26,10 @@ export interface ConversationListItem {
   isOnline: boolean;
 }
 
-export const CONVERSATION_TYPE_LABELS: Record<ConversationType, string> = {
+const CONVERSATION_TYPE_LABELS: Record<ConversationType, string> = {
   1: "DM",
   2: "Nhóm",
   3: "Kênh",
-};
-
-export const CONVERSATION_ROLE_LABELS: Record<ConversationRole, string> = {
-  1: "Chủ sở hữu",
-  2: "Quản trị",
-  3: "Thành viên",
 };
 
 export const MOCK_CONVERSATIONS: ConversationListItem[] = [
@@ -181,10 +175,6 @@ export const MOCK_CONVERSATIONS: ConversationListItem[] = [
 
 export function getConversationTypeLabel(type: ConversationType) {
   return CONVERSATION_TYPE_LABELS[type];
-}
-
-export function getConversationRoleLabel(role: ConversationRole) {
-  return CONVERSATION_ROLE_LABELS[role];
 }
 
 export function formatConversationActivity(value?: string) {

@@ -24,6 +24,11 @@ const hiddenInputClass =
 const iconButtonClass =
   "outline-none select-none focus-ring disabled:opacity-50 disabled:cursor-not-allowed p-2 flex items-center justify-center rounded-full size-7 bg-transparent hover:bg-[rgb(var(--backgroundColor-state-hover))] active:bg-[rgb(var(--backgroundColor-state-pressed))] data-[popup-open]:bg-[rgb(var(--backgroundColor-state-hover))] transition-colors cursor-pointer shrink-0";
 
+const MODEL_LABEL_MAP: Record<string, string> = {
+  "3-flash": "Nhanh",
+  code: "Mã hóa",
+};
+
 interface ChatInputProps {
   ariaLabel?: string;
   placeholder?: string;
@@ -59,11 +64,6 @@ export default function ChatInput({
   const modelButtonRef = useRef<HTMLButtonElement>(null);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [selectedModel, setSelectedModel] = useState("3-flash");
-
-  const modelLabelMap: Record<string, string> = {
-    "3-flash": "Nhanh",
-    "code": "Mã hóa",
-  };
 
   const trimmedText = inputText.trim();
   const canSend = Boolean(onSend && trimmedText && !isSending);
@@ -240,7 +240,7 @@ export default function ChatInput({
                   style={{ transform: "none" }}
                   onClick={() => setIsModelSelectorOpen((open) => !open)}
                 >
-                  <span className="whitespace-nowrap">{modelLabelMap[selectedModel]}</span>
+                  <span className="whitespace-nowrap">{MODEL_LABEL_MAP[selectedModel]}</span>
                   <ChevronDownIcon />
                 </button>
 
